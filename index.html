@@ -3,218 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Renee Brielle Angelo Duran | Operations & Marketing</title>
-    <!-- Modern Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome for Icons -->
+    <title>Renee Brielle Angelo Duran | Operations Manager | MBA & Civil Engineer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
         :root {
-            --primary: #0f172a; /* Deep Navy */
-            --accent: #3b82f6;  /* Professional Blue */
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --bg: #f8fafc;
             --text: #334155;
-            --light: #f8fafc;
+            --white: #ffffff;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; line-height: 1.6; color: var(--text); background-color: var(--light); }
-        
-        /* Navigation */
-        nav {
-            background: white;
-            padding: 1rem 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        .logo { font-weight: 700; color: var(--primary); font-size: 1.2rem; }
-        .nav-links a { margin-left: 20px; text-decoration: none; color: var(--text); font-weight: 500; font-size: 0.9rem; transition: 0.3s; }
-        .nav-links a:hover { color: var(--accent); }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
 
-        /* Hero Section */
-        header {
-            padding: 100px 5%;
-            background: white;
-            text-align: center;
-        }
-        .badge {
-            background: #dcfce7;
-            color: #166534;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            display: inline-block;
-            margin-bottom: 20px;
-        }
-        h1 { font-size: 3rem; color: var(--primary); margin-bottom: 10px; }
-        .subtitle { font-size: 1.2rem; color: #64748b; max-width: 700px; margin: 0 auto 30px; }
+        /* Nav */
+        nav { background: var(--white); padding: 1.2rem 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .logo { font-weight: 800; font-size: 1.2rem; color: var(--primary); letter-spacing: -1px; }
+        .nav-links a { text-decoration: none; color: var(--text); margin-left: 20px; font-weight: 500; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* Section Styling */
-        section { padding: 80px 5%; }
-        .section-title { font-size: 1.8rem; margin-bottom: 40px; color: var(--primary); border-left: 5px solid var(--accent); padding-left: 15px; }
+        /* Hero */
+        header { background: var(--white); padding: 120px 5% 80px; text-align: center; border-bottom: 1px solid #e2e8f0; }
+        .badge { background: #dcfce7; color: #166534; padding: 6px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: inline-block; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        h1 { font-size: 3.8rem; color: var(--primary); letter-spacing: -2px; line-height: 1; margin-bottom: 15px; }
+        .hero-title { font-size: 1.5rem; color: var(--accent); font-weight: 600; margin-bottom: 20px; }
+        .hero-desc { font-size: 1.2rem; max-width: 800px; margin: 0 auto 40px; color: #64748b; }
 
-        /* Work Experience Cards */
-        .experience-card {
-            background: white;
-            border-radius: 12px;
-            padding: 40px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-            transition: 0.3s;
-            border: 1px solid #e2e8f0;
-        }
-        .exp-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-        .exp-title h3 { font-size: 1.4rem; color: var(--primary); }
-        .company { color: var(--accent); font-weight: 600; font-size: 1.1rem; }
-        .date { color: #94a3b8; font-size: 0.9rem; }
-        
-        .highlight-box {
-            background: #eff6ff;
-            border-left: 4px solid var(--accent);
-            padding: 15px;
-            margin: 20px 0;
-            font-style: italic;
-        }
+        /* MBA & Engineering Section */
+        .academic-pills { display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; }
+        .pill { border: 2px solid var(--primary); padding: 10px 25px; border-radius: 50px; font-weight: 800; color: var(--primary); font-size: 0.9rem; }
+        .pill.mba { background: var(--primary); color: white; }
 
-        /* Skills/Tools Grid */
-        .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 20px; }
-        .skill-tag {
-            background: #f1f5f9;
-            padding: 5px 12px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            color: #475569;
-            display: inline-block;
-        }
+        /* Tools Section */
+        .tools-overview { background: var(--primary); color: white; padding: 60px 5%; text-align: center; }
+        .tools-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 1000px; margin: 30px auto 0; }
+        .tool-pill { background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 8px; font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.2); }
 
-        /* Footer */
-        footer { background: var(--primary); color: white; padding: 50px 5%; text-align: center; }
-        .social-links a { color: white; margin: 0 15px; font-size: 1.5rem; text-decoration: none; opacity: 0.8; }
-        .social-links a:hover { opacity: 1; color: var(--accent); }
+        /* Content Sections */
+        section { padding: 100px 5%; max-width: 1100px; margin: 0 auto; }
+        .section-title { font-size: 2.2rem; margin-bottom: 50px; color: var(--primary); display: flex; align-items: center; gap: 15px; letter-spacing: -1px; }
+        .section-title::after { content: ""; height: 2px; background: #e2e8f0; flex-grow: 1; }
+
+        .card { background: var(--white); border-radius: 16px; padding: 45px; margin-bottom: 40px; border: 1px solid #e2e8f0; position: relative; }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #f1f5f9; }
+        .role-info h3 { font-size: 1.6rem; color: var(--primary); margin-bottom: 5px; }
+        .company-name { color: var(--accent); font-weight: 700; font-size: 1.1rem; }
+        .meta { color: #94a3b8; font-size: 0.85rem; text-align: right; line-height: 1.4; }
+
+        .highlight { background: #f0f7ff; border-left: 5px solid var(--accent); padding: 25px; margin: 30px 0; border-radius: 4px; }
+        .highlight h4 { color: var(--accent); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
+        .highlight p { font-style: italic; font-size: 1.05rem; color: var(--primary); font-weight: 500; }
+
+        .tags-group { margin-top: 30px; }
+        .tags-label { font-size: 0.75rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; display: block; margin-bottom: 12px; letter-spacing: 1px; }
+        .tag { background: #f1f5f9; color: #475569; padding: 5px 14px; border-radius: 6px; font-size: 0.8rem; margin: 0 6px 6px 0; display: inline-block; font-weight: 600; }
+
+        /* Resume Styling */
+        .resume-container { background: #f1f5f9; padding: 60px; border-radius: 24px; text-align: center; border: 2px dashed #cbd5e1; }
+        .resume-img { max-width: 100%; box-shadow: 0 30px 60px -12px rgba(0,0,0,0.25); border-radius: 4px; transition: 0.4s; }
+        .resume-img:hover { transform: translateY(-10px); }
+
+        footer { background: var(--white); padding: 80px 5%; text-align: center; border-top: 1px solid #e2e8f0; }
+        .contact-btn { background: var(--accent); color: white; padding: 20px 45px; border-radius: 12px; text-decoration: none; font-weight: 700; display: inline-block; margin-top: 25px; font-size: 1.1rem; }
 
         @media (max-width: 768px) {
-            h1 { font-size: 2.2rem; }
-            .exp-header { flex-direction: column; }
-            .date { margin-top: 5px; }
+            h1 { font-size: 2.8rem; }
+            .card-header { flex-direction: column; }
+            .meta { text-align: left; margin-top: 15px; }
+            .academic-pills { flex-direction: column; align-items: center; }
         }
     </style>
 </head>
 <body>
 
     <nav>
-        <div class="logo">RENEENGINEER</div>
+        <div class="logo">RENE DURAN</div>
         <div class="nav-links">
-            <a href="#home">Home</a>
-            <a href="#work">Work Experiences</a>
-            <a href="#contact">Contact</a>
+            <a href="#home">Intro</a>
+            <a href="#work">Experience</a>
+            <a href="#resume">Resume</a>
+            <a href="#contact">Hire Me</a>
         </div>
     </nav>
 
     <header id="home">
-        <span class="badge"><i class="fa fa-dot-circle"></i> Available for Fractional Work</span>
+        <span class="badge"><i class="fa fa-circle-check"></i> Available for Fractional Work</span>
         <h1>Renee Brielle Angelo Duran</h1>
-        <p class="subtitle">Operations Manager & E-Commerce Specialist specializing in scaling technical infrastructure, optimizing CRO, and automating workflows.</p>
-        <div class="social-links">
-            <a href="#"><i class="fab fa-linkedin"></i></a>
-            <a href="#"><i class="fab fa-github"></i></a>
-            <a href="mailto:ReneengineerServices@gmail.com"><i class="fa fa-envelope"></i></a>
+        <div class="hero-title">Operations Manager & Marketing Strategist</div>
+        
+        <div class="academic-pills">
+            <div class="pill mba">MBA - MASTER OF BUSINESS ADMINISTRATION</div>
+            <div class="pill">BS CIVIL ENGINEERING</div>
+        </div>
+
+        <p class="hero-desc">Applying engineering-grade precision to business operations and scalable marketing systems. From structural logic to conversion optimization.</p>
+        
+        <div class="nav-links">
+            <a href="https://linkedin.com/in/YOUR_PROFILE" target="_blank"><i class="fab fa-linkedin fa-2x"></i></a>
+            <a href="mailto:ReneengineerServices@gmail.com"><i class="fa fa-envelope fa-2x"></i></a>
         </div>
     </header>
 
+    <div class="tools-overview">
+        <h3>The Technical Stack</h3>
+        <div class="tools-grid">
+            <span class="tool-pill">HubSpot</span> <span class="tool-pill">Zapier</span> <span class="tool-pill">Shopify</span>
+            <span class="tool-pill">Amazon Seller Central</span> <span class="tool-pill">Claude AI</span> <span class="tool-pill">ActiveCampaign</span>
+            <span class="tool-pill">Wordpress</span> <span class="tool-pill">Google Analytics</span> <span class="tool-pill">Photoshop</span>
+            <span class="tool-pill">Freshdesk</span> <span class="tool-pill">WooCommerce</span> <span class="tool-pill">ActiveCampaign</span>
+            <span class="tool-pill">SurveyMonkey</span> <span class="tool-pill">Canva</span>
+        </div>
+    </div>
+
     <section id="work">
-        <h2 class="section-title">Work Experiences</h2>
+        <h2 class="section-title">Professional Experience</h2>
 
-        <!-- Experience 1 -->
-        <div class="experience-card">
-            <div class="exp-header">
-                <div class="exp-title">
+        <!-- RPM US -->
+        <div class="card">
+            <div class="card-header">
+                <div class="role-info">
                     <h3>Operations Manager</h3>
-                    <div class="company">Remote Patient Monitoring US</div>
+                    <div class="company-name">Remote Patient Monitoring US</div>
                 </div>
-                <div class="date">Since Jun 2020 (Remote, US)</div>
+                <div class="meta">
+                    <div>Jun 2020 — Jun 2024</div>
+                    <div>United States (Remote)</div>
+                </div>
             </div>
-            <p>Served as the CEO’s right hand, building marketing infrastructure from the ground up. Managed the full tech stack to drive lead engagement and combined creative content production with technical operations.</p>
-            <div class="highlight-box">
-                "Systematized the company's workflows by creating comprehensive SOPs, turning ad-hoc marketing tasks into repeatable, efficient processes."
+            <p>CEO’s right hand, architecting marketing infrastructure from the ground up. Bridging creative production with technical operations to execute scalable campaigns.</p>
+            
+            <div class="highlight">
+                <h4>Operational Impact</h4>
+                <p>"Systematized the company's workflows by creating comprehensive SOPs, turning ad-hoc marketing tasks into repeatable, efficient processes."</p>
             </div>
-            <strong>Tools & Skills:</strong>
-            <div class="skills-grid">
-                <span class="skill-tag">HubSpot</span>
-                <span class="skill-tag">Zapier</span>
-                <span class="skill-tag">ActiveCampaign</span>
-                <span class="skill-tag">Claude/AI</span>
-                <span class="skill-tag">Workflow Automation</span>
-                <span class="skill-tag">CRM Admin</span>
-                <span class="skill-tag">SOP Creation</span>
+
+            <div class="tags-group">
+                <span class="tags-label">Systems & Tools</span>
+                <span class="tag">HubSpot</span> <span class="tag">Zapier</span> <span class="tag">ActiveCampaign</span> <span class="tag">Freshdesk</span> <span class="tag">Claude</span> <span class="tag">Wordpress</span> <span class="tag">Google Analytics</span>
+            </div>
+            <div class="tags-group">
+                <span class="tags-label">Expertise</span>
+                <span class="tag">Automation</span> <span class="tag">CRM Administration</span> <span class="tag">Project Management</span> <span class="tag">Content Analytics</span>
             </div>
         </div>
 
-        <!-- Experience 2 -->
-        <div class="experience-card">
-            <div class="exp-header">
-                <div class="exp-title">
+        <!-- Care Coach -->
+        <div class="card">
+            <div class="card-header">
+                <div class="role-info">
                     <h3>Health Advocate</h3>
-                    <div class="company">Care Coach</div>
+                    <div class="company-name">Care Coach</div>
                 </div>
-                <div class="date">Nov 2019 - Jun 2020 (Remote, US)</div>
+                <div class="meta">
+                    <div>Nov 2019 — Jun 2020</div>
+                    <div>United States (Remote)</div>
+                </div>
             </div>
-            <p>Managed high-volume user engagement using proprietary conversational technology. Delivered top-tier performance in patient relationships across bilingual (English/Spanish) demographics.</p>
-            <div class="highlight-box">
-                "Consistently ranked as a top performer for user response times and engagement quality."
+            <p>Optimized user engagement and retention strategies using proprietary conversational AI tech. Managed bilingual patient relationships with a focus on platform 'stickiness'.</p>
+            
+            <div class="highlight">
+                <h4>Performance Highlight</h4>
+                <p>"Consistently ranked as a top performer for user response times and engagement quality across AMER demographics."</p>
             </div>
-            <strong>Tools & Skills:</strong>
-            <div class="skills-grid">
-                <span class="skill-tag">Chatbots</span>
-                <span class="skill-tag">Consumer Psychology</span>
-                <span class="skill-tag">Bilingual Support</span>
-                <span class="skill-tag">Healthcare Tech</span>
-                <span class="skill-tag">Excel/Sheets</span>
+
+            <div class="tags-group">
+                <span class="tags-label">Core Competencies</span>
+                <span class="tag">Consumer Psychology</span> <span class="tag">AI Chatbots</span> <span class="tag">Bilingual Communication</span> <span class="tag">User Satisfaction</span>
             </div>
         </div>
 
-        <!-- Experience 3 -->
-        <div class="experience-card">
-            <div class="exp-header">
-                <div class="exp-title">
+        <!-- ALT Shift Ctrl -->
+        <div class="card">
+            <div class="card-header">
+                <div class="role-info">
                     <h3>E-Commerce Marketing Specialist</h3>
-                    <div class="company">ALT Shift Ctrl</div>
+                    <div class="company-name">ALT Shift Ctrl</div>
                 </div>
-                <div class="date">Mar 2018 - Dec 2018 (Remote, Israel)</div>
+                <div class="meta">
+                    <div>Mar 2018 — Dec 2018</div>
+                    <div>Israel (Remote)</div>
+                </div>
             </div>
-            <p>Managed end-to-end product listing strategies on Amazon, Shopify, and eBay. Focused on Conversion Rate Optimization (CRO) by combining SEO-driven copywriting with visual merchandising.</p>
-            <div class="highlight-box">
-                "Sourced a product at $5 and marketed it at $100 (1,900% ROI) with high sales volume."
+            <p>Directed end-to-end product listing and visual merchandising for Amazon, Shopify, and eBay. Specialized in Conversion Rate Optimization (CRO) through SEO-driven storytelling.</p>
+            
+            <div class="highlight">
+                <h4>E-Commerce Win</h4>
+                <p>"Strategized a creative positioning that transformed a $5 sourced product into a $100 high-volume seller (1,900% ROI)."</p>
             </div>
-            <strong>Tools & Skills:</strong>
-            <div class="skills-grid">
-                <span class="skill-tag">Amazon SEO</span>
-                <span class="skill-tag">Shopify</span>
-                <span class="skill-tag">Product Positioning</span>
-                <span class="skill-tag">CRO</span>
-                <span class="skill-tag">Market Research</span>
-                <span class="skill-tag">Copywriting</span>
+
+            <div class="tags-group">
+                <span class="tags-label">Platforms</span>
+                <span class="tag">Amazon Seller Central</span> <span class="tag">Amazon DSP</span> <span class="tag">Shopify</span> <span class="tag">WooCommerce</span> <span class="tag">Marketplace SEO</span>
             </div>
         </div>
     </section>
 
-    <section id="contact" style="background: white; text-align: center;">
-        <h2 class="section-title" style="border:none; padding:0;">Get In Touch</h2>
-        <p>Looking for an Operations Manager or E-Commerce expert?</p>
-        <br>
-        <a href="mailto:ReneengineerServices@gmail.com" style="background: var(--accent); color: white; padding: 15px 30px; border-radius: 8px; text-decoration: none; font-weight: 600;">Contact Renee</a>
+    <!-- Resume Section -->
+    <section id="resume">
+        <h2 class="section-title">Credentials & CV</h2>
+        <div class="resume-container">
+            <!-- Ensure your image is named resume.jpg inside your images folder -->
+            <img src="images/resume.jpg" alt="Renee Duran MBA CE Resume" class="resume-img">
+            <p style="margin-top: 30px; font-weight: 600; color: #64748b;">MBA & Civil Engineering Portfolio</p>
+        </div>
     </section>
 
-    <footer>
-        <p>&copy; 2026 Renee Brielle Angelo Duran. Built with passion.</p>
-        <div class="social-links" style="margin-top: 20px;">
-            <a href="#"><i class="fab fa-linkedin"></i></a>
-            <a href="#"><i class="fab fa-github"></i></a>
+    <footer id="contact">
+        <h2>Strategic operations at scale.</h2>
+        <p>I am currently available for fractional or full-time strategic roles.</p>
+        <a href="mailto:ReneengineerServices@gmail.com" class="contact-btn">Get In Touch</a>
+        <div style="margin-top: 50px; color: #94a3b8; font-size: 0.8rem;">
+            &copy; 2026 Renee Brielle Angelo Duran. All rights reserved.
         </div>
     </footer>
 
