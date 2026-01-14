@@ -3,221 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Renee Brielle Angelo Duran | Strategic Operations Lead</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Poppins:wght@700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>RENEENGINEER | Operations & Strategy Lead</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --bg-dark: #020617;
-            --card-bg: #1e293b;
-            --accent-blue: #3b82f6;
-            --accent-green: #10b981;
-            --text-main: #f8fafc;
-            --text-dim: #94a3b8;
+            --bg: #000000;
+            --card-bg: #1c1c1e;
+            --card-border: rgba(255, 255, 255, 0.1);
+            --accent: #0071e3; /* Apple Blue */
+            --text-main: #f5f5f7;
+            --text-dim: #86868b;
+            --glass: rgba(0, 0, 0, 0.7);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text-main); line-height: 1.6; overflow-x: hidden; }
+        body { 
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; 
+            background: var(--bg); 
+            color: var(--text-main); 
+            line-height: 1.5; 
+            overflow-x: hidden;
+        }
 
-        /* Navigation */
-        nav { background: rgba(2, 6, 23, 0.95); backdrop-filter: blur(12px); padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .logo { font-family: 'Poppins', sans-serif; font-weight: 900; font-size: 1.2rem; color: #fff; }
-        .logo span { color: var(--accent-blue); }
-        .nav-links a { text-decoration: none; color: var(--text-dim); margin-left: 20px; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; transition: 0.3s; }
+        /* Nav */
+        nav {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            background: var(--glass); backdrop-filter: saturate(180%) blur(20px);
+            border-bottom: 1px solid var(--card-border);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.8rem 5%;
+        }
+        .logo { font-weight: 800; font-size: 1.1rem; letter-spacing: -0.5px; text-transform: uppercase; }
+        .logo span { color: var(--accent); }
 
         /* Hero */
-        header { padding: 80px 5% 60px; text-align: center; }
-        .profile-img { width: 160px; height: 160px; border-radius: 50%; object-fit: cover; border: 4px solid var(--accent-blue); margin-bottom: 20px; }
-        h1 { font-family: 'Poppins', sans-serif; font-size: clamp(2.5rem, 7vw, 4rem); line-height: 1.1; margin-bottom: 10px; background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-        .hero-title { font-size: 1.2rem; color: var(--accent-blue); font-weight: 700; letter-spacing: 2px; margin-bottom: 30px; }
+        header {
+            height: 90vh; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; text-align: center;
+            padding: 0 5%;
+        }
+        .hero-mba { color: var(--accent); font-weight: 700; font-size: 1.1rem; margin-bottom: 10px; display: block; }
+        h1 { font-size: clamp(2.5rem, 8vw, 4.5rem); font-weight: 800; letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 20px; }
+        .hero-sub { color: var(--text-dim); max-width: 600px; font-size: 1.2rem; margin-bottom: 30px; }
 
-        /* Experience Section */
-        section { padding: 60px 5%; max-width: 1000px; margin: 0 auto; }
-        .section-tag { color: var(--accent-blue); font-weight: 800; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 3px; display: block; margin-bottom: 10px; }
-        .section-title { font-family: 'Poppins', sans-serif; font-size: 2.2rem; margin-bottom: 40px; }
-
-        .exp-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 35px; border-radius: 20px; margin-bottom: 30px; }
-        .exp-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; }
-        .exp-header h3 { font-size: 1.4rem; color: #fff; }
-        .company { color: var(--accent-blue); font-weight: 700; font-size: 1.1rem; }
-        .date-label { color: var(--text-dim); font-size: 0.85rem; font-weight: 600; }
+        /* Bento Grid */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 5% 100px; }
         
-        .exp-list { list-style: none; }
-        .exp-list li { position: relative; padding-left: 25px; margin-bottom: 12px; color: #cbd5e1; font-size: 0.95rem; }
-        .exp-list li::before { content: "✓"; position: absolute; left: 0; color: var(--accent-green); font-weight: 900; }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            grid-auto-rows: minmax(160px, auto);
+            gap: 20px;
+        }
 
-        /* Device Mockups */
-        .mockup-wrapper { display: flex; justify-content: center; align-items: flex-end; gap: 40px; margin: 50px 0; flex-wrap: wrap; }
-        
-        /* iPhone CSS */
-        .iphone { width: 200px; height: 400px; background: #000; border: 8px solid #334155; border-radius: 30px; position: relative; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .iphone-notch { width: 100px; height: 20px; background: #000; position: absolute; top: 0; left: 50%; transform: translateX(-50%); border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; z-index: 10; }
-        
-        /* MacBook CSS */
-        .macbook { width: 450px; height: 280px; background: #111827; border: 12px solid #334155; border-radius: 15px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .macbook::after { content: ""; width: 110%; height: 10px; background: #475569; position: absolute; bottom: -20px; left: -5%; border-radius: 5px; }
-        
-        .screen-content { width: 100%; height: 100%; object-fit: cover; display: flex; align-items: center; justify-content: center; text-align: center; color: var(--text-dim); font-size: 0.7rem; font-weight: 700; background: #0f172a; }
+        .bento-item {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 28px;
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.3s ease;
+            transform-style: preserve-3d;
+        }
 
-        /* Resume Styling */
-        .resume-section { text-align: center; background: rgba(255,255,255,0.01); padding: 80px 5%; }
-        .resume-img { width: 100%; max-width: 800px; margin: 0 auto; display: block; border-radius: 8px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        /* Hierarchy Setup */
+        .item-main-strategy { grid-column: span 8; grid-row: span 2; } /* MBA & Ops First */
+        .item-software { grid-column: span 4; grid-row: span 3; background: linear-gradient(145deg, #1c1c1e 0%, #0a0a0a 100%); }
+        .item-cloud { grid-column: span 4; grid-row: span 2; }
+        .item-navy { grid-column: span 4; grid-row: span 2; }
+        .item-edu { grid-column: span 4; grid-row: span 1; display: flex; align-items: center; gap: 15px; }
 
-        /* Testimonials */
-        .testimonial-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .test-card { background: rgba(59, 130, 246, 0.05); padding: 30px; border-radius: 15px; border: 1px solid rgba(59, 130, 246, 0.1); font-style: italic; font-size: 0.95rem; }
+        /* Content Styling */
+        h2 { font-size: 1.8rem; margin-bottom: 12px; font-weight: 700; letter-spacing: -0.02em; }
+        .tag { font-size: 0.7rem; font-weight: 700; color: var(--accent); text-transform: uppercase; margin-bottom: 8px; display: block; }
+        p { color: var(--text-dim); font-size: 1rem; }
 
-        .cta-btn { background: var(--accent-blue); color: #fff; padding: 18px 35px; border-radius: 12px; text-decoration: none; font-weight: 800; display: inline-block; margin-top: 20px; }
+        /* Software/Dashboard Box */
+        .dashboard-preview {
+            margin-top: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            width: 110%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
 
-        @media (max-width: 768px) {
-            .exp-header { flex-direction: column; }
-            .macbook { width: 90%; height: 200px; }
+        /* Skill Pills */
+        .skill-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
+        .skill-pill { background: rgba(255,255,255,0.05); padding: 5px 12px; border-radius: 100px; font-size: 0.8rem; border: 1px solid var(--card-border); }
+
+        /* Fade Animation */
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 1s cubic-bezier(0.22, 1, 0.36, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* Buttons */
+        .btn {
+            background: var(--text-main); color: var(--bg);
+            padding: 14px 28px; border-radius: 100px; text-decoration: none;
+            font-weight: 700; transition: 0.3s; display: inline-block;
+        }
+        .btn:hover { transform: scale(1.05); }
+
+        /* Mobile */
+        @media (max-width: 900px) {
+            .bento-grid { display: flex; flex-direction: column; }
+            h1 { font-size: 3rem; }
         }
     </style>
 </head>
 <body>
 
     <nav>
-        <div class="logo">RENEENGINEER</span></div>
-        <div class="nav-links">
-            <a href="#work">Experience</a>
-            <a href="#software">Software</a>
-            <a href="#resume">CV</a>
-            <a href="#contact">Contact</a>
-        </div>
+        <div class="logo">RENEE<span>ENGINEER</span></div>
+        <a href="mailto:ReneengineerServices@gmail.com" style="color: var(--text-main); text-decoration: none; font-size: 0.9rem; font-weight: 600;">Let's Talk</a>
     </nav>
 
-    <header id="home">
-        <!-- UPLOAD YOUR PHOTO AS headshot.jpg IN THE images/ FOLDER -->
-        <img src="images/headshot.jpg" alt="Renee Duran Headshot" class="profile-img">
-        <br>
-        <span class="hero-tag" style="color:var(--accent-green); font-weight:800; font-size:0.8rem;">MBA & CIVIL ENGINEER</span>
-        <h1>Structural Strategy. <br> Operational Excellence.</h1>
-        <p style="color: var(--text-dim); max-width: 700px; margin: 20px auto;">Applying engineering precision to scale remote operations and healthcare technology ecosystems.</p>
-        
-        <div class="nav-links">
-            <a href="https://www.linkedin.com/in/reneengineer/" target="_blank"><i class="fab fa-linkedin fa-2x"></i></a>
-            <a href="mailto:ReneengineerServices@gmail.com"><i class="fa fa-envelope fa-2x"></i></a>
-        </div>
+    <header>
+        <span class="hero-mba reveal">MBA STRATEGIST & CIVIL ENGINEER</span>
+        <h1 class="reveal">Optimizing Operations <br>with Technical Logic.</h1>
+        <p class="hero-sub reveal">I build the architectural systems that allow businesses to scale, combining high-level business strategy with engineering execution.</p>
+        <a href="#work" class="btn reveal">Explore Systems</a>
     </header>
 
-    <section id="software">
-        <span class="section-tag">Proprietary Development</span>
-        <h2 class="section-title">Custom Logistics Ecosystem</h2>
-        <p style="color:var(--text-dim)">Built a custom inventory and ERP solution using Glide and Apps Script when off-the-shelf tools failed to meet clinical compliance requirements.</p>
-        
-        <div class="mockup-wrapper">
-            <!-- iPhone Mockup -->
-            <div class="iphone">
-                <div class="iphone-notch"></div>
-                <!-- TO CHANGE THE IMAGE: Replace the <div> below with: <img src="images/app.jpg" class="screen-content"> -->
-                <img src="images/app.jpg" class="screen-content">
+    <div class="container" id="work">
+        <div class="bento-grid">
+            
+            <!-- 1. MBA & STRATEGY (Priority #1) -->
+            <div class="bento-item item-main-strategy reveal">
+                <span class="tag">Strategic Leadership</span>
+                <h2>Operations Manager</h2>
+                <p>Driving 100% KPI adherence for a 30+ member remote workforce. I translate complex business goals into repeatable, technical workflows.</p>
+                <div class="skill-group">
+                    <div class="skill-pill">Resource Planning</div>
+                    <div class="skill-pill">Supply Chain Optimization</div>
+                    <div class="skill-pill">KPI Engineering</div>
+                </div>
             </div>
 
-            <!-- MacBook Mockup -->
-            <div class="macbook">
-                <!-- TO CHANGE THE IMAGE: Replace the <div> below with: <img src="images/dashboard.jpg" class="screen-content"> -->
-                <img src="images/dashboard.jpg" class="screen-content">
+            <!-- 2. SOFTWARE (Glide/App Script) -->
+            <div class="bento-item item-software reveal">
+                <span class="tag">Custom Software</span>
+                <h2>Low-Code Systems</h2>
+                <p>Architected a proprietary inventory tracking app in Glide & Google Apps Script.</p>
+                <img src="dashboard.jpg" alt="Dashboard" class="dashboard-preview">
             </div>
-        </div>
-    </section>
 
-    <section id="work">
-        <span class="section-tag">Career Trajectory</span>
-        <h2 class="section-title">Professional Experience</h2>
-
-        <!-- RPM LOGIX -->
-        <div class="exp-card">
-            <div class="exp-header">
-                <div><span class="company">RPM Logix</span><h3>Operations Manager</h3></div>
-                <div class="date-label">2020 — Present</div>
+            <!-- 3. GOOGLE CLOUD / DEV -->
+            <div class="bento-item item-cloud reveal">
+                <span class="tag">DevOps & Maintenance</span>
+                <h2>Cloud Management</h2>
+                <p>Managed Google Cloud source code and maintained web app integrity for enterprise-scale operations.</p>
+                <div class="skill-group">
+                    <div class="skill-pill">Google Cloud</div>
+                    <div class="skill-pill">Version Control</div>
+                    <div class="skill-pill">Apps Script</div>
+                </div>
             </div>
-            <ul class="exp-list">
-                <li><strong>Remote Workforce Engineering:</strong> Directed a 30+ member remote team, architecting workflows that ensured 100% adherence to rigorous client KPIs and clinical standards.</li>
-                <li><strong>Medical Device Lifecycle Management:</strong> Optimized end-to-end inventory tracking—from global procurement and IMEI assignment to partner clinic allocation.</li>
-                <li><strong>Supply Chain Optimization:</strong> Coordinated with cross-functional leadership to align supply forecasting with deployment, reducing hardware idle time.</li>
-                <li><strong>Systematized Operations:</strong> Designed and enforced comprehensive SOPs, turning ad-hoc marketing and logistics tasks into repeatable, scalable processes.</li>
-                <li><strong>Performance Quality Assurance:</strong> Executed data-driven onboarding and performance evaluations, maintaining top-tier service quality across the board.</li>
-            </ul>
-        </div>
 
-        <!-- CARE COACH -->
-        <div class="exp-card">
-            <div class="exp-header">
-                <div><span class="company">Care Coach</span><h3>Health Advocate II</h3></div>
-                <div class="date-label">2019</div>
+            <!-- 4. NAVY / ENGINEERING -->
+            <div class="bento-item item-navy reveal">
+                <span class="tag">Technical Foundation</span>
+                <h2>Engineering Brigade</h2>
+                <p>Philippine Navy leadership. Directed multidisciplinary units in high-stakes environments with zero safety incidents.</p>
             </div>
-            <ul class="exp-list">
-                <li><strong>Engagement Strategy:</strong> Leveraged proprietary telehealth technology to guide patients through clinical care plans, directly improving patient adherence rates.</li>
-                <li><strong>Proactive Intervention:</strong> Monitored high-volume behavioral data to provide rapid interventions, resulting in enhanced patient wellness outcomes.</li>
-            </ul>
-        </div>
 
-        <!-- NAVY -->
-        <div class="exp-card">
-            <div class="exp-header">
-                <div><span class="company">Philippine Navy</span><h3>Engineering Brigade</h3></div>
-                <div class="date-label">2019</div>
+            <!-- 5. QUICK EDU PILLS -->
+            <div class="bento-item item-edu reveal">
+                <i class="fa fa-graduation-cap var(--accent)"></i>
+                <div>
+                    <h3 style="font-size: 1rem;">MBA Candidate</h3>
+                    <p style="font-size: 0.8rem;">Letran '25</p>
+                </div>
             </div>
-            <ul class="exp-list">
-                <li><strong>Technical Leadership:</strong> Directed multidisciplinary units in high-stakes environments, ensuring total compliance with rigid military regulatory standards.</li>
-                <li><strong>Infrastructure Delivery:</strong> Led large-scale planning and execution of infrastructure projects, maintaining zero safety incidents and strict adherence to timelines.</li>
-            </ul>
-        </div>
 
-        <!-- ECOMMERCE -->
-        <div class="exp-card">
-            <div class="exp-header">
-                <div><span class="company">ALT Shift Ctrl</span><h3>eCommerce Specialist</h3></div>
-                <div class="date-label">2018</div>
+            <div class="bento-item item-edu reveal">
+                <i class="fa fa-hard-hat var(--accent)"></i>
+                <div>
+                    <h3 style="font-size: 1rem;">BS Civil Engineering</h3>
+                    <p style="font-size: 0.8rem;">TUP '20</p>
+                </div>
             </div>
-            <ul class="exp-list">
-                <li><strong>Storefront Optimization:</strong> Scaled digital storefront performance by optimizing fulfillment accuracy and visual merchandising strategies.</li>
-                <li><strong>Logistics Engineering:</strong> Identified and resolved supply chain bottlenecks through rigorous data analysis, increasing overall order management efficiency.</li>
-            </ul>
-        </div>
 
-        <!-- BLAH THERAPY -->
-        <div class="exp-card">
-            <div class="exp-header">
-                <div><span class="company">Blah Therapy</span><h3>Community Management</h3></div>
-                <div class="date-label">2015 — Present</div>
-            </div>
-            <ul class="exp-list">
-                <li><strong>Crisis Communication:</strong> Utilized advanced de-escalation and interpersonal skills to maintain safe, respectful environments in high-volume virtual communities.</li>
-            </ul>
         </div>
-    </section>
+    </div>
 
-    <section id="testimonials">
-        <span class="section-tag">Validation</span>
-        <h2 class="section-title">Endorsements</h2>
-        <div class="testimonial-grid">
-            <div class="test-card">"You don't even know how much you helped me man!"</div>
-            <div class="test-card">"Great job using your engineering Brain."</div>
-            <div class="test-card">"I didn't even know you can do it that way."</div>
-        </div>
-    </section>
-
-    <section id="resume" class="resume-section">
-        <span class="section-tag">Full Credentials</span>
-        <h2 class="section-title">The Curriculum Vitae</h2>
-        <img src="images/resume.jpg" alt="Renee Duran MBA Resume" class="resume-img">
-        <br><br>
-        <a href="images/resume.pdf" download class="cta-btn" style="background: var(--accent-green);">
-            <i class="fa fa-file-pdf"></i> Download PDF Version
-        </a>
-    </section>
-
-    <footer id="contact">
-        <h2 style="font-family:'Poppins'; font-size:2.5rem; margin-bottom:20px;">Ready for Strategic Scale?</h2>
-        <a href="mailto:ReneengineerServices@gmail.com" class="cta-btn">Initialize Consultation</a>
-        <div style="margin-top:60px; font-size:0.7rem; color:#475569; letter-spacing:2px; text-transform:uppercase;">
-            &copy; 2026 RENEENGINEER | ENGINEERED FOR GROWTH
-        </div>
+    <footer style="padding: 100px 5%; text-align: center; background: #050505;">
+        <h2 style="font-size: 3rem;">Ready to automate?</h2>
+        <p style="margin-bottom: 40px; color: var(--text-dim);">Engineering growth, one process at a time.</p>
+        <a href="mailto:ReneengineerServices@gmail.com" class="btn" style="background: var(--accent); color: white;">Initialize Consultation</a>
     </footer>
 
+    <script>
+        // 1. Slow Fade-In Animation
+        const observerOptions = { threshold: 0.1 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // 2. 3D Tilt Effect
+        const cards = document.querySelectorAll('.bento-item');
+        cards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = (y - centerY) / 20;
+                const rotateY = (centerX - x) / 20;
+                
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+            });
+        });
+    </script>
 </body>
 </html>
