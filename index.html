@@ -16,9 +16,22 @@
             --text-main: #f5f5f7;
             --text-dim: #86868b;
             --glass: rgba(0, 0, 0, 0.8);
+            --aura-opacity: 0.15;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        /* Light Mode Variables */
+        body.light-mode {
+            --bg: #f5f5f7;
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --card-border: rgba(0, 0, 0, 0.1);
+            --accent: #0071e3;
+            --text-main: #1d1d1f;
+            --text-dim: #6e6e73;
+            --glass: rgba(245, 245, 247, 0.8);
+            --aura-opacity: 0.05;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.3s ease, color 0.3s ease; }
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
             background: var(--bg); 
@@ -28,14 +41,12 @@
             font-weight: 300;
         }
 
-        /* Mouse Aura Background */
         #aura {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(600px circle at var(--x) var(--y), rgba(0, 113, 227, 0.15), transparent 80%);
-            z-index: -1; pointer-events: none; transition: background 0.1s ease;
+            background: radial-gradient(600px circle at var(--x) var(--y), rgba(0, 113, 227, var(--aura-opacity)), transparent 80%);
+            z-index: -1; pointer-events: none;
         }
 
-        /* Navigation */
         nav {
             position: fixed; top: 0; width: 100%; z-index: 1000;
             background: var(--glass); backdrop-filter: saturate(180%) blur(20px);
@@ -46,7 +57,6 @@
         .logo { font-weight: 700; font-size: 1rem; letter-spacing: 1px; }
         .logo span { color: var(--accent); font-weight: 300; }
 
-        /* Hero - Layout A (Side by Side) */
         header {
             min-height: 100vh; display: flex; align-items: center; justify-content: center;
             padding: 100px 10%; gap: 60px;
@@ -55,7 +65,7 @@
         .hero-img { 
             width: 400px; height: 500px; object-fit: cover; 
             border-radius: 40px; border: 1px solid var(--card-border);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
         }
         .hero-text { flex: 1.2; }
         .hero-text h1 { 
@@ -64,84 +74,97 @@
         }
         .hero-text b { font-weight: 600; color: var(--accent); }
         .hero-stats { display: flex; gap: 30px; margin-top: 40px; }
-        .stat-item b { display: block; font-size: 1.5rem; color: #fff; }
+        .stat-item b { display: block; font-size: 1.5rem; color: var(--text-main); }
         .stat-item span { color: var(--text-dim); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* Bento Grid */
-        .section-title { padding: 80px 10% 40px; font-size: 2rem; font-weight: 300; }
-        .container { max-width: 1400px; margin: 0 auto; padding: 0 5%; }
-        
+        /* Perfect Rectangle Bento Grid */
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 5% 100px; }
         .bento-grid {
             display: grid; grid-template-columns: repeat(12, 1fr);
-            grid-auto-rows: 200px; gap: 20px;
+            grid-auto-rows: 220px; gap: 20px;
         }
         .bento-item {
             background: var(--card-bg); border: 1px solid var(--card-border);
             border-radius: 30px; padding: 40px; overflow: hidden;
-            backdrop-filter: blur(10px); transition: 0.4s ease;
+            backdrop-filter: blur(10px); transition: transform 0.4s ease, border 0.3s ease;
         }
-        .item-lg { grid-column: span 8; grid-row: span 2; }
-        .item-md { grid-column: span 4; grid-row: span 2; }
-        .item-sm { grid-column: span 4; grid-row: span 1; }
 
-        /* Interactive Experience Tabs */
+        .item-exp { grid-column: span 8; grid-row: span 2; }
+        .item-soft { grid-column: span 4; grid-row: span 2; }
+        .item-resume { grid-column: span 4; grid-row: span 1; }
+        .item-skills { grid-column: span 4; grid-row: span 1; }
+        .item-social { grid-column: span 4; grid-row: span 1; }
+
+        /* Social Grid Styling */
+        .social-links { display: flex; flex-direction: column; height: 100%; justify-content: center; gap: 12px; }
+        .social-row { display: flex; align-items: center; gap: 15px; text-decoration: none; color: var(--text-dim); font-size: 0.9rem; transition: 0.3s; }
+        .social-row i { font-size: 1.2rem; color: var(--accent); width: 25px; text-align: center; }
+        .social-row:hover { color: var(--text-main); transform: translateX(5px); }
+
+        /* Tabs */
         .exp-container { display: flex; gap: 40px; margin-top: 20px; }
-        .exp-tabs { display: flex; flex-direction: column; gap: 10px; min-width: 200px; }
+        .exp-tabs { display: flex; flex-direction: column; gap: 8px; min-width: 180px; }
         .tab-btn {
             background: none; border: none; color: var(--text-dim);
-            text-align: left; padding: 12px; cursor: pointer;
-            border-radius: 10px; transition: 0.3s; font-family: inherit;
+            text-align: left; padding: 10px; cursor: pointer;
+            border-radius: 10px; transition: 0.3s; font-family: inherit; font-size: 0.85rem;
         }
-        .tab-btn.active { background: rgba(255,255,255,0.05); color: var(--accent); font-weight: 600; }
+        .tab-btn.active { background: rgba(0, 113, 227, 0.1); color: var(--accent); font-weight: 600; }
         .exp-content { display: none; }
         .exp-content.active { display: block; animation: fadeIn 0.5s ease forwards; }
 
-        /* Software Mockups */
-        .mockup-container { position: relative; height: 100%; display: flex; align-items: center; justify-content: center; }
-        .mac-img { width: 90%; border-radius: 10px; box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
-        .iphone-img { 
-            position: absolute; bottom: -20px; right: 0; width: 120px; 
-            border: 5px solid #1c1c1e; border-radius: 20px;
+        /* Mockups */
+        .mockup-container { position: relative; height: 100%; display: flex; align-items: center; justify-content: center; margin-top: 10px; }
+        .mac-img { width: 95%; border-radius: 8px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); border: 1px solid var(--card-border); }
+        .iphone-img { position: absolute; bottom: -10px; right: -5px; width: 100px; border: 4px solid #1c1c1e; border-radius: 18px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+
+        /* Resume Preview */
+        .resume-preview { cursor: pointer; position: relative; width: 100%; height: 100%; background: #000; }
+        .resume-preview img { width: 100%; height: 100%; object-fit: cover; opacity: 0.5; transition: 0.3s; }
+        .resume-preview:hover img { opacity: 0.8; }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            position: fixed; bottom: 30px; right: 30px; z-index: 1001;
+            background: var(--accent); color: white; border: none;
+            width: 50px; height: 50px; border-radius: 50%; cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center;
         }
 
-        /* Resume Lightbox */
-        .resume-preview { cursor: pointer; position: relative; width: 100%; height: 100%; }
-        .resume-preview img { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; transition: 0.3s; }
-        .resume-preview:hover img { opacity: 1; }
-        
+        /* Lightbox */
         #lightbox {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.95); z-index: 2000;
             display: none; align-items: center; justify-content: center; flex-direction: column;
         }
-        #lightbox img { max-height: 85vh; border-radius: 10px; margin-bottom: 20px; }
+        #lightbox img { max-height: 80vh; max-width: 90%; border-radius: 10px; }
+        .lightbox-controls { margin-top: 20px; display: flex; gap: 15px; }
 
-        .btn {
-            padding: 12px 30px; border-radius: 100px; text-decoration: none;
-            font-weight: 600; font-size: 0.9rem; transition: 0.3s;
-            display: inline-block; cursor: pointer; border: none;
-        }
+        .btn { padding: 12px 30px; border-radius: 100px; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: 0.3s; display: inline-block; cursor: pointer; border: none; }
         .btn-primary { background: var(--accent); color: white; }
-        .btn-outline { border: 1px solid var(--card-border); color: #fff; }
+        .btn-outline { border: 1px solid var(--card-border); color: var(--text-main); }
 
-        /* Animations */
         .reveal { opacity: 0; transform: translateY(40px); transition: 1s ease-out; }
         .active-reveal { opacity: 1; transform: translateY(0); }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
 
-        @media (max-width: 1024px) {
-            header { flex-direction: column; text-align: center; }
-            .hero-img-container { text-align: center; }
-            .hero-img { width: 280px; height: 350px; }
+        @media (max-width: 1100px) {
+            header { flex-direction: column; text-align: center; padding-top: 150px; }
+            .hero-img-container { text-align: center; order: 2; }
+            .hero-text { order: 1; }
+            .hero-img { width: 300px; height: 380px; }
             .bento-grid { display: flex; flex-direction: column; }
-            .exp-container { flex-direction: column; }
         }
     </style>
 </head>
 <body>
 
     <div id="aura"></div>
+
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Light/Dark Mode">
+        <i class="fas fa-moon" id="theme-icon"></i>
+    </button>
 
     <nav>
         <div class="logo">RENE<span>ENGINEER</span></div>
@@ -156,11 +179,11 @@
         </div>
         <div class="hero-text reveal">
             <h1>Renee Brielle <br><b>Angelo Duran</b></h1>
-            <p class="hero-sub">MBA Graduate & Civil Engineer. I architect operational ecosystems where engineering precision meets business strategy.</p>
+            <p class="hero-sub">MBA & Civil Engineer. I architect operational ecosystems where technical precision meets high-level business logic.</p>
             <div class="hero-stats">
+                <div class="stat-item"><b>2</b><span>Degrees</span></div>
                 <div class="stat-item"><b>30+</b><span>Team Members</span></div>
                 <div class="stat-item"><b>100%</b><span>KPI Success</span></div>
-                <div class="stat-item"><b>2</b><span>Industries</span></div>
             </div>
         </div>
     </header>
@@ -168,9 +191,9 @@
     <div class="container">
         <div class="bento-grid">
             
-            <!-- Tabbed Experience -->
-            <div class="bento-item item-lg reveal">
-                <h3 style="margin-bottom: 20px; font-weight: 500;">Interactive Journey</h3>
+            <!-- Experience -->
+            <div class="bento-item item-exp reveal">
+                <h3 style="margin-bottom: 20px; font-weight: 500;">Professional Journey</h3>
                 <div class="exp-container">
                     <div class="exp-tabs">
                         <button class="tab-btn active" onclick="openTab(event, 'rpmlogix')">RPM Logix</button>
@@ -181,135 +204,157 @@
                     </div>
                     <div class="exp-content-wrap">
                         <div id="rpmlogix" class="exp-content active">
-                            <h4>Operations Manager <span>2020 - Present</span></h4>
-                            <ul style="margin-top:15px; font-size: 0.9rem; color: var(--text-dim); padding-left: 20px;">
-                                <li>Directed a 30+ member remote team for rigorous KPI adherence.</li>
-                                <li>Managed end-to-end medical device inventory (Procurement → Distribution).</li>
-                                <li>Architected custom IMEI tracking & supply planning ecosystems.</li>
+                            <h4>Operations Manager <span style="font-weight: 300; font-size: 0.8rem; opacity: 0.7;">2020 - PRESENT</span></h4>
+                            <ul style="margin-top:15px; font-size: 0.85rem; color: var(--text-dim); padding-left: 20px;">
+                                <li>Directing 30+ member remote team for medical device logistics.</li>
+                                <li>End-to-end inventory management: Procurement to Distribution.</li>
+                                <li>Custom ecosystem architecture for supply planning & forecasting.</li>
                             </ul>
                         </div>
                         <div id="navy" class="exp-content">
-                            <h4>Engineering Brigade <span>2019</span></h4>
-                            <ul style="margin-top:15px; font-size: 0.9rem; color: var(--text-dim); padding-left: 20px;">
-                                <li>Supervised multidisciplinary units in high-pressure military environments.</li>
-                                <li>Led infrastructure delivery with strict adherence to safety & quality standards.</li>
+                            <h4>Engineering Brigade <span style="font-weight: 300; font-size: 0.8rem; opacity: 0.7;">2019</span></h4>
+                            <ul style="margin-top:15px; font-size: 0.85rem; color: var(--text-dim); padding-left: 20px;">
+                                <li>Supervised multidisciplinary units in military environments.</li>
+                                <li>Led infrastructure delivery under strict regulatory compliance.</li>
                             </ul>
                         </div>
                         <div id="carecoach" class="exp-content">
-                            <h4>Health Advocate II <span>2019</span></h4>
-                            <ul style="margin-top:15px; font-size: 0.9rem; color: var(--text-dim); padding-left: 20px;">
-                                <li>Guided patients through care plans using proprietary telehealth tools.</li>
-                                <li>Monitored behavioral data to drive outcome improvements.</li>
+                            <h4>Health Advocate II <span style="font-weight: 300; font-size: 0.8rem; opacity: 0.7;">2019</span></h4>
+                            <ul style="margin-top:15px; font-size: 0.85rem; color: var(--text-dim); padding-left: 20px;">
+                                <li>Guided patients using proprietary telehealth technologies.</li>
                             </ul>
                         </div>
                         <div id="altshift" class="exp-content">
-                            <h4>eCommerce Specialist <span>2018</span></h4>
-                            <ul style="margin-top:15px; font-size: 0.9rem; color: var(--text-dim); padding-left: 20px;">
-                                <li>Streamlined order management and logistics for digital storefronts.</li>
-                                <li>Used performance data to eliminate supply chain bottlenecks.</li>
+                            <h4>eCommerce Specialist <span style="font-weight: 300; font-size: 0.8rem; opacity: 0.7;">2018</span></h4>
+                            <ul style="margin-top:15px; font-size: 0.85rem; color: var(--text-dim); padding-left: 20px;">
+                                <li>Optimized digital storefront logistics and fulfillment accuracy.</li>
                             </ul>
                         </div>
                         <div id="charity" class="exp-content">
-                            <h4>Crisis Listener <span>Since 2015</span></h4>
-                            <ul style="margin-top:15px; font-size: 0.9rem; color: var(--text-dim); padding-left: 20px;">
-                                <li>Provided de-escalation and interpersonal support in virtual environments.</li>
+                            <h4>Crisis Listener <span style="font-weight: 300; font-size: 0.8rem; opacity: 0.7;">SINCE 2015</span></h4>
+                            <ul style="margin-top:15px; font-size: 0.85rem; color: var(--text-dim); padding-left: 20px;">
+                                <li>De-escalation and interpersonal communication for virtual safety.</li>
                             </ul>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Software Dual-Mockup -->
-            <div class="bento-item item-md reveal">
-                <h3 style="font-weight: 500;">Custom Build</h3>
-                <p style="font-size: 0.8rem; color: var(--text-dim);">ERP Dashboard & Glide Mobile App</p>
+            <!-- Software -->
+            <div class="bento-item item-soft reveal">
+                <h3 style="font-weight: 500;">System Design</h3>
+                <p style="font-size: 0.8rem; color: var(--text-dim);">Custom ERP & Glide Mobile Solutions</p>
                 <div class="mockup-container">
-                    <img src="images/dashboard.jpg" class="mac-img" alt="Dashboard View">
-                    <img src="images/app.jpg" class="iphone-img" alt="Mobile App View">
+                    <img src="images/dashboard.jpg" class="mac-img" alt="Web App">
+                    <img src="images/app.jpg" class="iphone-img" alt="Mobile App">
                 </div>
             </div>
 
-            <!-- Resume Preview -->
-            <div class="bento-item item-sm reveal" style="padding: 0;" onclick="openLightbox()">
+            <!-- Resume -->
+            <div class="bento-item item-resume reveal" style="padding: 0;" onclick="openLightbox()">
                 <div class="resume-preview">
                     <img src="images/resume.jpg" alt="Resume Preview">
                     <div style="position: absolute; bottom: 20px; left: 20px; z-index: 2;">
-                        <h4 style="font-weight: 600;">View Curriculum Vitae</h4>
-                        <p style="font-size: 0.7rem;">Interactive Expansion</p>
+                        <h4 style="font-weight: 600; color: white;">View CV</h4>
+                        <p style="font-size: 0.7rem; color: rgba(255,255,255,0.7);">Full Expansion Available</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Skills Box -->
-            <div class="bento-item item-sm reveal">
-                <h3 style="font-weight: 500; margin-bottom: 10px;">Tech Stack</h3>
-                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                    <span class="btn btn-outline" style="font-size: 0.7rem; padding: 5px 12px;">Google Apps Script</span>
-                    <span class="btn btn-outline" style="font-size: 0.7rem; padding: 5px 12px;">Google Cloud</span>
-                    <span class="btn btn-outline" style="font-size: 0.7rem; padding: 5px 12px;">Glide</span>
-                    <span class="btn btn-outline" style="font-size: 0.7rem; padding: 5px 12px;">STAAD Pro</span>
-                    <span class="btn btn-outline" style="font-size: 0.7rem; padding: 5px 12px;">Excel</span>
+            <!-- Skills -->
+            <div class="bento-item item-skills reveal">
+                <h3 style="font-weight: 500; margin-bottom: 12px;">Competencies</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                    <span class="btn-outline" style="font-size: 0.65rem; padding: 4px 10px; border-radius: 5px;">Apps Script</span>
+                    <span class="btn-outline" style="font-size: 0.65rem; padding: 4px 10px; border-radius: 5px;">Google Cloud</span>
+                    <span class="btn-outline" style="font-size: 0.65rem; padding: 4px 10px; border-radius: 5px;">Glide</span>
+                    <span class="btn-outline" style="font-size: 0.65rem; padding: 4px 10px; border-radius: 5px;">STAAD Pro</span>
+                    <span class="btn-outline" style="font-size: 0.65rem; padding: 4px 10px; border-radius: 5px;">Project Ops</span>
+                    <span class="btn-outline" style="font-size: 0.65rem; padding: 4px 10px; border-radius: 5px;">Advanced Excel</span>
+                </div>
+            </div>
+
+            <!-- Social Media (Completes the Rectangle) -->
+            <div class="bento-item item-social reveal">
+                <h3 style="font-weight: 500; margin-bottom: 12px;">Network</h3>
+                <div class="social-links">
+                    <a href="https://www.linkedin.com/in/reneengineer" target="_blank" class="social-row">
+                        <i class="fab fa-linkedin"></i> linkedin.com/in/reneengineer
+                    </a>
+                    <a href="https://www.facebook.com/Reneengineered/" target="_blank" class="social-row">
+                        <i class="fab fa-facebook"></i> facebook.com/Reneengineered
+                    </a>
+                    <a href="mailto:reneebrielleangeloduran@yahoo.com" class="social-row">
+                        <i class="fas fa-envelope"></i> reneebrielleangeloduran@yahoo.com
+                    </a>
                 </div>
             </div>
 
         </div>
     </div>
 
-    <footer style="padding: 120px 5%; text-align: center;">
-        <h2 style="font-size: 2.5rem; font-weight: 200;">Ready for Strategic Scale?</h2>
-        <br>
-        <a href="mailto:ReneengineerServices@gmail.com" class="btn btn-primary">Initialize Consultation</a>
+    <footer style="padding: 100px 5%; text-align: center; opacity: 0.6; font-size: 0.8rem; letter-spacing: 1px;">
+        &copy; 2026 RENEENGINEER | ENGINEERED FOR GROWTH
     </footer>
 
     <!-- Lightbox -->
     <div id="lightbox" onclick="closeLightbox()">
         <img src="images/resume.jpg" alt="Resume Full">
-        <div>
-            <a href="resume.pdf" download class="btn btn-primary"><i class="fa fa-download"></i> Download PDF</a>
+        <div class="lightbox-controls">
+            <a href="images/resume.pdf" download class="btn btn-primary"><i class="fa fa-download"></i> Download PDF</a>
             <button class="btn btn-outline" onclick="closeLightbox()">Close</button>
         </div>
     </div>
 
     <script>
-        // 1. Mouse Aura Logic
+        // Theme Toggle
+        function toggleTheme() {
+            const body = document.body;
+            const icon = document.getElementById('theme-icon');
+            body.classList.toggle('light-mode');
+            if(body.classList.contains('light-mode')) {
+                icon.className = 'fas fa-sun';
+            } else {
+                icon.className = 'fas fa-moon';
+            }
+        }
+
+        // Mouse Aura
         const aura = document.getElementById('aura');
         document.addEventListener('mousemove', (e) => {
             aura.style.setProperty('--x', e.clientX + 'px');
             aura.style.setProperty('--y', e.clientY + 'px');
         });
 
-        // 2. Tab Logic
+        // Tabs
         function openTab(evt, tabName) {
             const contents = document.getElementsByClassName("exp-content");
             for (let i = 0; i < contents.length; i++) contents[i].classList.remove("active");
-            
             const buttons = document.getElementsByClassName("tab-btn");
             for (let i = 0; i < buttons.length; i++) buttons[i].classList.remove("active");
-            
             document.getElementById(tabName).classList.add("active");
             evt.currentTarget.classList.add("active");
         }
 
-        // 3. Lightbox Logic
+        // Lightbox
         function openLightbox() { document.getElementById('lightbox').style.display = 'flex'; }
         function closeLightbox() { document.getElementById('lightbox').style.display = 'none'; }
 
-        // 4. Scroll Reveal
+        // Scroll Reveal
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) entry.target.classList.add('active-reveal');
             });
         }, { threshold: 0.1 });
-
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-        // 5. 3D Tilt Logic
+        // 3D Tilt
         document.querySelectorAll('.bento-item').forEach(card => {
             card.addEventListener('mousemove', (e) => {
                 const rect = card.getBoundingClientRect();
                 const x = (e.clientX - rect.left) / rect.width - 0.5;
                 const y = (e.clientY - rect.top) / rect.height - 0.5;
-                card.style.transform = `perspective(1000px) rotateY(${x * 10}deg) rotateX(${y * -10}deg) translateY(-5px)`;
+                card.style.transform = `perspective(1000px) rotateY(${x * 8}deg) rotateX(${y * -8}deg) translateY(-5px)`;
             });
             card.addEventListener('mouseleave', () => {
                 card.style.transform = `perspective(1000px) rotateY(0deg) rotateX(0deg) translateY(0px)`;
