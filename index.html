@@ -16,145 +16,139 @@
             --text-main: #f5f5f7;
             --text-dim: #86868b;
             --glass: rgba(0, 0, 0, 0.8);
-            --aura-opacity: 0.15;
+            --aura-color: rgba(0, 113, 227, 0.15);
+            --spotlight-opacity: 1;
         }
 
-        /* Light Mode Variables */
         body.light-mode {
             --bg: #f5f5f7;
-            --card-bg: rgba(255, 255, 255, 0.7);
-            --card-border: rgba(0, 0, 0, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --card-border: rgba(0, 0, 0, 0.08);
             --accent: #0071e3;
             --text-main: #1d1d1f;
             --text-dim: #6e6e73;
             --glass: rgba(245, 245, 247, 0.8);
-            --aura-opacity: 0.05;
+            --aura-color: rgba(0, 0, 0, 0.05);
+            --spotlight-opacity: 0.7; /* Dimmer by default in light mode for the spotlight effect */
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.3s ease, color 0.3s ease; }
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.4s ease, color 0.4s ease; }
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: var(--bg); 
-            color: var(--text-main); 
-            line-height: 1.6; 
-            overflow-x: hidden;
-            font-weight: 300;
+            background: var(--bg); color: var(--text-main); 
+            line-height: 1.6; overflow-x: hidden; font-weight: 300;
         }
 
+        /* Mouse Aura / Spotlight */
         #aura {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(600px circle at var(--x) var(--y), rgba(0, 113, 227, var(--aura-opacity)), transparent 80%);
+            background: radial-gradient(600px circle at var(--x) var(--y), var(--aura-color), transparent 80%);
             z-index: -1; pointer-events: none;
         }
 
+        /* Breathing Logo */
         nav {
             position: fixed; top: 0; width: 100%; z-index: 1000;
             background: var(--glass); backdrop-filter: saturate(180%) blur(20px);
             border-bottom: 1px solid var(--card-border);
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 1rem 5%;
+            display: flex; justify-content: space-between; align-items: center; padding: 1rem 5%;
         }
         .logo { font-weight: 700; font-size: 1rem; letter-spacing: 1px; }
-        .logo span { color: var(--accent); font-weight: 300; }
+        .logo span { color: var(--accent); font-weight: 300; animation: breathe 4s infinite ease-in-out; }
 
+        @keyframes breathe {
+            0%, 100% { opacity: 0.5; text-shadow: 0 0 0px var(--accent); }
+            50% { opacity: 1; text-shadow: 0 0 15px var(--accent); }
+        }
+
+        /* Hero */
         header {
             min-height: 100vh; display: flex; align-items: center; justify-content: center;
-            padding: 100px 10%; gap: 60px;
+            padding: 120px 10% 80px; gap: 60px;
         }
-        .hero-img-container { flex: 1; text-align: right; }
         .hero-img { 
-            width: 400px; height: 500px; object-fit: cover; 
-            border-radius: 40px; border: 1px solid var(--card-border);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+            width: 400px; height: 500px; object-fit: cover; border-radius: 40px; 
+            border: 1px solid var(--card-border); box-shadow: 0 30px 60px rgba(0,0,0,0.2);
         }
-        .hero-text { flex: 1.2; }
-        .hero-text h1 { 
-            font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 200; 
-            line-height: 1.1; margin-bottom: 20px; letter-spacing: -1px;
-        }
-        .hero-text b { font-weight: 600; color: var(--accent); }
-        .hero-stats { display: flex; gap: 30px; margin-top: 40px; }
-        .stat-item b { display: block; font-size: 1.5rem; color: var(--text-main); }
-        .stat-item span { color: var(--text-dim); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        .hero-text h1 { font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 200; letter-spacing: -2px; line-height: 1.1; }
+        .hero-subtitle { font-size: 1.2rem; color: var(--accent); font-weight: 500; margin: 10px 0 25px; }
+        
+        /* Status Pulse */
+        .status-tag { display: inline-flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 600; color: var(--text-dim); letter-spacing: 1px; margin-bottom: 15px;}
+        .pulse-dot { width: 8px; height: 8px; background: #34c759; border-radius: 50%; position: relative; }
+        .pulse-dot::after { content: ''; position: absolute; width: 100%; height: 100%; background: #34c759; border-radius: 50%; animation: ripple 2s infinite; }
 
-        /* Perfect Rectangle Bento Grid */
+        @keyframes ripple { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
+
+        /* Bento Grid */
         .container { max-width: 1400px; margin: 0 auto; padding: 0 5% 100px; }
-        .bento-grid {
-            display: grid; grid-template-columns: repeat(12, 1fr);
-            grid-auto-rows: 220px; gap: 20px;
+        .bento-grid { display: grid; grid-template-columns: repeat(12, 1fr); grid-auto-rows: 220px; gap: 20px; }
+        .bento-item { 
+            background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 30px; 
+            padding: 40px; overflow: hidden; backdrop-filter: blur(10px); opacity: var(--spotlight-opacity);
+            transition: opacity 0.3s ease, transform 0.4s ease;
         }
-        .bento-item {
-            background: var(--card-bg); border: 1px solid var(--card-border);
-            border-radius: 30px; padding: 40px; overflow: hidden;
-            backdrop-filter: blur(10px); transition: transform 0.4s ease, border 0.3s ease;
-        }
+        .bento-item.highlight { opacity: 1 !important; border-color: var(--accent); }
 
         .item-exp { grid-column: span 8; grid-row: span 2; }
         .item-soft { grid-column: span 4; grid-row: span 2; }
-        .item-resume { grid-column: span 4; grid-row: span 1; }
+        .item-assets { grid-column: span 4; grid-row: span 1; }
         .item-skills { grid-column: span 4; grid-row: span 1; }
         .item-social { grid-column: span 4; grid-row: span 1; }
 
-        /* Social Grid Styling */
-        .social-links { display: flex; flex-direction: column; height: 100%; justify-content: center; gap: 12px; }
-        .social-row { display: flex; align-items: center; gap: 15px; text-decoration: none; color: var(--text-dim); font-size: 0.9rem; transition: 0.3s; }
-        .social-row i { font-size: 1.2rem; color: var(--accent); width: 25px; text-align: center; }
-        .social-row:hover { color: var(--text-main); transform: translateX(5px); }
-
-        /* Tabs */
+        /* Tabs & Experience */
         .exp-container { display: flex; gap: 40px; margin-top: 20px; }
-        .exp-tabs { display: flex; flex-direction: column; gap: 8px; min-width: 180px; }
+        .exp-tabs { display: flex; flex-direction: column; gap: 8px; min-width: 200px; }
         .tab-btn {
-            background: none; border: none; color: var(--text-dim);
-            text-align: left; padding: 10px; cursor: pointer;
-            border-radius: 10px; transition: 0.3s; font-family: inherit; font-size: 0.85rem;
+            background: none; border: none; color: var(--text-dim); text-align: left; 
+            padding: 12px; cursor: pointer; border-radius: 12px; font-size: 0.85rem; font-family: inherit;
         }
-        .tab-btn.active { background: rgba(0, 113, 227, 0.1); color: var(--accent); font-weight: 600; }
-        .exp-content { display: none; }
+        .tab-btn.active { background: rgba(0, 113, 227, 0.15); color: var(--accent); font-weight: 600; }
+        .exp-content { display: none; height: 280px; overflow-y: auto; padding-right: 10px; }
         .exp-content.active { display: block; animation: fadeIn 0.5s ease forwards; }
 
+        /* Research Preview Card */
+        .takeaway-box { background: rgba(0, 113, 227, 0.1); border-left: 3px solid var(--accent); padding: 15px; margin-top: 15px; border-radius: 0 10px 10px 0; }
+
+        /* Social Copy Utility */
+        .email-copy-btn { 
+            background: var(--accent); color: white; border: none; padding: 10px 20px; 
+            border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 0.8rem; width: 100%; margin-top: 10px;
+        }
+
         /* Mockups */
-        .mockup-container { position: relative; height: 100%; display: flex; align-items: center; justify-content: center; margin-top: 10px; }
+        .mockup-container { position: relative; height: 100%; display: flex; align-items: center; justify-content: center; }
         .mac-img { width: 95%; border-radius: 8px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); border: 1px solid var(--card-border); }
-        .iphone-img { position: absolute; bottom: -10px; right: -5px; width: 100px; border: 4px solid #1c1c1e; border-radius: 18px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .iphone-img { position: absolute; bottom: -10px; right: -5px; width: 90px; border: 4px solid #1c1c1e; border-radius: 15px; }
 
-        /* Resume Preview */
-        .resume-preview { cursor: pointer; position: relative; width: 100%; height: 100%; background: #000; }
-        .resume-preview img { width: 100%; height: 100%; object-fit: cover; opacity: 0.5; transition: 0.3s; }
-        .resume-preview:hover img { opacity: 0.8; }
-
-        /* Theme Toggle Button */
-        .theme-toggle {
-            position: fixed; bottom: 30px; right: 30px; z-index: 1001;
-            background: var(--accent); color: white; border: none;
-            width: 50px; height: 50px; border-radius: 50%; cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center;
-        }
-
-        /* Lightbox */
-        #lightbox {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 2000;
-            display: none; align-items: center; justify-content: center; flex-direction: column;
-        }
+        /* Lightbox & Theme */
+        .theme-toggle { position: fixed; bottom: 30px; right: 30px; z-index: 1001; background: var(--accent); color: white; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; border: none; }
+        #lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: none; align-items: center; justify-content: center; flex-direction: column; }
         #lightbox img { max-height: 80vh; max-width: 90%; border-radius: 10px; }
-        .lightbox-controls { margin-top: 20px; display: flex; gap: 15px; }
 
-        .btn { padding: 12px 30px; border-radius: 100px; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: 0.3s; display: inline-block; cursor: pointer; border: none; }
+        .btn { padding: 12px 30px; border-radius: 100px; text-decoration: none; font-weight: 600; transition: 0.3s; display: inline-block; cursor: pointer; border: none; }
         .btn-primary { background: var(--accent); color: white; }
         .btn-outline { border: 1px solid var(--card-border); color: var(--text-main); }
 
-        .reveal { opacity: 0; transform: translateY(40px); transition: 1s ease-out; }
-        .active-reveal { opacity: 1; transform: translateY(0); }
-
         @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
 
+        /* Tablet/Mobile Adjustments */
         @media (max-width: 1100px) {
             header { flex-direction: column; text-align: center; padding-top: 150px; }
-            .hero-img-container { text-align: center; order: 2; }
+            .hero-img { width: 300px; height: 380px; order: 2; }
             .hero-text { order: 1; }
-            .hero-img { width: 300px; height: 380px; }
             .bento-grid { display: flex; flex-direction: column; }
+            
+            /* Horizontal Scroll Tabs for Mobile */
+            .exp-container { flex-direction: column; }
+            .exp-tabs { 
+                flex-direction: row; overflow-x: auto; padding-bottom: 15px; 
+                width: 100%; border-bottom: 1px solid var(--card-border);
+                scrollbar-width: none;
+            }
+            .exp-tabs::-webkit-scrollbar { display: none; }
+            .tab-btn { white-space: nowrap; padding: 10px 20px; }
+            .exp-content { height: auto; }
         }
     </style>
 </head>
@@ -162,28 +156,28 @@
 
     <div id="aura"></div>
 
-    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Light/Dark Mode">
-        <i class="fas fa-moon" id="theme-icon"></i>
-    </button>
+    <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon" id="theme-icon"></i></button>
 
     <nav>
-        <div class="logo">RENE<span>ENGINEER</span></div>
-        <div style="display: flex; gap: 20px;">
-            <a href="mailto:ReneengineerServices@gmail.com" class="btn-outline btn">Contact</a>
-        </div>
+        <div class="logo">RENEE<span>ENGINEER</span></div>
+        <a href="mailto:ReneengineerServices@gmail.com" class="btn-outline btn" style="font-size: 0.8rem;">Let's Talk</a>
     </nav>
 
     <header>
-        <div class="hero-img-container reveal">
+        <div class="hero-img-container">
             <img src="images/headshot.jpg" alt="Renee Duran" class="hero-img">
         </div>
-        <div class="hero-text reveal">
+        <div class="hero-text">
+            <div class="status-tag">
+                <div class="pulse-dot"></div> LOCATION: PHILIPPINES / REMOTE
+            </div>
             <h1>Renee Brielle <br><b>Angelo Duran</b></h1>
-            <p class="hero-sub">MBA & Civil Engineer. I architect operational ecosystems where technical precision meets high-level business logic.</p>
-            <div class="hero-stats">
-                <div class="stat-item"><b>2</b><span>Degrees</span></div>
-                <div class="stat-item"><b>30+</b><span>Team Members</span></div>
-                <div class="stat-item"><b>100%</b><span>KPI Success</span></div>
+            <p class="hero-subtitle">MBA Graduate & Civil Engineer</p>
+            <p style="color: var(--text-dim); max-width: 500px; margin-bottom: 30px;">Strategizing operational scale through engineering precision and technical logic.</p>
+            <div style="display: flex; gap: 30px;">
+                <div style="text-align: left;"><b>2</b><br><span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase;">Degrees</span></div>
+                <div style="text-align: left;"><b>30+</b><br><span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase;">Remote Staff</span></div>
+                <div style="text-align: left;"><b>100%</b><br><span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase;">KPI Success</span></div>
             </div>
         </div>
     </header>
@@ -191,142 +185,145 @@
     <div class="container">
         <div class="bento-grid">
             
-            <!-- Experience -->
-            <div class="bento-item item-exp reveal">
-                <h3 style="margin-bottom: 20px; font-weight: 500;">Professional Journey</h3>
+            <!-- Professional Journey Tab -->
+            <div class="bento-item item-exp">
+                <h3 style="font-weight: 500;">Professional Journey</h3>
                 <div class="exp-container">
                     <div class="exp-tabs">
-                        <button class="tab-btn active" onclick="openTab(event, 'rpmlogix')">RPM Logix</button>
+                        <button class="tab-btn active" onclick="openTab(event, 'mba')">Master of Business Administration</button>
+                        <button class="tab-btn" onclick="openTab(event, 'rpmlogix')">RPM Logix</button>
                         <button class="tab-btn" onclick="openTab(event, 'navy')">Philippine Navy</button>
                         <button class="tab-btn" onclick="openTab(event, 'carecoach')">Care Coach</button>
-                        <button class="tab-btn" onclick="openTab(event, 'altshift')">ALT Shift Ctrl</button>
-                        <button class="tab-btn" onclick="openTab(event, 'charity')">Charity Work</button>
                     </div>
                     <div class="exp-content-wrap">
-                        <div id="rpmlogix" class="exp-content active">
-                            <h4>Operations Manager <span style="font-weight: 300; font-size: 0.8rem; opacity: 0.7;">2020 - PRESENT</span></h4>
-                            <ul style="margin-top:15px; font-size: 0.85rem; color: var(--text-dim); padding-left: 20px;">
-                                <li>Directing 30+ member remote team for medical device logistics.</li>
-                                <li>End-to-end inventory management: Procurement to Distribution.</li>
-                                <li>Custom ecosystem architecture for supply planning & forecasting.</li>
+                        <div id="mba" class="exp-content active">
+                            <h4>Published Research | 2025</h4>
+                            <p style="font-size: 0.8rem; margin: 10px 0; color: var(--accent); font-weight: 600;">Exploring the Influence of Time Tracking Software on Remote Worker Productivity.</p>
+                            <p style="font-size: 0.75rem; color: var(--text-dim);">Findings indicate that while EPM improves accountability, regional factors like connectivity shape the remote experience. Balance of autonomy and monitoring is key.</p>
+                            <div class="takeaway-box">
+                                <span style="font-size: 0.7rem; font-weight: 700; color: var(--text-main);">STRATEGIC TAKEAWAY:</span>
+                                <p style="font-size: 0.75rem; font-style: italic;">"Engineered monitoring frameworks that maximize accountability without compromising the Autonomy/Competence of remote units."</p>
+                            </div>
+                            <a href="https://research-manila.letran.edu.ph/article/239" target="_blank" style="font-size: 0.75rem; color: var(--accent); display: block; margin-top: 10px;">View Publication <i class="fas fa-external-link-alt"></i></a>
+                        </div>
+                        <div id="rpmlogix" class="exp-content">
+                            <h4>Operations Manager <span>Since 2020</span></h4>
+                            <ul style="font-size: 0.85rem; color: var(--text-dim); margin-top: 10px; padding-left: 20px;">
+                                <li>Directing daily operations for 30+ remote team members.</li>
+                                <li>End-to-end inventory architecture for medical device distribution.</li>
+                                <li>Implementation of SOPs and corrective actions for 100% KPI adherence.</li>
                             </ul>
                         </div>
                         <div id="navy" class="exp-content">
-                            <h4>Engineering Brigade <span style="font-weight: 300; font-size: 0.8rem; opacity: 0.7;">2019</span></h4>
-                            <ul style="margin-top:15px; font-size: 0.85rem; color: var(--text-dim); padding-left: 20px;">
-                                <li>Supervised multidisciplinary units in military environments.</li>
-                                <li>Led infrastructure delivery under strict regulatory compliance.</li>
+                            <h4>Engineering Brigade <span>2019</span></h4>
+                            <ul style="font-size: 0.85rem; color: var(--text-dim); margin-top: 10px; padding-left: 20px;">
+                                <li>Supervised multidisciplinary units under military pressure.</li>
+                                <li>Ensured project compliance with rigid safety and timeline standards.</li>
                             </ul>
                         </div>
                         <div id="carecoach" class="exp-content">
-                            <h4>Health Advocate II <span style="font-weight: 300; font-size: 0.8rem; opacity: 0.7;">2019</span></h4>
-                            <ul style="margin-top:15px; font-size: 0.85rem; color: var(--text-dim); padding-left: 20px;">
-                                <li>Guided patients using proprietary telehealth technologies.</li>
-                            </ul>
-                        </div>
-                        <div id="altshift" class="exp-content">
-                            <h4>eCommerce Specialist <span style="font-weight: 300; font-size: 0.8rem; opacity: 0.7;">2018</span></h4>
-                            <ul style="margin-top:15px; font-size: 0.85rem; color: var(--text-dim); padding-left: 20px;">
-                                <li>Optimized digital storefront logistics and fulfillment accuracy.</li>
-                            </ul>
-                        </div>
-                        <div id="charity" class="exp-content">
-                            <h4>Crisis Listener <span style="font-weight: 300; font-size: 0.8rem; opacity: 0.7;">SINCE 2015</span></h4>
-                            <ul style="margin-top:15px; font-size: 0.85rem; color: var(--text-dim); padding-left: 20px;">
-                                <li>De-escalation and interpersonal communication for virtual safety.</li>
-                            </ul>
+                            <h4>Health Advocate II <span>2019</span></h4>
+                            <p style="font-size: 0.85rem; color: var(--text-dim); margin-top: 10px;">Guided patients through care plans using proprietary telehealth technologies.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Software -->
-            <div class="bento-item item-soft reveal">
+            <!-- System Design -->
+            <div class="bento-item item-soft">
                 <h3 style="font-weight: 500;">System Design</h3>
-                <p style="font-size: 0.8rem; color: var(--text-dim);">Custom ERP & Glide Mobile Solutions</p>
                 <div class="mockup-container">
-                    <img src="images/dashboard.jpg" class="mac-img" alt="Web App">
-                    <img src="images/app.jpg" class="iphone-img" alt="Mobile App">
+                    <img src="images/dashboard.jpg" class="mac-img" alt="Web">
+                    <img src="images/app.jpg" class="iphone-img" alt="App">
                 </div>
             </div>
 
-            <!-- Resume -->
-            <div class="bento-item item-resume reveal" style="padding: 0;" onclick="openLightbox()">
-                <div class="resume-preview">
-                    <img src="images/resume.jpg" alt="Resume Preview">
-                    <div style="position: absolute; bottom: 20px; left: 20px; z-index: 2;">
-                        <h4 style="font-weight: 600; color: white;">View CV</h4>
-                        <p style="font-size: 0.7rem; color: rgba(255,255,255,0.7);">Full Expansion Available</p>
+            <!-- Strategic Assets -->
+            <div class="bento-item item-assets" style="padding: 0; cursor: pointer;" onclick="openLightbox()">
+                <div style="height: 100%; position: relative;">
+                    <img src="images/resume.jpg" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.4;">
+                    <div style="position: absolute; top: 30px; left: 30px;">
+                        <h3 style="font-weight: 600; color: white;">Strategic Assets</h3>
+                        <p style="font-size: 0.7rem; color: rgba(255,255,255,0.7);">CURRICULUM VITAE (ENLARGE)</p>
                     </div>
                 </div>
             </div>
 
             <!-- Skills -->
-            <div class="bento-item item-skills reveal">
-                <h3 style="font-weight: 500; margin-bottom: 12px;">Competencies</h3>
+            <div class="bento-item item-skills">
+                <h3 style="font-weight: 500; margin-bottom: 12px;">Tech Stack</h3>
                 <div style="display: flex; flex-wrap: wrap; gap: 6px;">
                     <span class="btn-outline" style="font-size: 0.65rem; padding: 4px 10px; border-radius: 5px;">Apps Script</span>
                     <span class="btn-outline" style="font-size: 0.65rem; padding: 4px 10px; border-radius: 5px;">Google Cloud</span>
                     <span class="btn-outline" style="font-size: 0.65rem; padding: 4px 10px; border-radius: 5px;">Glide</span>
                     <span class="btn-outline" style="font-size: 0.65rem; padding: 4px 10px; border-radius: 5px;">STAAD Pro</span>
-                    <span class="btn-outline" style="font-size: 0.65rem; padding: 4px 10px; border-radius: 5px;">Project Ops</span>
-                    <span class="btn-outline" style="font-size: 0.65rem; padding: 4px 10px; border-radius: 5px;">Advanced Excel</span>
+                    <span class="btn-outline" style="font-size: 0.65rem; padding: 4px 10px; border-radius: 5px;">Excel</span>
                 </div>
             </div>
 
-            <!-- Social Media (Completes the Rectangle) -->
-            <div class="bento-item item-social reveal">
-                <h3 style="font-weight: 500; margin-bottom: 12px;">Network</h3>
-                <div class="social-links">
-                    <a href="https://www.linkedin.com/in/reneengineer" target="_blank" class="social-row">
-                        <i class="fab fa-linkedin"></i> linkedin.com/in/reneengineer
-                    </a>
-                    <a href="https://www.facebook.com/Reneengineered/" target="_blank" class="social-row">
-                        <i class="fab fa-facebook"></i> facebook.com/Reneengineered
-                    </a>
-                    <a href="mailto:reneebrielleangeloduran@yahoo.com" class="social-row">
-                        <i class="fas fa-envelope"></i> reneebrielleangeloduran@yahoo.com
-                    </a>
+            <!-- Social/Network -->
+            <div class="bento-item item-social">
+                <h3 style="font-weight: 500; margin-bottom: 12px;">Network <span style="font-size: 0.6rem; background: var(--accent); color: white; padding: 2px 6px; border-radius: 4px; margin-left: 5px;">VERIFIED</span></h3>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <a href="https://www.linkedin.com/in/reneengineer" target="_blank" style="text-decoration: none; color: var(--text-dim); font-size: 0.8rem;"><i class="fab fa-linkedin" style="color: var(--accent);"></i> LinkedIn Profile</a>
+                    <a href="https://www.facebook.com/Reneengineered/" target="_blank" style="text-decoration: none; color: var(--text-dim); font-size: 0.8rem;"><i class="fab fa-facebook" style="color: var(--accent);"></i> Facebook Portfolio</a>
+                    <button class="email-copy-btn" id="emailBtn" onclick="copyEmail()">Copy Corporate Email</button>
                 </div>
             </div>
 
         </div>
     </div>
 
-    <footer style="padding: 100px 5%; text-align: center; opacity: 0.6; font-size: 0.8rem; letter-spacing: 1px;">
-        &copy; 2026 RENEENGINEER | ENGINEERED FOR GROWTH
+    <footer style="padding: 100px 5%; text-align: center; font-size: 0.7rem; opacity: 0.5;">
+        &copy; 2026 RENEENGINEER | PHILIPPINES | ENGINEERED FOR GROWTH
     </footer>
 
-    <!-- Lightbox -->
     <div id="lightbox" onclick="closeLightbox()">
-        <img src="images/resume.jpg" alt="Resume Full">
-        <div class="lightbox-controls">
+        <img src="images/resume.jpg" alt="Resume">
+        <div style="margin-top: 20px; display: flex; gap: 10px;">
             <a href="images/resume.pdf" download class="btn btn-primary"><i class="fa fa-download"></i> Download PDF</a>
-            <button class="btn btn-outline" onclick="closeLightbox()">Close</button>
+            <button class="btn btn-outline" onclick="closeLightbox()" style="color: white;">Close</button>
         </div>
     </div>
 
     <script>
-        // Theme Toggle
+        // Copy Email Logic
+        function copyEmail() {
+            const email = "reneebrielleangeloduran@yahoo.com";
+            navigator.clipboard.writeText(email).then(() => {
+                const btn = document.getElementById('emailBtn');
+                btn.innerText = "Email Copied!";
+                btn.style.background = "#34c759";
+                setTimeout(() => {
+                    btn.innerText = "Copy Corporate Email";
+                    btn.style.background = "var(--accent)";
+                }, 2000);
+            });
+        }
+
+        // Theme Logic
         function toggleTheme() {
             const body = document.body;
             const icon = document.getElementById('theme-icon');
             body.classList.toggle('light-mode');
-            if(body.classList.contains('light-mode')) {
-                icon.className = 'fas fa-sun';
-            } else {
-                icon.className = 'fas fa-moon';
-            }
+            icon.className = body.classList.contains('light-mode') ? 'fas fa-sun' : 'fas fa-moon';
         }
 
-        // Mouse Aura
-        const aura = document.getElementById('aura');
+        // Mouse Spotlight
         document.addEventListener('mousemove', (e) => {
-            aura.style.setProperty('--x', e.clientX + 'px');
-            aura.style.setProperty('--y', e.clientY + 'px');
+            document.getElementById('aura').style.setProperty('--x', e.clientX + 'px');
+            document.getElementById('aura').style.setProperty('--y', e.clientY + 'px');
+            
+            // In light mode, highlight the bento box under cursor
+            if(document.body.classList.contains('light-mode')) {
+                const hovered = document.elementFromPoint(e.clientX, e.clientY);
+                const card = hovered ? hovered.closest('.bento-item') : null;
+                document.querySelectorAll('.bento-item').forEach(c => c.classList.remove('highlight'));
+                if(card) card.classList.add('highlight');
+            }
         });
 
-        // Tabs
+        // Tabs Logic
         function openTab(evt, tabName) {
             const contents = document.getElementsByClassName("exp-content");
             for (let i = 0; i < contents.length; i++) contents[i].classList.remove("active");
@@ -340,21 +337,13 @@
         function openLightbox() { document.getElementById('lightbox').style.display = 'flex'; }
         function closeLightbox() { document.getElementById('lightbox').style.display = 'none'; }
 
-        // Scroll Reveal
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) entry.target.classList.add('active-reveal');
-            });
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-        // 3D Tilt
+        // Tilt Effect
         document.querySelectorAll('.bento-item').forEach(card => {
             card.addEventListener('mousemove', (e) => {
                 const rect = card.getBoundingClientRect();
                 const x = (e.clientX - rect.left) / rect.width - 0.5;
                 const y = (e.clientY - rect.top) / rect.height - 0.5;
-                card.style.transform = `perspective(1000px) rotateY(${x * 8}deg) rotateX(${y * -8}deg) translateY(-5px)`;
+                card.style.transform = `perspective(1000px) rotateY(${x * 6}deg) rotateX(${y * -6}deg) translateY(-5px)`;
             });
             card.addEventListener('mouseleave', () => {
                 card.style.transform = `perspective(1000px) rotateY(0deg) rotateX(0deg) translateY(0px)`;
