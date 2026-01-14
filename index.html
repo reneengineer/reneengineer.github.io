@@ -3,231 +3,316 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RENEENGINEER | Operations & Strategy Lead</title>
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Renee Duran | Operations & Strategy Lead</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
             --bg: #000000;
-            --card-bg: #1c1c1e;
+            --card-bg: rgba(28, 28, 30, 0.6);
             --card-border: rgba(255, 255, 255, 0.1);
-            --accent: #0071e3; /* Apple Blue */
+            --accent: #0071e3;
             --text-main: #f5f5f7;
             --text-dim: #86868b;
-            --glass: rgba(0, 0, 0, 0.7);
+            --glass: rgba(0, 0, 0, 0.8);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
-            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
             background: var(--bg); 
             color: var(--text-main); 
-            line-height: 1.5; 
+            line-height: 1.6; 
             overflow-x: hidden;
+            font-weight: 300;
         }
 
-        /* Nav */
+        /* Mouse Aura Background */
+        #aura {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(600px circle at var(--x) var(--y), rgba(0, 113, 227, 0.15), transparent 80%);
+            z-index: -1; pointer-events: none; transition: background 0.1s ease;
+        }
+
+        /* Navigation */
         nav {
             position: fixed; top: 0; width: 100%; z-index: 1000;
             background: var(--glass); backdrop-filter: saturate(180%) blur(20px);
             border-bottom: 1px solid var(--card-border);
             display: flex; justify-content: space-between; align-items: center;
-            padding: 0.8rem 5%;
+            padding: 1rem 5%;
         }
-        .logo { font-weight: 800; font-size: 1.1rem; letter-spacing: -0.5px; text-transform: uppercase; }
-        .logo span { color: var(--accent); }
+        .logo { font-weight: 700; font-size: 1rem; letter-spacing: 1px; }
+        .logo span { color: var(--accent); font-weight: 300; }
 
-        /* Hero */
+        /* Hero - Layout A (Side by Side) */
         header {
-            height: 90vh; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; text-align: center;
-            padding: 0 5%;
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            padding: 100px 10%; gap: 60px;
         }
-        .hero-mba { color: var(--accent); font-weight: 700; font-size: 1.1rem; margin-bottom: 10px; display: block; }
-        h1 { font-size: clamp(2.5rem, 8vw, 4.5rem); font-weight: 800; letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 20px; }
-        .hero-sub { color: var(--text-dim); max-width: 600px; font-size: 1.2rem; margin-bottom: 30px; }
+        .hero-img-container { flex: 1; text-align: right; }
+        .hero-img { 
+            width: 400px; height: 500px; object-fit: cover; 
+            border-radius: 40px; border: 1px solid var(--card-border);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+        .hero-text { flex: 1.2; }
+        .hero-text h1 { 
+            font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 200; 
+            line-height: 1.1; margin-bottom: 20px; letter-spacing: -1px;
+        }
+        .hero-text b { font-weight: 600; color: var(--accent); }
+        .hero-stats { display: flex; gap: 30px; margin-top: 40px; }
+        .stat-item b { display: block; font-size: 1.5rem; color: #fff; }
+        .stat-item span { color: var(--text-dim); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
 
         /* Bento Grid */
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 5% 100px; }
+        .section-title { padding: 80px 10% 40px; font-size: 2rem; font-weight: 300; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 5%; }
         
         .bento-grid {
-            display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            grid-auto-rows: minmax(160px, auto);
-            gap: 20px;
+            display: grid; grid-template-columns: repeat(12, 1fr);
+            grid-auto-rows: 200px; gap: 20px;
         }
-
         .bento-item {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 28px;
-            padding: 32px;
-            position: relative;
-            overflow: hidden;
-            transition: border-color 0.3s ease;
-            transform-style: preserve-3d;
+            background: var(--card-bg); border: 1px solid var(--card-border);
+            border-radius: 30px; padding: 40px; overflow: hidden;
+            backdrop-filter: blur(10px); transition: 0.4s ease;
+        }
+        .item-lg { grid-column: span 8; grid-row: span 2; }
+        .item-md { grid-column: span 4; grid-row: span 2; }
+        .item-sm { grid-column: span 4; grid-row: span 1; }
+
+        /* Interactive Experience Tabs */
+        .exp-container { display: flex; gap: 40px; margin-top: 20px; }
+        .exp-tabs { display: flex; flex-direction: column; gap: 10px; min-width: 200px; }
+        .tab-btn {
+            background: none; border: none; color: var(--text-dim);
+            text-align: left; padding: 12px; cursor: pointer;
+            border-radius: 10px; transition: 0.3s; font-family: inherit;
+        }
+        .tab-btn.active { background: rgba(255,255,255,0.05); color: var(--accent); font-weight: 600; }
+        .exp-content { display: none; }
+        .exp-content.active { display: block; animation: fadeIn 0.5s ease forwards; }
+
+        /* Software Mockups */
+        .mockup-container { position: relative; height: 100%; display: flex; align-items: center; justify-content: center; }
+        .mac-img { width: 90%; border-radius: 10px; box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
+        .iphone-img { 
+            position: absolute; bottom: -20px; right: 0; width: 120px; 
+            border: 5px solid #1c1c1e; border-radius: 20px;
         }
 
-        /* Hierarchy Setup */
-        .item-main-strategy { grid-column: span 8; grid-row: span 2; } /* MBA & Ops First */
-        .item-software { grid-column: span 4; grid-row: span 3; background: linear-gradient(145deg, #1c1c1e 0%, #0a0a0a 100%); }
-        .item-cloud { grid-column: span 4; grid-row: span 2; }
-        .item-navy { grid-column: span 4; grid-row: span 2; }
-        .item-edu { grid-column: span 4; grid-row: span 1; display: flex; align-items: center; gap: 15px; }
-
-        /* Content Styling */
-        h2 { font-size: 1.8rem; margin-bottom: 12px; font-weight: 700; letter-spacing: -0.02em; }
-        .tag { font-size: 0.7rem; font-weight: 700; color: var(--accent); text-transform: uppercase; margin-bottom: 8px; display: block; }
-        p { color: var(--text-dim); font-size: 1rem; }
-
-        /* Software/Dashboard Box */
-        .dashboard-preview {
-            margin-top: 20px;
-            border-radius: 12px;
-            border: 1px solid var(--card-border);
-            width: 110%;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        /* Resume Lightbox */
+        .resume-preview { cursor: pointer; position: relative; width: 100%; height: 100%; }
+        .resume-preview img { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; transition: 0.3s; }
+        .resume-preview:hover img { opacity: 1; }
+        
+        #lightbox {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 2000;
+            display: none; align-items: center; justify-content: center; flex-direction: column;
         }
+        #lightbox img { max-height: 85vh; border-radius: 10px; margin-bottom: 20px; }
 
-        /* Skill Pills */
-        .skill-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
-        .skill-pill { background: rgba(255,255,255,0.05); padding: 5px 12px; border-radius: 100px; font-size: 0.8rem; border: 1px solid var(--card-border); }
-
-        /* Fade Animation */
-        .reveal { opacity: 0; transform: translateY(30px); transition: all 1s cubic-bezier(0.22, 1, 0.36, 1); }
-        .reveal.active { opacity: 1; transform: translateY(0); }
-
-        /* Buttons */
         .btn {
-            background: var(--text-main); color: var(--bg);
-            padding: 14px 28px; border-radius: 100px; text-decoration: none;
-            font-weight: 700; transition: 0.3s; display: inline-block;
+            padding: 12px 30px; border-radius: 100px; text-decoration: none;
+            font-weight: 600; font-size: 0.9rem; transition: 0.3s;
+            display: inline-block; cursor: pointer; border: none;
         }
-        .btn:hover { transform: scale(1.05); }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-outline { border: 1px solid var(--card-border); color: #fff; }
 
-        /* Mobile */
-        @media (max-width: 900px) {
+        /* Animations */
+        .reveal { opacity: 0; transform: translateY(40px); transition: 1s ease-out; }
+        .active-reveal { opacity: 1; transform: translateY(0); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+
+        @media (max-width: 1024px) {
+            header { flex-direction: column; text-align: center; }
+            .hero-img-container { text-align: center; }
+            .hero-img { width: 280px; height: 350px; }
             .bento-grid { display: flex; flex-direction: column; }
-            h1 { font-size: 3rem; }
+            .exp-container { flex-direction: column; }
         }
     </style>
 </head>
 <body>
 
+    <div id="aura"></div>
+
     <nav>
         <div class="logo">RENEE<span>ENGINEER</span></div>
-        <a href="mailto:ReneengineerServices@gmail.com" style="color: var(--text-main); text-decoration: none; font-size: 0.9rem; font-weight: 600;">Let's Talk</a>
+        <div style="display: flex; gap: 20px;">
+            <a href="mailto:ReneengineerServices@gmail.com" class="btn-outline btn">Contact</a>
+        </div>
     </nav>
 
     <header>
-        <span class="hero-mba reveal">MBA STRATEGIST & CIVIL ENGINEER</span>
-        <h1 class="reveal">Optimizing Operations <br>with Technical Logic.</h1>
-        <p class="hero-sub reveal">I build the architectural systems that allow businesses to scale, combining high-level business strategy with engineering execution.</p>
-        <a href="#work" class="btn reveal">Explore Systems</a>
+        <div class="hero-img-container reveal">
+            <img src="headshot.jpg" alt="Renee Duran" class="hero-img">
+        </div>
+        <div class="hero-text reveal">
+            <h1>Renee Brielle <br><b>Angelo Duran</b></h1>
+            <p class="hero-sub">MBA Graduate & Civil Engineer. I architect operational ecosystems where engineering precision meets business strategy.</p>
+            <div class="hero-stats">
+                <div class="stat-item"><b>30+</b><span>Team Members</span></div>
+                <div class="stat-item"><b>100%</b><span>KPI Success</span></div>
+                <div class="stat-item"><b>2</b><span>Industries</span></div>
+            </div>
+        </div>
     </header>
 
-    <div class="container" id="work">
+    <div class="container">
         <div class="bento-grid">
             
-            <!-- 1. MBA & STRATEGY (Priority #1) -->
-            <div class="bento-item item-main-strategy reveal">
-                <span class="tag">Strategic Leadership</span>
-                <h2>Operations Manager</h2>
-                <p>Driving 100% KPI adherence for a 30+ member remote workforce. I translate complex business goals into repeatable, technical workflows.</p>
-                <div class="skill-group">
-                    <div class="skill-pill">Resource Planning</div>
-                    <div class="skill-pill">Supply Chain Optimization</div>
-                    <div class="skill-pill">KPI Engineering</div>
+            <!-- Tabbed Experience -->
+            <div class="bento-item item-lg reveal">
+                <h3 style="margin-bottom: 20px; font-weight: 500;">Interactive Journey</h3>
+                <div class="exp-container">
+                    <div class="exp-tabs">
+                        <button class="tab-btn active" onclick="openTab(event, 'rpmlogix')">RPM Logix</button>
+                        <button class="tab-btn" onclick="openTab(event, 'navy')">Philippine Navy</button>
+                        <button class="tab-btn" onclick="openTab(event, 'carecoach')">Care Coach</button>
+                        <button class="tab-btn" onclick="openTab(event, 'altshift')">ALT Shift Ctrl</button>
+                        <button class="tab-btn" onclick="openTab(event, 'charity')">Charity Work</button>
+                    </div>
+                    <div class="exp-content-wrap">
+                        <div id="rpmlogix" class="exp-content active">
+                            <h4>Operations Manager <span>2020 - Present</span></h4>
+                            <ul style="margin-top:15px; font-size: 0.9rem; color: var(--text-dim); padding-left: 20px;">
+                                <li>Directed a 30+ member remote team for rigorous KPI adherence.</li>
+                                <li>Managed end-to-end medical device inventory (Procurement → Distribution).</li>
+                                <li>Architected custom IMEI tracking & supply planning ecosystems.</li>
+                            </ul>
+                        </div>
+                        <div id="navy" class="exp-content">
+                            <h4>Engineering Brigade <span>2019</span></h4>
+                            <ul style="margin-top:15px; font-size: 0.9rem; color: var(--text-dim); padding-left: 20px;">
+                                <li>Supervised multidisciplinary units in high-pressure military environments.</li>
+                                <li>Led infrastructure delivery with strict adherence to safety & quality standards.</li>
+                            </ul>
+                        </div>
+                        <div id="carecoach" class="exp-content">
+                            <h4>Health Advocate II <span>2019</span></h4>
+                            <ul style="margin-top:15px; font-size: 0.9rem; color: var(--text-dim); padding-left: 20px;">
+                                <li>Guided patients through care plans using proprietary telehealth tools.</li>
+                                <li>Monitored behavioral data to drive outcome improvements.</li>
+                            </ul>
+                        </div>
+                        <div id="altshift" class="exp-content">
+                            <h4>eCommerce Specialist <span>2018</span></h4>
+                            <ul style="margin-top:15px; font-size: 0.9rem; color: var(--text-dim); padding-left: 20px;">
+                                <li>Streamlined order management and logistics for digital storefronts.</li>
+                                <li>Used performance data to eliminate supply chain bottlenecks.</li>
+                            </ul>
+                        </div>
+                        <div id="charity" class="exp-content">
+                            <h4>Crisis Listener <span>Since 2015</span></h4>
+                            <ul style="margin-top:15px; font-size: 0.9rem; color: var(--text-dim); padding-left: 20px;">
+                                <li>Provided de-escalation and interpersonal support in virtual environments.</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- 2. SOFTWARE (Glide/App Script) -->
-            <div class="bento-item item-software reveal">
-                <span class="tag">Custom Software</span>
-                <h2>Low-Code Systems</h2>
-                <p>Architected a proprietary inventory tracking app in Glide & Google Apps Script.</p>
-                <img src="dashboard.jpg" alt="Dashboard" class="dashboard-preview">
-            </div>
-
-            <!-- 3. GOOGLE CLOUD / DEV -->
-            <div class="bento-item item-cloud reveal">
-                <span class="tag">DevOps & Maintenance</span>
-                <h2>Cloud Management</h2>
-                <p>Managed Google Cloud source code and maintained web app integrity for enterprise-scale operations.</p>
-                <div class="skill-group">
-                    <div class="skill-pill">Google Cloud</div>
-                    <div class="skill-pill">Version Control</div>
-                    <div class="skill-pill">Apps Script</div>
+            <!-- Software Dual-Mockup -->
+            <div class="bento-item item-md reveal">
+                <h3 style="font-weight: 500;">Custom Build</h3>
+                <p style="font-size: 0.8rem; color: var(--text-dim);">ERP Dashboard & Glide Mobile App</p>
+                <div class="mockup-container">
+                    <img src="dashboard.jpg" class="mac-img" alt="Dashboard View">
+                    <img src="app.jpg" class="iphone-img" alt="Mobile App View">
                 </div>
             </div>
 
-            <!-- 4. NAVY / ENGINEERING -->
-            <div class="bento-item item-navy reveal">
-                <span class="tag">Technical Foundation</span>
-                <h2>Engineering Brigade</h2>
-                <p>Philippine Navy leadership. Directed multidisciplinary units in high-stakes environments with zero safety incidents.</p>
-            </div>
-
-            <!-- 5. QUICK EDU PILLS -->
-            <div class="bento-item item-edu reveal">
-                <i class="fa fa-graduation-cap var(--accent)"></i>
-                <div>
-                    <h3 style="font-size: 1rem;">MBA Candidate</h3>
-                    <p style="font-size: 0.8rem;">Letran '25</p>
+            <!-- Resume Preview -->
+            <div class="bento-item item-sm reveal" style="padding: 0;" onclick="openLightbox()">
+                <div class="resume-preview">
+                    <img src="resume.jpg" alt="Resume Preview">
+                    <div style="position: absolute; bottom: 20px; left: 20px; z-index: 2;">
+                        <h4 style="font-weight: 600;">View Curriculum Vitae</h4>
+                        <p style="font-size: 0.7rem;">Interactive Expansion</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="bento-item item-edu reveal">
-                <i class="fa fa-hard-hat var(--accent)"></i>
-                <div>
-                    <h3 style="font-size: 1rem;">BS Civil Engineering</h3>
-                    <p style="font-size: 0.8rem;">TUP '20</p>
+            <!-- Skills Box -->
+            <div class="bento-item item-sm reveal">
+                <h3 style="font-weight: 500; margin-bottom: 10px;">Tech Stack</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span class="btn btn-outline" style="font-size: 0.7rem; padding: 5px 12px;">Google Apps Script</span>
+                    <span class="btn btn-outline" style="font-size: 0.7rem; padding: 5px 12px;">Google Cloud</span>
+                    <span class="btn btn-outline" style="font-size: 0.7rem; padding: 5px 12px;">Glide</span>
+                    <span class="btn btn-outline" style="font-size: 0.7rem; padding: 5px 12px;">STAAD Pro</span>
+                    <span class="btn btn-outline" style="font-size: 0.7rem; padding: 5px 12px;">Excel VBA</span>
                 </div>
             </div>
 
         </div>
     </div>
 
-    <footer style="padding: 100px 5%; text-align: center; background: #050505;">
-        <h2 style="font-size: 3rem;">Ready to automate?</h2>
-        <p style="margin-bottom: 40px; color: var(--text-dim);">Engineering growth, one process at a time.</p>
-        <a href="mailto:ReneengineerServices@gmail.com" class="btn" style="background: var(--accent); color: white;">Initialize Consultation</a>
+    <footer style="padding: 120px 5%; text-align: center;">
+        <h2 style="font-size: 2.5rem; font-weight: 200;">Ready for Strategic Scale?</h2>
+        <br>
+        <a href="mailto:ReneengineerServices@gmail.com" class="btn btn-primary">Initialize Consultation</a>
     </footer>
 
+    <!-- Lightbox -->
+    <div id="lightbox" onclick="closeLightbox()">
+        <img src="resume.jpg" alt="Resume Full">
+        <div>
+            <a href="resume.pdf" download class="btn btn-primary"><i class="fa fa-download"></i> Download PDF</a>
+            <button class="btn btn-outline" onclick="closeLightbox()">Close</button>
+        </div>
+    </div>
+
     <script>
-        // 1. Slow Fade-In Animation
-        const observerOptions = { threshold: 0.1 };
+        // 1. Mouse Aura Logic
+        const aura = document.getElementById('aura');
+        document.addEventListener('mousemove', (e) => {
+            aura.style.setProperty('--x', e.clientX + 'px');
+            aura.style.setProperty('--y', e.clientY + 'px');
+        });
+
+        // 2. Tab Logic
+        function openTab(evt, tabName) {
+            const contents = document.getElementsByClassName("exp-content");
+            for (let i = 0; i < contents.length; i++) contents[i].classList.remove("active");
+            
+            const buttons = document.getElementsByClassName("tab-btn");
+            for (let i = 0; i < buttons.length; i++) buttons[i].classList.remove("active");
+            
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        // 3. Lightbox Logic
+        function openLightbox() { document.getElementById('lightbox').style.display = 'flex'; }
+        function closeLightbox() { document.getElementById('lightbox').style.display = 'none'; }
+
+        // 4. Scroll Reveal
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                }
+                if (entry.isIntersecting) entry.target.classList.add('active-reveal');
             });
-        }, observerOptions);
+        }, { threshold: 0.1 });
 
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-        // 2. 3D Tilt Effect
-        const cards = document.querySelectorAll('.bento-item');
-        cards.forEach(card => {
+        // 5. 3D Tilt Logic
+        document.querySelectorAll('.bento-item').forEach(card => {
             card.addEventListener('mousemove', (e) => {
                 const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                
-                const rotateX = (y - centerY) / 20;
-                const rotateY = (centerX - x) / 20;
-                
-                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                const x = (e.clientX - rect.left) / rect.width - 0.5;
+                const y = (e.clientY - rect.top) / rect.height - 0.5;
+                card.style.transform = `perspective(1000px) rotateY(${x * 10}deg) rotateX(${y * -10}deg) translateY(-5px)`;
             });
-            
             card.addEventListener('mouseleave', () => {
-                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                card.style.transform = `perspective(1000px) rotateY(0deg) rotateX(0deg) translateY(0px)`;
             });
         });
     </script>
