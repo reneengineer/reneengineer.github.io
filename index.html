@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Renee Brielle Angelo Duran | MBA & Strategic Civil Engineer</title>
-    <!-- Modern Font: Poppins & Inter -->
+    <title>Renee Brielle Angelo Duran | Strategic Operations Lead</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Poppins:wght@700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -22,69 +21,63 @@
         html { scroll-behavior: smooth; }
         body { font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text-main); line-height: 1.6; overflow-x: hidden; }
 
-        .blob {
-            position: absolute;
-            width: 500px; height: 500px;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(16, 185, 129, 0.15));
-            filter: blur(80px); border-radius: 50%; z-index: -1; animation: move 20s infinite alternate;
-        }
-        @keyframes move { from { transform: translate(-10%, -10%); } to { transform: translate(20%, 20%); } }
-
-        nav { background: rgba(2, 6, 23, 0.9); backdrop-filter: blur(12px); padding: 1.5rem 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .logo { font-family: 'Poppins', sans-serif; font-weight: 900; font-size: 1.2rem; color: #fff; letter-spacing: -1px; }
+        /* Navigation */
+        nav { background: rgba(2, 6, 23, 0.95); backdrop-filter: blur(12px); padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .logo { font-family: 'Poppins', sans-serif; font-weight: 900; font-size: 1.2rem; color: #fff; }
         .logo span { color: var(--accent-blue); }
-        .nav-links a { text-decoration: none; color: var(--text-dim); margin-left: 25px; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; transition: 0.3s; }
-        .nav-links a:hover { color: var(--accent-blue); }
+        .nav-links a { text-decoration: none; color: var(--text-dim); margin-left: 20px; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; transition: 0.3s; }
 
-        /* Hero Section */
-        header { padding: 100px 5% 80px; text-align: center; position: relative; }
-        .profile-img { width: 180px; height: 180px; border-radius: 50%; object-fit: cover; border: 4px solid var(--accent-blue); margin-bottom: 20px; box-shadow: 0 0 30px rgba(59, 130, 246, 0.3); }
-        .hero-badge { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); padding: 8px 20px; border-radius: 50px; font-size: 0.75rem; font-weight: 800; display: inline-block; margin-bottom: 25px; border: 1px solid var(--accent-green); }
-        h1 { font-family: 'Poppins', sans-serif; font-size: clamp(2rem, 6vw, 4rem); line-height: 1.1; margin-bottom: 15px; background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-        .hero-title { font-size: 1.2rem; color: var(--accent-blue); font-weight: 700; margin-bottom: 30px; letter-spacing: 2px; }
+        /* Hero */
+        header { padding: 80px 5% 60px; text-align: center; }
+        .profile-img { width: 160px; height: 160px; border-radius: 50%; object-fit: cover; border: 4px solid var(--accent-blue); margin-bottom: 20px; }
+        h1 { font-family: 'Poppins', sans-serif; font-size: clamp(2.5rem, 7vw, 4rem); line-height: 1.1; margin-bottom: 10px; background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero-title { font-size: 1.2rem; color: var(--accent-blue); font-weight: 700; letter-spacing: 2px; margin-bottom: 30px; }
 
-        .academic-grid { display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; flex-wrap: wrap; }
-        .credential-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 12px 20px; border-radius: 12px; display: flex; align-items: center; gap: 12px; }
-        .credential-card i { color: var(--accent-blue); font-size: 1.2rem; }
-        .credential-card h4 { font-size: 0.8rem; color: #fff; margin: 0; }
-
-        /* Mockup Section */
-        .mockup-container { display: flex; justify-content: center; gap: 30px; align-items: flex-end; margin: 60px 0; flex-wrap: wrap; }
-        .device { background: #111827; border: 8px solid #334155; border-radius: 20px; overflow: hidden; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
-        .mobile { width: 180px; height: 360px; }
-        .web { width: 450px; height: 280px; }
-        .mock-screen { width: 100%; height: 100%; background: linear-gradient(45deg, #1e293b, #0f172a); display: flex; align-items: center; justify-content: center; color: var(--accent-blue); font-size: 0.7rem; text-align: center; padding: 20px; }
-
-        section { padding: 80px 5%; max-width: 1200px; margin: 0 auto; }
+        /* Experience Section */
+        section { padding: 60px 5%; max-width: 1000px; margin: 0 auto; }
         .section-tag { color: var(--accent-blue); font-weight: 800; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 3px; display: block; margin-bottom: 10px; }
-        .section-title { font-family: 'Poppins', sans-serif; font-size: 2.2rem; margin-bottom: 50px; }
+        .section-title { font-family: 'Poppins', sans-serif; font-size: 2.2rem; margin-bottom: 40px; }
 
-        /* Cards & Experience */
-        .exp-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 40px; border-radius: 24px; margin-bottom: 30px; }
-        .exp-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 20px; }
-        .exp-header h3 { font-size: 1.5rem; color: #fff; }
-        .company { color: var(--accent-blue); font-weight: 700; display: block; }
-        .exp-list { list-style: none; padding-top: 10px; }
-        .exp-list li { position: relative; padding-left: 20px; margin-bottom: 10px; color: #cbd5e1; font-size: 0.9rem; }
-        .exp-list li::before { content: "→"; position: absolute; left: 0; color: var(--accent-green); }
+        .exp-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 35px; border-radius: 20px; margin-bottom: 30px; }
+        .exp-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; }
+        .exp-header h3 { font-size: 1.4rem; color: #fff; }
+        .company { color: var(--accent-blue); font-weight: 700; font-size: 1.1rem; }
+        .date-label { color: var(--text-dim); font-size: 0.85rem; font-weight: 600; }
+        
+        .exp-list { list-style: none; }
+        .exp-list li { position: relative; padding-left: 25px; margin-bottom: 12px; color: #cbd5e1; font-size: 0.95rem; }
+        .exp-list li::before { content: "✓"; position: absolute; left: 0; color: var(--accent-green); font-weight: 900; }
+
+        /* Device Mockups */
+        .mockup-wrapper { display: flex; justify-content: center; align-items: flex-end; gap: 40px; margin: 50px 0; flex-wrap: wrap; }
+        
+        /* iPhone CSS */
+        .iphone { width: 200px; height: 400px; background: #000; border: 8px solid #334155; border-radius: 30px; position: relative; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .iphone-notch { width: 100px; height: 20px; background: #000; position: absolute; top: 0; left: 50%; transform: translateX(-50%); border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; z-index: 10; }
+        
+        /* MacBook CSS */
+        .macbook { width: 450px; height: 280px; background: #111827; border: 12px solid #334155; border-radius: 15px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .macbook::after { content: ""; width: 110%; height: 10px; background: #475569; position: absolute; bottom: -20px; left: -5%; border-radius: 5px; }
+        
+        .screen-content { width: 100%; height: 100%; object-fit: cover; display: flex; align-items: center; justify-content: center; text-align: center; color: var(--text-dim); font-size: 0.7rem; font-weight: 700; background: #0f172a; }
+
+        /* Resume Styling */
+        .resume-section { text-align: center; background: rgba(255,255,255,0.01); padding: 80px 5%; }
+        .resume-img { width: 100%; max-width: 800px; margin: 0 auto; display: block; border-radius: 8px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
 
         /* Testimonials */
         .testimonial-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .test-card { background: rgba(59, 130, 246, 0.05); padding: 30px; border-radius: 15px; border: 1px solid rgba(59, 130, 246, 0.1); font-style: italic; font-size: 0.95rem; position: relative; }
-        .test-card::before { content: "\f10d"; font-family: "Font Awesome 5 Free"; font-weight: 900; position: absolute; top: -10px; left: 20px; color: var(--accent-blue); font-size: 1.5rem; opacity: 0.3; }
+        .test-card { background: rgba(59, 130, 246, 0.05); padding: 30px; border-radius: 15px; border: 1px solid rgba(59, 130, 246, 0.1); font-style: italic; font-size: 0.95rem; }
 
-        .btn-download { background: var(--accent-green); color: #fff; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: 700; display: inline-block; margin-top: 20px; transition: 0.3s; }
-        .btn-download:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3); }
+        .cta-btn { background: var(--accent-blue); color: #fff; padding: 18px 35px; border-radius: 12px; text-decoration: none; font-weight: 800; display: inline-block; margin-top: 20px; }
 
-        footer { background: #020617; padding: 80px 5%; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); }
-        .cta-btn { background: var(--accent-blue); color: #fff; padding: 18px 35px; border-radius: 12px; text-decoration: none; font-weight: 800; display: inline-block; }
-
-        @media (max-width: 768px) { h1 { font-size: 2.5rem; } .web { width: 100%; height: 200px; } }
+        @media (max-width: 768px) {
+            .exp-header { flex-direction: column; }
+            .macbook { width: 90%; height: 200px; }
+        }
     </style>
 </head>
 <body>
-
-    <div class="blob"></div>
 
     <nav>
         <div class="logo">RENEENGINEER</span></div>
@@ -97,26 +90,12 @@
     </nav>
 
     <header id="home">
-        <img src="images/headshot.jpg" alt="Renee Brielle Angelo Duran" class="profile-img">
+        <!-- UPLOAD YOUR PHOTO AS headshot.jpg IN THE images/ FOLDER -->
+        <img src="images/headshot.jpg" alt="Renee Duran Headshot" class="profile-img">
         <br>
-        <span class="hero-badge"><i class="fa fa-bolt"></i> OPEN FOR FRACTIONAL LEADERSHIP</span>
-        <h1>Renee Brielle <br> Angelo Duran</h1>
-        <p class="hero-title">MBA & CIVIL ENGINEER</p>
-        
-        <div class="academic-grid">
-            <div class="credential-card">
-                <i class="fa fa-graduation-cap"></i>
-                <div><h4>MBA Graduate</h4></div>
-            </div>
-            <div class="credential-card">
-                <i class="fa fa-hard-hat"></i>
-                <div><h4>Civil Engineer</h4></div>
-            </div>
-        </div>
-
-        <p style="color: var(--text-dim); max-width: 700px; margin: 0 auto 30px; font-size: 1rem;">
-            Strategizing business scalability through engineering precision. Specialized in custom operational automation and process architecture.
-        </p>
+        <span class="hero-tag" style="color:var(--accent-green); font-weight:800; font-size:0.8rem;">MBA & CIVIL ENGINEER</span>
+        <h1>Structural Strategy. <br> Operational Excellence.</h1>
+        <p style="color: var(--text-dim); max-width: 700px; margin: 20px auto;">Applying engineering precision to scale remote operations and healthcare technology ecosystems.</p>
         
         <div class="nav-links">
             <a href="https://www.linkedin.com/in/reneengineer/" target="_blank"><i class="fab fa-linkedin fa-2x"></i></a>
@@ -124,38 +103,97 @@
         </div>
     </header>
 
-    <section id="software" style="background: rgba(255,255,255,0.01);">
-        <span class="section-tag">Proprietary Tech</span>
-        <h2 class="section-title">Custom Operations Ecosystem</h2>
-        <p style="color: var(--text-dim); max-width: 800px;">When off-the-shelf ERPs failed to meet complex inventory requirements, I engineered a custom cross-platform solution using Glide and Apps Script.</p>
+    <section id="software">
+        <span class="section-tag">Proprietary Development</span>
+        <h2 class="section-title">Custom Logistics Ecosystem</h2>
+        <p style="color:var(--text-dim)">Built a custom inventory and ERP solution using Glide and Apps Script when off-the-shelf tools failed to meet clinical compliance requirements.</p>
         
-        <div class="mockup-container">
-            <!-- Mobile Mockup -->
-            <div class="device mobile">
-                <div class="mock-screen">
-                    <div>
-                        <i class="fa fa-mobile-alt fa-3x"></i><br><br>
-                        <strong>Custom Logistics App</strong><br>
-                        IMEI Assignment & Tracking
-                    </div>
-                </div>
+        <div class="mockup-wrapper">
+            <!-- iPhone Mockup -->
+            <div class="iphone">
+                <div class="iphone-notch"></div>
+                <!-- TO CHANGE THE IMAGE: Replace the <div> below with: <img src="images/app.jpg" class="screen-content"> -->
+                <img src="images/app.jpg" class="screen-content">
             </div>
-            <!-- Web Mockup -->
-            <div class="device web">
-                <div class="mock-screen">
-                    <div>
-                        <i class="fa fa-laptop fa-3x"></i><br><br>
-                        <strong>Internal Admin Dashboard</strong><br>
-                        Automated Supplier Planning & Forecasting
-                    </div>
-                </div>
+
+            <!-- MacBook Mockup -->
+            <div class="macbook">
+                <!-- TO CHANGE THE IMAGE: Replace the <div> below with: <img src="images/dashboard.jpg" class="screen-content"> -->
+                <img src="images/dashboard.jpg" class="screen-content">
             </div>
         </div>
     </section>
 
+    <section id="work">
+        <span class="section-tag">Career Trajectory</span>
+        <h2 class="section-title">Professional Experience</h2>
+
+        <!-- RPM LOGIX -->
+        <div class="exp-card">
+            <div class="exp-header">
+                <div><span class="company">RPM Logix</span><h3>Operations Manager</h3></div>
+                <div class="date-label">2020 — Present</div>
+            </div>
+            <ul class="exp-list">
+                <li><strong>Remote Workforce Engineering:</strong> Directed a 30+ member remote team, architecting workflows that ensured 100% adherence to rigorous client KPIs and clinical standards.</li>
+                <li><strong>Medical Device Lifecycle Management:</strong> Optimized end-to-end inventory tracking—from global procurement and IMEI assignment to partner clinic allocation.</li>
+                <li><strong>Supply Chain Optimization:</strong> Coordinated with cross-functional leadership to align supply forecasting with deployment, reducing hardware idle time.</li>
+                <li><strong>Systematized Operations:</strong> Designed and enforced comprehensive SOPs, turning ad-hoc marketing and logistics tasks into repeatable, scalable processes.</li>
+                <li><strong>Performance Quality Assurance:</strong> Executed data-driven onboarding and performance evaluations, maintaining top-tier service quality across the board.</li>
+            </ul>
+        </div>
+
+        <!-- CARE COACH -->
+        <div class="exp-card">
+            <div class="exp-header">
+                <div><span class="company">Care Coach</span><h3>Health Advocate II</h3></div>
+                <div class="date-label">2019</div>
+            </div>
+            <ul class="exp-list">
+                <li><strong>Engagement Strategy:</strong> Leveraged proprietary telehealth technology to guide patients through clinical care plans, directly improving patient adherence rates.</li>
+                <li><strong>Proactive Intervention:</strong> Monitored high-volume behavioral data to provide rapid interventions, resulting in enhanced patient wellness outcomes.</li>
+            </ul>
+        </div>
+
+        <!-- NAVY -->
+        <div class="exp-card">
+            <div class="exp-header">
+                <div><span class="company">Philippine Navy</span><h3>Engineering Brigade</h3></div>
+                <div class="date-label">2019</div>
+            </div>
+            <ul class="exp-list">
+                <li><strong>Technical Leadership:</strong> Directed multidisciplinary units in high-stakes environments, ensuring total compliance with rigid military regulatory standards.</li>
+                <li><strong>Infrastructure Delivery:</strong> Led large-scale planning and execution of infrastructure projects, maintaining zero safety incidents and strict adherence to timelines.</li>
+            </ul>
+        </div>
+
+        <!-- ECOMMERCE -->
+        <div class="exp-card">
+            <div class="exp-header">
+                <div><span class="company">ALT Shift Ctrl</span><h3>eCommerce Specialist</h3></div>
+                <div class="date-label">2018</div>
+            </div>
+            <ul class="exp-list">
+                <li><strong>Storefront Optimization:</strong> Scaled digital storefront performance by optimizing fulfillment accuracy and visual merchandising strategies.</li>
+                <li><strong>Logistics Engineering:</strong> Identified and resolved supply chain bottlenecks through rigorous data analysis, increasing overall order management efficiency.</li>
+            </ul>
+        </div>
+
+        <!-- BLAH THERAPY -->
+        <div class="exp-card">
+            <div class="exp-header">
+                <div><span class="company">Blah Therapy</span><h3>Community Management</h3></div>
+                <div class="date-label">2015 — Present</div>
+            </div>
+            <ul class="exp-list">
+                <li><strong>Crisis Communication:</strong> Utilized advanced de-escalation and interpersonal skills to maintain safe, respectful environments in high-volume virtual communities.</li>
+            </ul>
+        </div>
+    </section>
+
     <section id="testimonials">
-        <span class="section-tag">Social Proof</span>
-        <h2 class="section-title">Partner Feedback</h2>
+        <span class="section-tag">Validation</span>
+        <h2 class="section-title">Endorsements</h2>
         <div class="testimonial-grid">
             <div class="test-card">"You don't even know how much you helped me man!"</div>
             <div class="test-card">"Great job using your engineering Brain."</div>
@@ -163,49 +201,20 @@
         </div>
     </section>
 
-    <section id="work">
-        <span class="section-tag">Career History</span>
-        <h2 class="section-title">Experience Highlights</h2>
-
-        <div class="exp-card">
-            <div class="exp-header">
-                <div><span class="company">RPM Logix</span><h3>Operations Manager</h3></div>
-                <div class="date-label">2020 — Present</div>
-            </div>
-            <ul class="exp-list">
-                <li>Directing 30+ remote personnel, ensuring military-grade adherence to SOPs and medical compliance.</li>
-                <li>Engineered custom inventory logic tracking medical devices from procurement to final partner clinic deployment.</li>
-                <li>Reduced supply chain bottlenecks by coordinating cross-functional forecasting and supply planning.</li>
-            </ul>
-        </div>
-
-        <div class="exp-card">
-            <div class="exp-header">
-                <div><span class="company">Philippine Navy</span><h3>Engineering Brigade</h3></div>
-                <div class="date-label">2019 — 2020</div>
-            </div>
-            <ul class="exp-list">
-                <li>Supervised multidisciplinary engineering units in high-stakes environments.</li>
-                <li>Managed project infrastructure planning with strict adherence to safety and timeline benchmarks.</li>
-                <li>*Projects held under professional confidentiality protocols.</li>
-            </ul>
-        </div>
-    </section>
-
-    <section id="resume" style="text-align: center;">
-        <span class="section-tag">Credentials</span>
-        <h2 class="section-title">Resume & CV</h2>
+    <section id="resume" class="resume-section">
+        <span class="section-tag">Full Credentials</span>
+        <h2 class="section-title">The Curriculum Vitae</h2>
         <img src="images/resume.jpg" alt="Renee Duran MBA Resume" class="resume-img">
-        <br>
-        <a href="images/resume.pdf" download class="btn-download">
+        <br><br>
+        <a href="images/resume.pdf" download class="cta-btn" style="background: var(--accent-green);">
             <i class="fa fa-file-pdf"></i> Download PDF Version
         </a>
     </section>
 
     <footer id="contact">
-        <h2 style="font-family: 'Poppins'; font-size: 2.5rem; margin-bottom: 20px;">Ready for <br> Strategic Growth?</h2>
+        <h2 style="font-family:'Poppins'; font-size:2.5rem; margin-bottom:20px;">Ready for Strategic Scale?</h2>
         <a href="mailto:ReneengineerServices@gmail.com" class="cta-btn">Initialize Consultation</a>
-        <div style="margin-top: 50px; font-size: 0.7rem; color: #475569; letter-spacing: 2px;">
+        <div style="margin-top:60px; font-size:0.7rem; color:#475569; letter-spacing:2px; text-transform:uppercase;">
             &copy; 2026 RENEENGINEER | ENGINEERED FOR GROWTH
         </div>
     </footer>
