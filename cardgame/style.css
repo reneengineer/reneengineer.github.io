@@ -300,6 +300,7 @@ body {
 .card-front {
   transform: rotateY(180deg);
   border: 1.5px solid;
+  background: var(--surface);
 }
 
 .card-type-label {

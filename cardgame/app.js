@@ -155,7 +155,7 @@ const App = {
       numberEl.style.color = '#e74c3c';
     } else {
       front.style.borderColor = card.color;
-      front.style.background = `linear-gradient(135deg, ${card.color}11, ${card.color}08)`;
+      front.style.background = `linear-gradient(135deg, ${card.color}33, #151515)`;
 
       if (card.setLabel) {
         typeLabel.textContent = card.setLabel;
@@ -470,6 +470,22 @@ const App = {
 
     document.getElementById('menu-resume').addEventListener('click', () => {
       this.showScreen('game');
+    });
+
+    document.getElementById('menu-l1').addEventListener('click', () => {
+      this.showScreen('level-intro', 'level1');
+    });
+
+    document.getElementById('menu-l2').addEventListener('click', () => {
+      this.showScreen('level-intro', 'level2');
+    });
+
+    document.getElementById('menu-l3').addEventListener('click', () => {
+      this.showScreen('level-intro', 'level3');
+    });
+
+    document.getElementById('menu-bonus').addEventListener('click', () => {
+      this.showScreen('level-intro', 'bonus');
     });
 
     document.getElementById('menu-restart').addEventListener('click', () => {
