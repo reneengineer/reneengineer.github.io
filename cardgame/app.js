@@ -184,6 +184,8 @@ const App = {
     const container = document.getElementById('card-container');
 
     if (!this.isFlipped) {
+      // Remove dealing animation so it doesn't override the flip transform
+      container.classList.remove('dealing');
       container.classList.add('flipped');
       this.isFlipped = true;
     } else {
