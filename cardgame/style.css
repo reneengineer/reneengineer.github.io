@@ -1090,6 +1090,7 @@ body::before {
 
 .menu-close {
   margin-top: 8px;
+  margin-bottom: 60px;
   width: 100%;
   max-width: 340px;
   display: flex;
@@ -1097,6 +1098,7 @@ body::before {
   justify-content: center;
   height: 48px;
   padding: 0;
+  flex-shrink: 0;
 }
 
 /* ============ SECTION SCREENS (Notes Vault, Favorites, Custom) ============ */
