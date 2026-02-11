@@ -134,9 +134,13 @@ const App = {
     const typeLabel = document.getElementById('card-type-label');
     const numberEl = document.getElementById('card-number');
 
+    // Reset to back face (no transition during reset)
+    container.style.transition = 'none';
     container.classList.remove('flipped');
+    container.classList.remove('hidden');
     this.isFlipped = false;
 
+    // Set card front content
     front.className = 'card-face card-front';
 
     if (card.type === 'wildcard') {
@@ -171,9 +175,9 @@ const App = {
     question.textContent = card.text;
     numberEl.textContent = `${this.cardsPlayed + 1}`;
 
-    container.classList.remove('dealing');
+    // Force layout, then re-enable transitions
     void container.offsetWidth;
-    container.classList.add('dealing');
+    container.style.transition = '';
 
     this.updateProgress();
     this.updateNextLevelButton();
@@ -184,11 +188,11 @@ const App = {
     const container = document.getElementById('card-container');
 
     if (!this.isFlipped) {
-      // Remove dealing animation so it doesn't override the flip transform
-      container.classList.remove('dealing');
+      // Flip to reveal question
       container.classList.add('flipped');
       this.isFlipped = true;
     } else {
+      // Tapped revealed card — go to next
       this.nextCard();
     }
   },
@@ -201,10 +205,20 @@ const App = {
     this.totalCardsPlayed++;
     this.cardIndex++;
 
+    const container = document.getElementById('card-container');
+
+    // Fade out current card
+    container.classList.add('hidden');
+
+    // After fade out, swap content and fade in
     setTimeout(() => {
       this.showCard();
-      this.isAnimating = false;
-    }, 150);
+      // Small delay then fade in
+      requestAnimationFrame(() => {
+        container.classList.remove('hidden');
+        this.isAnimating = false;
+      });
+    }, 180);
   },
 
   // ============ DIG DEEPER ============

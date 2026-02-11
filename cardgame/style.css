@@ -237,26 +237,17 @@ body {
   position: relative;
   cursor: pointer;
   transform-style: preserve-3d;
-  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+  opacity: 1;
 }
 
 .card-container.flipped {
   transform: rotateY(180deg);
 }
 
-.card-container.dealing {
-  animation: dealIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-@keyframes dealIn {
-  0% {
-    transform: translateY(40px) scale(0.9) rotateZ(-3deg);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(0) scale(1) rotateZ(0);
-    opacity: 1;
-  }
+.card-container.hidden {
+  opacity: 0;
+  transition: opacity 0.15s ease;
 }
 
 .card-face {
