@@ -1308,6 +1308,130 @@ body::before {
   padding-bottom: max(24px, env(safe-area-inset-bottom));
 }
 
+/* ============ MOOD CHECK SCREEN ============ */
+#mood-check {
+  gap: 20px;
+  text-align: center;
+}
+
+.mood-title {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 500;
+  font-style: italic;
+  letter-spacing: -0.5px;
+}
+
+.mood-subtitle {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--text-muted);
+  margin-top: -8px;
+}
+
+.mood-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.mood-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 8px;
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: var(--text);
+  font-family: var(--font-body);
+}
+
+.mood-btn:active {
+  transform: scale(0.95);
+}
+
+.mood-btn.selected {
+  border-color: rgba(176, 124, 216, 0.5);
+  background: rgba(176, 124, 216, 0.15);
+  box-shadow: 0 0 16px rgba(176, 124, 216, 0.15);
+}
+
+.mood-emoji {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.mood-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  color: var(--text-dim);
+}
+
+/* ============ CARD INTENSITY DOTS ============ */
+.card-intensity {
+  position: absolute;
+  bottom: 24px;
+  left: 28px;
+  font-size: 8px;
+  letter-spacing: 4px;
+  opacity: 0.25;
+}
+
+/* ============ END SCREEN ADDITIONS ============ */
+.end-duration {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.end-mood {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.end-mood-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--text-dim);
+}
+
+.end-mood-row .mood-arrow {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 0 2px;
+}
+
+.end-mood-row .end-mood-emoji {
+  font-size: 20px;
+}
+
+.end-mood-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
 /* ============ SAFE AREAS ============ */
 @supports (padding: max(0px)) {
   body {

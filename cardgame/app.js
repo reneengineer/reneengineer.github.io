@@ -36,6 +36,11 @@ const App = {
   previousScreen: null,
   gameSetUp: false,
   swipeHintShown: false,
+  sessionStartTime: null,
+  moodCheckPhase: null,
+  moodCheckTurn: 1,
+  moodBefore: { player1: null, player2: null },
+  moodAfter: { player1: null, player2: null },
 
   // Constants
   MIN_CARDS_PER_LEVEL: 15,
@@ -78,6 +83,7 @@ const App = {
     switch (screenId) {
       case 'welcome': this.updateWelcomeMusicBtn(); break;
       case 'name-entry': this.setupNameEntry(); break;
+      case 'mood-check': this.setupMoodCheck(); break;
       case 'level-intro': this.setupLevelIntro(data); break;
       case 'game': if (!this.gameSetUp) this.setupGame(); break;
       case 'level-complete': this.setupLevelComplete(); break;
@@ -128,6 +134,7 @@ const App = {
   // ============ GAME SETUP ============
   setupGame() {
     this.gameSetUp = true;
+    if (!this.sessionStartTime) this.sessionStartTime = Date.now();
     const data = this.getLevelData();
     const isOrdered = this.currentLevel === 'bonus';
     const noWildcards = ['bonus', 'spicy', 'anniversary', 'custom'].includes(this.currentLevel);
@@ -254,6 +261,17 @@ const App = {
 
     question.textContent = card.text;
     numberEl.textContent = `${this.cardsPlayed + 1}`;
+
+    // Intensity dots
+    const intensityEl = document.getElementById('card-intensity');
+    if (card.type === 'question') {
+      const level = this.getIntensity(card.text);
+      intensityEl.textContent = '\u25CF'.repeat(level);
+      intensityEl.style.color = card.color || 'var(--text-muted)';
+      intensityEl.style.display = '';
+    } else {
+      intensityEl.style.display = 'none';
+    }
 
     // Force layout, then re-enable transitions
     void container.offsetWidth;
@@ -519,7 +537,8 @@ const App = {
     }
 
     this.tempNote = null;
-    this.showScreen('end');
+    this.moodCheckPhase = 'after';
+    this.showScreen('mood-check');
   },
 
   // ============ END SCREEN ============
@@ -529,7 +548,110 @@ const App = {
     const count = this.totalCardsPlayed;
     document.getElementById('end-title').textContent = msg.title;
     document.getElementById('end-message').textContent = msg.text.replace(/\{count\}/g, count);
+
+    // Session duration
+    const durationEl = document.getElementById('end-duration');
+    if (this.sessionStartTime) {
+      const elapsed = Math.floor((Date.now() - this.sessionStartTime) / 60000);
+      if (elapsed < 1) {
+        durationEl.textContent = 'A few moments together';
+      } else if (elapsed === 1) {
+        durationEl.textContent = '1 minute together';
+      } else {
+        durationEl.textContent = `${elapsed} minutes together`;
+      }
+      durationEl.style.display = '';
+    } else {
+      durationEl.style.display = 'none';
+    }
+
+    // Mood comparison
+    const moodEl = document.getElementById('end-mood');
+    const hasBefore = this.moodBefore.player1 || this.moodBefore.player2;
+    const hasAfter = this.moodAfter.player1 || this.moodAfter.player2;
+    if (hasBefore || hasAfter) {
+      const name1 = this.player1Name || 'Player 1';
+      const name2 = this.player2Name || 'Player 2';
+      let html = '<div class="end-mood-label">Mood check</div>';
+
+      if (this.moodBefore.player1 || this.moodAfter.player1) {
+        html += `<div class="end-mood-row">${this.escapeHtml(name1)} `;
+        if (this.moodBefore.player1) html += `<span class="end-mood-emoji">${this.moodBefore.player1}</span>`;
+        if (this.moodBefore.player1 && this.moodAfter.player1) html += `<span class="mood-arrow">\u2192</span>`;
+        if (this.moodAfter.player1) html += `<span class="end-mood-emoji">${this.moodAfter.player1}</span>`;
+        html += '</div>';
+      }
+      if (this.moodBefore.player2 || this.moodAfter.player2) {
+        html += `<div class="end-mood-row">${this.escapeHtml(name2)} `;
+        if (this.moodBefore.player2) html += `<span class="end-mood-emoji">${this.moodBefore.player2}</span>`;
+        if (this.moodBefore.player2 && this.moodAfter.player2) html += `<span class="mood-arrow">\u2192</span>`;
+        if (this.moodAfter.player2) html += `<span class="end-mood-emoji">${this.moodAfter.player2}</span>`;
+        html += '</div>';
+      }
+      moodEl.innerHTML = html;
+      moodEl.style.display = '';
+    } else {
+      moodEl.style.display = 'none';
+    }
+
     this.clearProgress();
+    this.sessionStartTime = null;
+  },
+
+  // ============ MOOD CHECK ============
+  setupMoodCheck() {
+    this.moodCheckTurn = 1;
+    const title = document.getElementById('mood-title');
+    title.textContent = this.moodCheckPhase === 'before' ? 'Before we begin...' : 'How are you feeling now?';
+    this.showMoodCheckTurn();
+  },
+
+  showMoodCheckTurn() {
+    const label = document.getElementById('mood-turn-label');
+    const name = this.moodCheckTurn === 1
+      ? (this.player1Name || 'Player 1')
+      : (this.player2Name || 'Player 2');
+    label.textContent = `${name}'s turn`;
+
+    // Clear selections
+    document.querySelectorAll('.mood-btn').forEach(btn => btn.classList.remove('selected'));
+  },
+
+  selectMood(emoji) {
+    const target = this.moodCheckPhase === 'before' ? this.moodBefore : this.moodAfter;
+    if (this.moodCheckTurn === 1) {
+      target.player1 = emoji;
+      this.moodCheckTurn = 2;
+      this.haptic('light');
+      this.showMoodCheckTurn();
+    } else {
+      target.player2 = emoji;
+      this.haptic('light');
+      this.navigateAfterMoodCheck();
+    }
+  },
+
+  navigateAfterMoodCheck() {
+    if (this.moodCheckPhase === 'before') {
+      this.showScreen('level-intro', this.pendingLevel);
+    } else {
+      this.showScreen('end');
+    }
+  },
+
+  // ============ CARD INTENSITY ============
+  getIntensity(text) {
+    const lower = text.toLowerCase();
+    const deep = ['afraid', 'scared', 'vulnerable', 'hurt', 'wound', 'cry', 'cried', 'lonely', 'regret', 'die', 'dying', 'death', 'trauma', 'shame', 'guilt', 'apologize', 'pretend', 'fake', 'lie', 'lied', 'pain', 'loss', 'lost someone', 'darkest', 'worst', 'broken', 'betray'];
+    const medium = ['feel', 'wish', 'honest', 'truth', 'secret', 'dream', 'promise', 'sacrifice', 'trust', 'forgive', 'boundary', 'struggle', 'miss', 'need', 'worry', 'fear', 'hope', 'love', 'heart', 'soul', 'intimate', 'desire', 'jealous', 'insecure'];
+
+    for (const word of deep) {
+      if (lower.includes(word)) return 3;
+    }
+    for (const word of medium) {
+      if (lower.includes(word)) return 2;
+    }
+    return 1;
   },
 
   // ============ MENU ============
@@ -610,7 +732,8 @@ const App = {
     this.player2Name = name || 'Player 2';
     this.savePlayerNames();
     this.haptic('light');
-    this.showScreen('level-intro', this.pendingLevel);
+    this.moodCheckPhase = 'before';
+    this.showScreen('mood-check');
   },
 
   savePlayerNames() {
@@ -686,6 +809,10 @@ const App = {
     this.dig1Left = 1;
     this.dig2Left = 1;
     this.gameSetUp = false;
+    this.sessionStartTime = null;
+    this.moodCheckPhase = null;
+    this.moodBefore = { player1: null, player2: null };
+    this.moodAfter = { player1: null, player2: null };
     this.hideTimer();
     this.showScreen('welcome');
   },
@@ -1104,9 +1231,10 @@ const App = {
 
     document.getElementById('continue-btn').addEventListener('click', () => {
       if (this.currentLevel) {
-        // Skip name entry if names already saved
         if (this.player1Name && this.player2Name) {
-          this.showScreen('level-intro', this.currentLevel);
+          this.pendingLevel = this.currentLevel;
+          this.moodCheckPhase = 'before';
+          this.showScreen('mood-check');
         } else {
           this.pendingLevel = this.currentLevel;
           this.showScreen('name-entry');
@@ -1140,6 +1268,21 @@ const App = {
         e.preventDefault();
         this.savePlayerName();
       }
+    });
+
+    // Mood check
+    document.querySelectorAll('.mood-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Visual feedback
+        document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        // Brief delay for visual feedback, then advance
+        setTimeout(() => this.selectMood(btn.dataset.emoji), 200);
+      });
+    });
+
+    document.getElementById('mood-skip-btn').addEventListener('click', () => {
+      this.navigateAfterMoodCheck();
     });
 
     // Level intro
@@ -1238,7 +1381,7 @@ const App = {
         this.showFinalCardTurn();
         this.haptic('light');
       } else {
-        // Player 2 skipped — save whatever we have and end
+        // Player 2 skipped — save whatever we have and go to mood check
         if (this.tempNote) {
           const notes = JSON.parse(localStorage.getItem('betweenUs_notes') || '[]');
           notes.push({
@@ -1249,7 +1392,8 @@ const App = {
           localStorage.setItem('betweenUs_notes', JSON.stringify(notes));
         }
         this.tempNote = null;
-        this.showScreen('end');
+        this.moodCheckPhase = 'after';
+        this.showScreen('mood-check');
       }
     });
 

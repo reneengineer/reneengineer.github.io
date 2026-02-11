@@ -43,6 +43,25 @@
     <button id="name-save-btn" class="btn btn-primary btn-small">Save &amp; Next</button>
   </div>
 
+  <!-- ============ MOOD CHECK ============ -->
+  <div id="mood-check" class="screen">
+    <div class="welcome-icon">&#10084;&#65039;</div>
+    <h2 id="mood-title" class="mood-title">Before we begin...</h2>
+    <p class="mood-subtitle">Pick one.</p>
+    <div id="mood-turn-label" class="final-turn-label">Player 1</div>
+    <div class="mood-grid">
+      <button class="mood-btn" data-emoji="😊"><span class="mood-emoji">😊</span><span class="mood-label">Happy</span></button>
+      <button class="mood-btn" data-emoji="🥰"><span class="mood-emoji">🥰</span><span class="mood-label">Loving</span></button>
+      <button class="mood-btn" data-emoji="😌"><span class="mood-emoji">😌</span><span class="mood-label">Calm</span></button>
+      <button class="mood-btn" data-emoji="🤗"><span class="mood-emoji">🤗</span><span class="mood-label">Open</span></button>
+      <button class="mood-btn" data-emoji="🤔"><span class="mood-emoji">🤔</span><span class="mood-label">Curious</span></button>
+      <button class="mood-btn" data-emoji="😅"><span class="mood-emoji">😅</span><span class="mood-label">Nervous</span></button>
+      <button class="mood-btn" data-emoji="🥺"><span class="mood-emoji">🥺</span><span class="mood-label">Soft</span></button>
+      <button class="mood-btn" data-emoji="😴"><span class="mood-emoji">😴</span><span class="mood-label">Tired</span></button>
+    </div>
+    <button id="mood-skip-btn" class="btn btn-outline btn-small">Skip</button>
+  </div>
+
   <!-- ============ LEVEL INTRO ============ -->
   <div id="level-intro" class="screen">
     <div id="li-badge" class="level-badge">Level 1</div>
@@ -88,6 +107,7 @@
         <div id="card-front" class="card-face card-front">
           <div id="card-type-label" class="card-type-label">Level 1</div>
           <p id="card-question" class="card-question"></p>
+          <span id="card-intensity" class="card-intensity"></span>
           <span id="card-number" class="card-number"></span>
         </div>
       </div>
@@ -139,6 +159,8 @@
     <div class="end-icon">&#10084;&#65039;</div>
     <h2 id="end-title" class="end-title">That was us.</h2>
     <p id="end-message" class="end-message"></p>
+    <div id="end-duration" class="end-duration"></div>
+    <div id="end-mood" class="end-mood"></div>
     <div class="end-buttons">
       <button id="play-again-btn" class="btn btn-outline">Play Again</button>
     </div>
