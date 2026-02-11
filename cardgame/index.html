@@ -26,6 +26,10 @@
     <button id="start-btn" class="btn btn-primary">Begin</button>
     <button id="continue-btn" class="btn btn-outline btn-small" style="display:none;">Continue where you left off</button>
     <button id="quick-start-btn" class="btn btn-outline btn-small">Quick Play</button>
+    <div class="welcome-extras">
+      <button id="welcome-notes-btn" class="welcome-extra-btn">Notes Vault</button>
+      <button id="welcome-music-btn" class="welcome-extra-btn">Music <span id="welcome-music-status">OFF</span></button>
+    </div>
   </div>
 
   <!-- ============ LEVEL INTRO ============ -->
@@ -110,17 +114,12 @@
     <div class="final-icon">&#9997;&#65039;</div>
     <h2 class="final-title">The Final Card</h2>
     <p id="final-prompt" class="final-prompt"></p>
-    <div class="note-area dual-notes">
-      <div class="note-box">
-        <label class="note-label">Player 1</label>
-        <textarea id="note-input-1" placeholder="Write your note..." rows="4"></textarea>
-      </div>
-      <div class="note-box">
-        <label class="note-label">Player 2</label>
-        <textarea id="note-input-2" placeholder="Write your note..." rows="4"></textarea>
-      </div>
+    <div id="final-turn-label" class="final-turn-label">Your turn</div>
+    <div class="note-area">
+      <textarea id="note-input" placeholder="Write your note..." rows="5"></textarea>
+      <input id="note-name" type="text" class="note-name-input" placeholder="Your name" maxlength="30">
     </div>
-    <button id="save-note-btn" class="btn btn-primary btn-small">Save Notes</button>
+    <button id="save-note-btn" class="btn btn-primary btn-small">Save &amp; Pass</button>
     <button id="skip-note-btn" class="btn btn-outline btn-small">Skip</button>
   </div>
 

@@ -187,6 +187,45 @@ body::before {
   color: var(--text);
 }
 
+/* Welcome extras */
+.welcome-extras {
+  display: flex;
+  gap: 12px;
+  margin-top: -8px;
+}
+
+.welcome-extra-btn {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50px;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 400;
+  padding: 8px 18px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.3px;
+}
+
+.welcome-extra-btn:active {
+  transform: scale(0.96);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.welcome-extra-btn span {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin-left: 4px;
+  color: var(--text-muted);
+  transition: color 0.3s ease;
+}
+
+.welcome-extra-btn span.on {
+  color: var(--purple);
+}
+
 /* ============ BUTTONS ============ */
 .btn {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06));
@@ -802,36 +841,25 @@ body::before {
   max-width: 300px;
 }
 
-.note-area {
-  width: 100%;
-  max-width: 320px;
-}
-
-.note-area.dual-notes {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.note-box {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.note-label {
+.final-turn-label {
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: var(--text-muted);
-  text-align: left;
-  padding-left: 4px;
+  color: var(--purple);
+}
+
+.note-area {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .note-area textarea {
   width: 100%;
-  min-height: 120px;
+  min-height: 140px;
   background: var(--glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -855,6 +883,33 @@ body::before {
 }
 
 .note-area textarea::placeholder {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.note-name-input {
+  width: 100%;
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 400;
+  outline: none;
+  -webkit-user-select: text;
+  user-select: text;
+  transition: border-color 0.3s ease;
+}
+
+.note-name-input:focus {
+  border-color: var(--glass-border-light);
+}
+
+.note-name-input::placeholder {
   color: var(--text-muted);
   font-style: italic;
 }

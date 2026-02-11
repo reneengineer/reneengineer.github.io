@@ -22,6 +22,9 @@ const App = {
   ambientAudio: null,
   timerInterval: null,
   timerSeconds: 0,
+  finalCardTurn: 1,
+  tempNote: null,
+  tempName: null,
   swiped: false,
   touchStartX: 0,
   touchStartY: 0,
@@ -68,6 +71,7 @@ const App = {
     this.currentScreen = screenId;
 
     switch (screenId) {
+      case 'welcome': this.updateWelcomeMusicBtn(); break;
       case 'level-intro': this.setupLevelIntro(data); break;
       case 'game': if (!this.gameSetUp) this.setupGame(); break;
       case 'level-complete': this.setupLevelComplete(); break;
@@ -435,19 +439,66 @@ const App = {
     const prompts = QUESTIONS.finalCard.prompts;
     const prompt = prompts[Math.floor(Math.random() * prompts.length)];
     document.getElementById('final-prompt').textContent = prompt;
-    document.getElementById('note-input-1').value = '';
-    document.getElementById('note-input-2').value = '';
+    this.finalCardTurn = 1;
+    this.tempNote = null;
+    this.tempName = null;
+    this.showFinalCardTurn();
     this.saveProgress();
   },
 
+  showFinalCardTurn() {
+    const label = document.getElementById('final-turn-label');
+    const noteInput = document.getElementById('note-input');
+    const nameInput = document.getElementById('note-name');
+    const saveBtn = document.getElementById('save-note-btn');
+
+    noteInput.value = '';
+    nameInput.value = '';
+
+    if (this.finalCardTurn === 1) {
+      label.textContent = 'Player 1';
+      noteInput.placeholder = 'Write your note...';
+      nameInput.placeholder = 'Your name';
+      saveBtn.innerHTML = 'Save &amp; Pass';
+    } else {
+      label.textContent = 'Player 2';
+      noteInput.placeholder = 'Your turn — write your note...';
+      nameInput.placeholder = 'Your name';
+      saveBtn.textContent = 'Save';
+    }
+  },
+
   saveNote() {
-    const note1 = document.getElementById('note-input-1').value.trim();
-    const note2 = document.getElementById('note-input-2').value.trim();
-    if (note1 || note2) {
+    const note = document.getElementById('note-input').value.trim();
+    const name = document.getElementById('note-name').value.trim();
+
+    if (this.finalCardTurn === 1) {
+      this.tempNote = note;
+      this.tempName = name || 'Player 1';
+      this.finalCardTurn = 2;
+      this.showFinalCardTurn();
+      this.haptic('light');
+      return;
+    }
+
+    // Player 2 done — save both
+    const p1Note = this.tempNote || '';
+    const p1Name = this.tempName || 'Player 1';
+    const p2Note = note;
+    const p2Name = name || 'Player 2';
+
+    if (p1Note || p2Note) {
       const notes = JSON.parse(localStorage.getItem('betweenUs_notes') || '[]');
-      notes.push({ player1: note1, player2: note2, date: new Date().toISOString() });
+      notes.push({
+        player1: p1Note, name1: p1Name,
+        player2: p2Note, name2: p2Name,
+        date: new Date().toISOString()
+      });
       localStorage.setItem('betweenUs_notes', JSON.stringify(notes));
     }
+
+    this.tempNote = null;
+    this.tempName = null;
     this.showScreen('end');
   },
 
@@ -487,6 +538,12 @@ const App = {
       customCount > 0 ? `${customCount}` : '';
 
     this.showScreen('menu');
+  },
+
+  updateWelcomeMusicBtn() {
+    const status = document.getElementById('welcome-music-status');
+    status.textContent = this.ambientPlaying ? 'ON' : 'OFF';
+    status.classList.toggle('on', this.ambientPlaying);
   },
 
   updateToggleUI() {
@@ -699,7 +756,7 @@ const App = {
     list.innerHTML = notes.slice().reverse().map(n => {
       const date = new Date(n.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-      // Support old single-note format and new paired format
+      // Support old single-note format
       if (n.text) {
         return `<div class="note-card">
           <p class="note-text">${this.escapeHtml(n.text)}</p>
@@ -707,10 +764,12 @@ const App = {
         </div>`;
       }
 
+      const name1 = n.name1 || 'Player 1';
+      const name2 = n.name2 || 'Player 2';
       const entries = [];
       if (n.player1) {
         entries.push(`<div class="note-entry">
-          <div class="note-entry-label">Player 1</div>
+          <div class="note-entry-label">${this.escapeHtml(name1)}</div>
           <p class="note-text">${this.escapeHtml(n.player1)}</p>
         </div>`);
       }
@@ -719,7 +778,7 @@ const App = {
       }
       if (n.player2) {
         entries.push(`<div class="note-entry">
-          <div class="note-entry-label">Player 2</div>
+          <div class="note-entry-label">${this.escapeHtml(name2)}</div>
           <p class="note-text">${this.escapeHtml(n.player2)}</p>
         </div>`);
       }
@@ -968,6 +1027,15 @@ const App = {
       this.showScreen('level-intro', 'level1');
     });
 
+    document.getElementById('welcome-notes-btn').addEventListener('click', () => {
+      this.showScreen('notes-vault');
+    });
+
+    document.getElementById('welcome-music-btn').addEventListener('click', () => {
+      this.toggleAmbientSound();
+      this.updateWelcomeMusicBtn();
+    });
+
     // Level intro
     document.getElementById('begin-level-btn').addEventListener('click', () => {
       this.gameSetUp = false;
@@ -1052,7 +1120,28 @@ const App = {
     });
 
     document.getElementById('skip-note-btn').addEventListener('click', () => {
-      this.showScreen('end');
+      if (this.finalCardTurn === 1) {
+        // Player 1 skipped — move to player 2
+        this.tempNote = '';
+        this.tempName = 'Player 1';
+        this.finalCardTurn = 2;
+        this.showFinalCardTurn();
+        this.haptic('light');
+      } else {
+        // Player 2 skipped — save whatever we have and end
+        if (this.tempNote) {
+          const notes = JSON.parse(localStorage.getItem('betweenUs_notes') || '[]');
+          notes.push({
+            player1: this.tempNote, name1: this.tempName || 'Player 1',
+            player2: '', name2: 'Player 2',
+            date: new Date().toISOString()
+          });
+          localStorage.setItem('betweenUs_notes', JSON.stringify(notes));
+        }
+        this.tempNote = null;
+        this.tempName = null;
+        this.showScreen('end');
+      }
     });
 
     // End
@@ -1132,7 +1221,7 @@ const App = {
 
     // Notes vault back
     document.getElementById('notes-back').addEventListener('click', () => {
-      this.showScreen('menu');
+      this.showScreen(this.previousScreen === 'welcome' ? 'welcome' : 'menu');
     });
 
     // Favorites back
