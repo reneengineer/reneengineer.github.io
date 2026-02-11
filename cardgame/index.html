@@ -19,6 +19,14 @@
     <div class="welcome-icon">&#10084;&#65039;</div>
     <h1 class="app-title">Between Us</h1>
     <p class="app-subtitle">A card game for two people who want to go deeper.</p>
+    <div id="name-inputs" class="name-inputs glass">
+      <div class="name-label">Who's playing?</div>
+      <div class="name-row">
+        <input id="name-1" type="text" class="name-field" placeholder="Player 1" maxlength="20" autocomplete="off">
+        <span class="name-and">&</span>
+        <input id="name-2" type="text" class="name-field" placeholder="Player 2" maxlength="20" autocomplete="off">
+      </div>
+    </div>
     <div class="welcome-rule glass">
       <div class="rule-label">The Only Rule</div>
       <div class="rule-text">Be honest.</div>
@@ -76,10 +84,14 @@
           <span id="card-number" class="card-number"></span>
         </div>
       </div>
+      <div id="swipe-hint" class="swipe-hint" style="display:none;">
+        <span class="swipe-hint-arrow">&larr;</span> swipe for next
+      </div>
     </div>
 
     <div class="game-footer">
       <button id="fav-btn" class="footer-btn fav-btn">&hearts;</button>
+      <button id="share-btn" class="footer-btn share-btn">&#8599;</button>
       <button id="dig-btn" class="footer-btn dig-btn">Dig Deeper</button>
       <button id="next-level-btn" class="footer-btn next-level-btn" style="display:none;">Next Level</button>
     </div>
@@ -170,6 +182,9 @@
       </button>
     </div>
     <div class="menu-divider"></div>
+    <button id="menu-reset-played" class="menu-item">
+      Reset Played Cards <span id="played-count" class="mi-right"></span>
+    </button>
     <button id="menu-restart" class="menu-item" style="color: var(--red);">
       Start Over <span class="mi-right">&rarr;</span>
     </button>

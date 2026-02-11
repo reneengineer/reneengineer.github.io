@@ -28,6 +28,9 @@ const App = {
   touchStartY: 0,
   touchStartTime: 0,
   previousScreen: null,
+  gameSetUp: false,
+  playerNames: ['', ''],
+  swipeHintShown: false,
 
   // Constants
   MIN_CARDS_PER_LEVEL: 15,
@@ -43,6 +46,8 @@ const App = {
     this.loadPlayedCards();
     this.loadCustomQuestions();
     this.loadSettings();
+    this.loadNames();
+    this.swipeHintShown = localStorage.getItem('betweenUs_swipeHint') === 'true';
     this.bindEvents();
 
     const continueBtn = document.getElementById('continue-btn');
@@ -67,7 +72,7 @@ const App = {
 
     switch (screenId) {
       case 'level-intro': this.setupLevelIntro(data); break;
-      case 'game': this.setupGame(); break;
+      case 'game': if (!this.gameSetUp) this.setupGame(); break;
       case 'level-complete': this.setupLevelComplete(); break;
       case 'final-card': this.setupFinalCard(); break;
       case 'end': this.setupEnd(); break;
@@ -115,6 +120,7 @@ const App = {
 
   // ============ GAME SETUP ============
   setupGame() {
+    this.gameSetUp = true;
     const data = this.getLevelData();
     const isOrdered = this.currentLevel === 'bonus';
     const noWildcards = ['bonus', 'spicy', 'anniversary', 'custom'].includes(this.currentLevel);
@@ -199,6 +205,13 @@ const App = {
     container.classList.remove('hidden');
     this.isFlipped = false;
 
+    // Set card back tint per level
+    const cardBack = container.querySelector('.card-back');
+    cardBack.className = 'card-face card-back';
+    if (this.currentLevel) {
+      cardBack.classList.add(`level-${this.currentLevel}`);
+    }
+
     // Set card front content
     front.className = 'card-face card-front';
 
@@ -254,6 +267,15 @@ const App = {
       this.isFlipped = true;
       this.haptic('light');
       this.playFlipSound();
+
+      // Show swipe hint on first flip ever
+      if (!this.swipeHintShown) {
+        this.swipeHintShown = true;
+        localStorage.setItem('betweenUs_swipeHint', 'true');
+        const hint = document.getElementById('swipe-hint');
+        hint.style.display = 'block';
+        setTimeout(() => { hint.style.display = 'none'; }, 3200);
+      }
 
       // Show timer if this is a timed wildcard
       const card = this.deck[this.cardIndex];
@@ -348,6 +370,7 @@ const App = {
 
   advanceLevel() {
     this.haptic('medium');
+    this.gameSetUp = false;
     if (this.LEVELS.includes(this.currentLevel)) {
       this.showScreen('level-complete');
     } else {
@@ -356,6 +379,7 @@ const App = {
   },
 
   completeLevelForced() {
+    this.gameSetUp = false;
     if (this.LEVELS.includes(this.currentLevel)) {
       this.showScreen('level-complete');
     } else {
@@ -427,6 +451,15 @@ const App = {
   // ============ END SCREEN ============
   setupEnd() {
     document.getElementById('end-total').textContent = this.totalCardsPlayed;
+    // Personalize with names
+    const names = this.getDisplayNames();
+    const hasNames = this.playerNames[0] || this.playerNames[1];
+    const title = document.querySelector('.end-title');
+    if (hasNames) {
+      title.textContent = `That was ${names.name1} & ${names.name2}.`;
+    } else {
+      title.textContent = 'That was us.';
+    }
     this.clearProgress();
   },
 
@@ -446,6 +479,10 @@ const App = {
       this.currentLevel === 'level3' ? 'In progress' : isBonusActive ? 'Done' : '';
     document.getElementById('menu-bonus').querySelector('.mi-right').textContent =
       isBonusActive ? 'In progress' : '';
+
+    // Update played cards count
+    const playedTotal = this.getPlayedTotal();
+    document.getElementById('played-count').textContent = playedTotal > 0 ? `${playedTotal} seen` : '';
 
     // Update toggle statuses
     this.updateToggleUI();
@@ -513,6 +550,7 @@ const App = {
     this.cardsPlayed = 0;
     this.totalCardsPlayed = 0;
     this.digDeepersLeft = 1;
+    this.gameSetUp = false;
     this.hideTimer();
     this.showScreen('welcome');
   },
@@ -860,6 +898,70 @@ const App = {
     }
   },
 
+  // ============ COUPLE NAMES ============
+  saveNames() {
+    const n1 = document.getElementById('name-1').value.trim();
+    const n2 = document.getElementById('name-2').value.trim();
+    this.playerNames = [n1, n2];
+    localStorage.setItem('betweenUs_names', JSON.stringify(this.playerNames));
+  },
+
+  loadNames() {
+    const saved = localStorage.getItem('betweenUs_names');
+    if (saved) {
+      this.playerNames = JSON.parse(saved);
+      const n1 = document.getElementById('name-1');
+      const n2 = document.getElementById('name-2');
+      if (this.playerNames[0]) n1.value = this.playerNames[0];
+      if (this.playerNames[1]) n2.value = this.playerNames[1];
+    }
+  },
+
+  getDisplayNames() {
+    const n1 = this.playerNames[0] || 'Player 1';
+    const n2 = this.playerNames[1] || 'Player 2';
+    return { name1: n1, name2: n2 };
+  },
+
+  // ============ SHARE ============
+  shareQuestion() {
+    if (!this.isFlipped || !this.deck[this.cardIndex]) return;
+    const card = this.deck[this.cardIndex];
+    const text = card.text;
+    const shareData = {
+      title: 'Between Us',
+      text: `"${text}" — from Between Us, a card game for two.`
+    };
+
+    if (navigator.share) {
+      navigator.share(shareData).catch(() => {});
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText(shareData.text).then(() => {
+        const btn = document.getElementById('share-btn');
+        btn.textContent = '\u2713';
+        setTimeout(() => { btn.innerHTML = '&#8599;'; }, 1500);
+      }).catch(() => {});
+    }
+    this.haptic('light');
+  },
+
+  // ============ RESET PLAYED CARDS ============
+  resetPlayedCards() {
+    this.playedCards = {};
+    this.savePlayedCards();
+    this.haptic('medium');
+    this.showMenu();
+  },
+
+  getPlayedTotal() {
+    let total = 0;
+    for (const level in this.playedCards) {
+      total += this.playedCards[level].length;
+    }
+    return total;
+  },
+
   // ============ UTILITIES ============
   shuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
@@ -879,14 +981,17 @@ const App = {
   bindEvents() {
     // Welcome
     document.getElementById('start-btn').addEventListener('click', () => {
+      this.saveNames();
       this.showScreen('level-intro', 'level1');
     });
 
     document.getElementById('continue-btn').addEventListener('click', () => {
+      this.saveNames();
       if (this.currentLevel) this.showScreen('level-intro', this.currentLevel);
     });
 
     document.getElementById('quick-start-btn').addEventListener('click', () => {
+      this.saveNames();
       this.quickPlayMode = true;
       this.saveSettings();
       this.showScreen('level-intro', 'level1');
@@ -894,6 +999,7 @@ const App = {
 
     // Level intro
     document.getElementById('begin-level-btn').addEventListener('click', () => {
+      this.gameSetUp = false;
       this.showScreen('game');
     });
 
@@ -943,6 +1049,11 @@ const App = {
     document.getElementById('fav-btn').addEventListener('click', (e) => {
       e.stopPropagation();
       this.toggleFavorite();
+    });
+
+    document.getElementById('share-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.shareQuestion();
     });
 
     // Timer
@@ -1036,6 +1147,10 @@ const App = {
       this.toggleQuickPlay();
     });
 
+    document.getElementById('menu-reset-played').addEventListener('click', () => {
+      this.resetPlayedCards();
+    });
+
     document.getElementById('menu-restart').addEventListener('click', () => {
       this.resetGame();
     });
@@ -1076,9 +1191,11 @@ const App = {
       this.showScreen('menu');
     });
 
-    // Prevent zoom on double tap (iOS)
+    // Prevent zoom on double tap (iOS) — but allow in text inputs
     let lastTap = 0;
     document.addEventListener('touchend', (e) => {
+      const tag = e.target.tagName;
+      if (tag === 'TEXTAREA' || tag === 'INPUT') return;
       const now = Date.now();
       if (now - lastTap < 300) e.preventDefault();
       lastTap = now;

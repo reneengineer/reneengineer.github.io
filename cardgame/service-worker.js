@@ -1,4 +1,4 @@
-const CACHE_NAME = 'between-us-v8';
+const CACHE_NAME = 'between-us-v9';
 const ASSETS = [
   '/cardgame/',
   '/cardgame/index.html',
