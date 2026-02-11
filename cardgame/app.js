@@ -1208,11 +1208,15 @@ const App = {
     });
 
     document.getElementById('menu-reset-played').addEventListener('click', () => {
-      this.resetPlayedCards();
+      if (confirm('Reset all played card history? Cards will repeat again.')) {
+        this.resetPlayedCards();
+      }
     });
 
     document.getElementById('menu-restart').addEventListener('click', () => {
-      this.resetGame();
+      if (confirm('Start over? All current progress will be lost.')) {
+        this.resetGame();
+      }
     });
 
     document.getElementById('menu-close').addEventListener('click', () => {
