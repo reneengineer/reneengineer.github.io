@@ -10,15 +10,39 @@ const App = {
   isFlipped: false,
   isAnimating: false,
 
+  // New feature state
+  favorites: [],
+  playedCards: {},
+  customQuestions: [],
+  quickPlayMode: false,
+  ambientPlaying: false,
+  soundEnabled: true,
+  screenDimmed: false,
+  audioCtx: null,
+  ambientNode: null,
+  ambientGain: null,
+  timerInterval: null,
+  timerSeconds: 0,
+  swiped: false,
+  touchStartX: 0,
+  touchStartY: 0,
+  touchStartTime: 0,
+  previousScreen: null,
+
   // Constants
   MIN_CARDS_PER_LEVEL: 15,
   MIN_CARDS_BONUS: 12,
+  MIN_CARDS_QUICK: 5,
   WILDCARD_FREQUENCY: 5,
   LEVELS: ['level1', 'level2', 'level3'],
 
   // ============ INIT ============
   init() {
     this.loadProgress();
+    this.loadFavorites();
+    this.loadPlayedCards();
+    this.loadCustomQuestions();
+    this.loadSettings();
     this.bindEvents();
 
     const continueBtn = document.getElementById('continue-btn');
@@ -34,7 +58,10 @@ const App = {
     const current = document.querySelector('.screen.active');
     const next = document.getElementById(screenId);
 
-    if (current) current.classList.remove('active');
+    if (current) {
+      this.previousScreen = current.id;
+      current.classList.remove('active');
+    }
     next.classList.add('active');
     this.currentScreen = screenId;
 
@@ -44,24 +71,26 @@ const App = {
       case 'level-complete': this.setupLevelComplete(); break;
       case 'final-card': this.setupFinalCard(); break;
       case 'end': this.setupEnd(); break;
+      case 'notes-vault': this.renderNotesVault(); break;
+      case 'favorites-screen': this.renderFavorites(); break;
+      case 'custom-qs': this.renderCustomQuestions(); break;
     }
   },
 
   // ============ LEVEL INTRO ============
   setupLevelIntro(level) {
     if (level) this.currentLevel = level;
-    const data = QUESTIONS[this.currentLevel];
+    const data = this.getLevelData();
 
-    const isBonus = this.currentLevel === 'bonus';
-    const levelNum = isBonus ? '' : this.currentLevel.replace('level', '');
+    const isMainLevel = this.LEVELS.includes(this.currentLevel);
+    const levelNum = isMainLevel ? this.currentLevel.replace('level', '') : '';
 
-    document.getElementById('li-badge').textContent = isBonus ? 'Bonus' : `Level ${levelNum}`;
+    document.getElementById('li-badge').textContent = isMainLevel ? `Level ${levelNum}` : (this.currentLevel === 'custom' ? 'Custom' : data.name);
     document.getElementById('li-name').textContent = data.name;
     document.getElementById('li-name').style.color = data.color;
     document.getElementById('li-subtitle').textContent = data.subtitle;
     document.getElementById('li-count').textContent = `${data.cards.length} cards`;
 
-    // Show bonus description if present
     const descEl = document.getElementById('li-description');
     if (data.description) {
       descEl.textContent = data.description;
@@ -71,20 +100,39 @@ const App = {
     }
   },
 
+  getLevelData() {
+    if (this.currentLevel === 'custom') {
+      return {
+        name: "Custom",
+        color: "#A29BFE",
+        colorLight: "#D6CEFF",
+        subtitle: "Questions from the heart.",
+        cards: this.customQuestions
+      };
+    }
+    return QUESTIONS[this.currentLevel];
+  },
+
   // ============ GAME SETUP ============
   setupGame() {
-    const data = QUESTIONS[this.currentLevel];
-    const isBonus = this.currentLevel === 'bonus';
+    const data = this.getLevelData();
+    const isOrdered = this.currentLevel === 'bonus';
+    const noWildcards = ['bonus', 'spicy', 'anniversary', 'custom'].includes(this.currentLevel);
 
-    this.deck = isBonus ? this.buildBonusDeck(data) : this.buildDeck(data);
+    this.deck = isOrdered ? this.buildOrderedDeck(data) : this.buildDeck(data, !noWildcards);
     this.cardIndex = 0;
     this.cardsPlayed = 0;
-    this.digDeepersLeft = isBonus ? 0 : 1;
+    this.digDeepersLeft = noWildcards ? 0 : 1;
     this.isFlipped = false;
+    this.hideTimer();
 
     const tag = document.getElementById('game-level-tag');
     tag.textContent = data.name;
     tag.style.color = data.color;
+
+    // Set progress bar color
+    document.getElementById('progress-fill').style.background = data.color;
+    document.getElementById('progress-fill').style.color = data.color;
 
     this.updateProgress();
     this.updateDigButton();
@@ -92,16 +140,28 @@ const App = {
     this.showCard();
   },
 
-  buildDeck(levelData) {
+  buildDeck(levelData, includeWildcards) {
+    const played = this.playedCards[this.currentLevel] || [];
+    let available = levelData.cards.filter(q => !played.includes(q));
+
+    // Reset if not enough unplayed cards
+    const minNeeded = this.quickPlayMode ? this.MIN_CARDS_QUICK : this.MIN_CARDS_PER_LEVEL;
+    if (available.length < minNeeded) {
+      this.playedCards[this.currentLevel] = [];
+      available = [...levelData.cards];
+      this.savePlayedCards();
+    }
+
     const cards = [];
-    const questions = this.shuffle([...levelData.cards]);
-    const wildcards = this.shuffle([...QUESTIONS.wildcards]);
+    const questions = this.shuffle([...available]);
+    const wildcards = includeWildcards ? this.shuffle([...QUESTIONS.wildcards]) : [];
     let wcIndex = 0;
 
     questions.forEach((q, i) => {
       cards.push({ type: 'question', text: q, color: levelData.color, colorLight: levelData.colorLight });
-      if ((i + 1) % this.WILDCARD_FREQUENCY === 0 && wcIndex < wildcards.length) {
-        cards.push({ type: 'wildcard', text: wildcards[wcIndex].text });
+      if (includeWildcards && (i + 1) % this.WILDCARD_FREQUENCY === 0 && wcIndex < wildcards.length) {
+        const wc = wildcards[wcIndex];
+        cards.push({ type: 'wildcard', text: wc.text, timer: wc.timer || 0 });
         wcIndex++;
       }
     });
@@ -109,8 +169,7 @@ const App = {
     return cards;
   },
 
-  buildBonusDeck(levelData) {
-    // 36 Questions are played in order (not shuffled) — that's how the experiment works
+  buildOrderedDeck(levelData) {
     return levelData.cards.map((q, i) => ({
       type: 'question',
       text: q,
@@ -164,9 +223,9 @@ const App = {
       if (card.setLabel) {
         typeLabel.textContent = card.setLabel;
       } else {
-        const isBonus = this.currentLevel === 'bonus';
-        const levelNum = isBonus ? '' : this.currentLevel.replace('level', '');
-        typeLabel.textContent = isBonus ? 'Bonus' : `Level ${levelNum}`;
+        const isMainLevel = this.LEVELS.includes(this.currentLevel);
+        const levelNum = isMainLevel ? this.currentLevel.replace('level', '') : '';
+        typeLabel.textContent = isMainLevel ? `Level ${levelNum}` : this.getLevelData().name;
       }
       typeLabel.style.color = card.color;
       numberEl.style.color = card.color;
@@ -181,6 +240,8 @@ const App = {
 
     this.updateProgress();
     this.updateNextLevelButton();
+    this.updateFavButton();
+    this.hideTimer();
   },
 
   flipCard() {
@@ -191,6 +252,14 @@ const App = {
       // Flip to reveal question
       container.classList.add('flipped');
       this.isFlipped = true;
+      this.haptic('light');
+      this.playFlipSound();
+
+      // Show timer if this is a timed wildcard
+      const card = this.deck[this.cardIndex];
+      if (card && card.timer) {
+        this.showTimer(card.timer);
+      }
     } else {
       // Tapped revealed card — go to next
       this.nextCard();
@@ -201,6 +270,12 @@ const App = {
     if (this.isAnimating) return;
     this.isAnimating = true;
 
+    // Mark card as played
+    const card = this.deck[this.cardIndex];
+    if (card && card.type === 'question') {
+      this.markCardPlayed(card.text);
+    }
+
     this.cardsPlayed++;
     this.totalCardsPlayed++;
     this.cardIndex++;
@@ -209,11 +284,11 @@ const App = {
 
     // Fade out current card
     container.classList.add('hidden');
+    this.haptic('light');
 
     // After fade out, swap content and fade in
     setTimeout(() => {
       this.showCard();
-      // Small delay then fade in
       requestAnimationFrame(() => {
         container.classList.remove('hidden');
         this.isAnimating = false;
@@ -226,6 +301,7 @@ const App = {
     if (this.digDeepersLeft <= 0 || this.isAnimating) return;
     this.digDeepersLeft--;
     this.updateDigButton();
+    this.haptic('medium');
 
     const prompts = QUESTIONS.digDeeper;
     const prompt = prompts[Math.floor(Math.random() * prompts.length)];
@@ -236,7 +312,8 @@ const App = {
 
   updateDigButton() {
     const btn = document.getElementById('dig-btn');
-    if (this.currentLevel === 'bonus') {
+    const noWildcards = ['bonus', 'spicy', 'anniversary', 'custom'].includes(this.currentLevel);
+    if (noWildcards) {
       btn.style.display = 'none';
       return;
     }
@@ -253,17 +330,16 @@ const App = {
   // ============ LEVEL PROGRESSION ============
   updateNextLevelButton() {
     const btn = document.getElementById('next-level-btn');
+    const isMainLevel = this.LEVELS.includes(this.currentLevel);
     const isBonus = this.currentLevel === 'bonus';
-    const minCards = isBonus ? this.MIN_CARDS_BONUS : this.MIN_CARDS_PER_LEVEL;
+    const minCards = this.quickPlayMode ? this.MIN_CARDS_QUICK : (isBonus ? this.MIN_CARDS_BONUS : this.MIN_CARDS_PER_LEVEL);
 
     if (this.cardsPlayed >= minCards) {
       btn.style.display = 'flex';
-      if (this.currentLevel === 'level3') {
-        btn.textContent = 'Final Card';
-      } else if (isBonus) {
-        btn.textContent = 'Final Card';
-      } else {
+      if (isMainLevel && this.currentLevel !== 'level3') {
         btn.textContent = 'Next Level';
+      } else {
+        btn.textContent = 'Final Card';
       }
     } else {
       btn.style.display = 'none';
@@ -271,28 +347,25 @@ const App = {
   },
 
   advanceLevel() {
-    if (this.currentLevel === 'level3') {
+    this.haptic('medium');
+    if (this.LEVELS.includes(this.currentLevel)) {
       this.showScreen('level-complete');
-    } else if (this.currentLevel === 'bonus') {
-      this.showScreen('final-card');
     } else {
-      this.showScreen('level-complete');
+      this.showScreen('final-card');
     }
   },
 
   completeLevelForced() {
-    if (this.currentLevel === 'bonus') {
-      this.showScreen('final-card');
-    } else if (this.currentLevel === 'level3') {
+    if (this.LEVELS.includes(this.currentLevel)) {
       this.showScreen('level-complete');
     } else {
-      this.showScreen('level-complete');
+      this.showScreen('final-card');
     }
   },
 
   // ============ LEVEL COMPLETE ============
   setupLevelComplete() {
-    const data = QUESTIONS[this.currentLevel];
+    const data = this.getLevelData();
     document.getElementById('lc-title').textContent = `${data.name} complete`;
     document.getElementById('lc-title').style.color = data.color;
     document.getElementById('lc-cards-num').textContent = this.cardsPlayed;
@@ -302,13 +375,11 @@ const App = {
     const finalBtn = document.getElementById('lc-final-btn');
 
     if (this.currentLevel === 'level3') {
-      // After level 3: show bonus option and final card option
       nextBtn.style.display = 'none';
       bonusBtn.style.display = 'inline-block';
       finalBtn.style.display = 'inline-block';
       document.getElementById('lc-subtitle').textContent = 'You made it through all three levels. You can play the bonus round or go to the final card.';
     } else {
-      // After level 1 or 2: show next level
       const nextLevel = this.currentLevel === 'level1' ? 'level2' : 'level3';
       const nextData = QUESTIONS[nextLevel];
       nextBtn.textContent = `Begin ${nextData.name}`;
@@ -374,13 +445,38 @@ const App = {
     document.getElementById('menu-bonus').querySelector('.mi-right').textContent =
       isBonusActive ? 'In progress' : '';
 
+    // Update toggle statuses
+    this.updateToggleUI();
+
+    // Show/hide custom play option
+    const customCount = this.customQuestions.length;
+    document.getElementById('menu-custom').querySelector('.mi-right').textContent =
+      customCount > 0 ? `${customCount}` : '';
+
     this.showScreen('menu');
+  },
+
+  updateToggleUI() {
+    const soundStatus = document.getElementById('sound-status');
+    const dimStatus = document.getElementById('dim-status');
+    const quickStatus = document.getElementById('quick-status');
+
+    soundStatus.textContent = this.ambientPlaying ? 'ON' : 'OFF';
+    soundStatus.classList.toggle('on', this.ambientPlaying);
+    dimStatus.textContent = this.screenDimmed ? 'ON' : 'OFF';
+    dimStatus.classList.toggle('on', this.screenDimmed);
+    quickStatus.textContent = this.quickPlayMode ? 'ON' : 'OFF';
+    quickStatus.classList.toggle('on', this.quickPlayMode);
   },
 
   // ============ PROGRESS ============
   updateProgress() {
-    const total = QUESTIONS[this.currentLevel].cards.length;
+    const total = this.getLevelData().cards.length;
     document.getElementById('game-progress').textContent = `${this.cardsPlayed} / ${total}`;
+
+    // Update progress bar
+    const pct = total > 0 ? (this.cardsPlayed / total) * 100 : 0;
+    document.getElementById('progress-fill').style.width = `${Math.min(pct, 100)}%`;
   },
 
   saveProgress() {
@@ -415,7 +511,351 @@ const App = {
     this.cardsPlayed = 0;
     this.totalCardsPlayed = 0;
     this.digDeepersLeft = 1;
+    this.hideTimer();
     this.showScreen('welcome');
+  },
+
+  // ============ FAVORITES ============
+  toggleFavorite() {
+    if (!this.isFlipped || !this.deck[this.cardIndex]) return;
+    const card = this.deck[this.cardIndex];
+    if (card.type !== 'question') return;
+
+    const idx = this.favorites.findIndex(f => f.text === card.text);
+    if (idx >= 0) {
+      this.favorites.splice(idx, 1);
+    } else {
+      this.favorites.push({
+        text: card.text,
+        level: this.currentLevel,
+        date: new Date().toISOString()
+      });
+    }
+    this.saveFavorites();
+    this.updateFavButton();
+    this.haptic('light');
+  },
+
+  updateFavButton() {
+    const btn = document.getElementById('fav-btn');
+    if (!this.isFlipped || !this.deck[this.cardIndex] || this.deck[this.cardIndex].type !== 'question') {
+      btn.classList.remove('is-fav');
+      return;
+    }
+    const card = this.deck[this.cardIndex];
+    const isFav = this.favorites.some(f => f.text === card.text);
+    btn.classList.toggle('is-fav', isFav);
+  },
+
+  saveFavorites() {
+    localStorage.setItem('betweenUs_favorites', JSON.stringify(this.favorites));
+  },
+
+  loadFavorites() {
+    const saved = localStorage.getItem('betweenUs_favorites');
+    if (saved) this.favorites = JSON.parse(saved);
+  },
+
+  renderFavorites() {
+    const list = document.getElementById('fav-list');
+    if (this.favorites.length === 0) {
+      list.innerHTML = '<p class="empty-state">No favorites yet. Tap the heart while playing to save questions you love.</p>';
+      return;
+    }
+    list.innerHTML = this.favorites.map((f, i) => {
+      const levelName = f.level === 'custom' ? 'Custom' : (QUESTIONS[f.level] ? QUESTIONS[f.level].name : f.level);
+      return `<div class="fav-card">
+        <span class="fav-card-text">${this.escapeHtml(f.text)}</span>
+        <span class="fav-card-level">${this.escapeHtml(levelName)}</span>
+        <button class="fav-remove" data-idx="${i}">&times;</button>
+      </div>`;
+    }).join('');
+
+    list.querySelectorAll('.fav-remove').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = parseInt(e.target.dataset.idx);
+        this.favorites.splice(idx, 1);
+        this.saveFavorites();
+        this.renderFavorites();
+      });
+    });
+  },
+
+  // ============ PLAYED CARDS TRACKING ============
+  markCardPlayed(text) {
+    if (!this.currentLevel) return;
+    if (!this.playedCards[this.currentLevel]) this.playedCards[this.currentLevel] = [];
+    if (!this.playedCards[this.currentLevel].includes(text)) {
+      this.playedCards[this.currentLevel].push(text);
+      this.savePlayedCards();
+    }
+  },
+
+  savePlayedCards() {
+    localStorage.setItem('betweenUs_played', JSON.stringify(this.playedCards));
+  },
+
+  loadPlayedCards() {
+    const saved = localStorage.getItem('betweenUs_played');
+    if (saved) this.playedCards = JSON.parse(saved);
+  },
+
+  // ============ CUSTOM QUESTIONS ============
+  addCustomQuestion() {
+    const input = document.getElementById('custom-q-input');
+    const text = input.value.trim();
+    if (!text) return;
+    this.customQuestions.push(text);
+    this.saveCustomQuestions();
+    input.value = '';
+    this.renderCustomQuestions();
+    this.haptic('light');
+  },
+
+  removeCustomQuestion(idx) {
+    this.customQuestions.splice(idx, 1);
+    this.saveCustomQuestions();
+    this.renderCustomQuestions();
+  },
+
+  saveCustomQuestions() {
+    localStorage.setItem('betweenUs_custom', JSON.stringify(this.customQuestions));
+  },
+
+  loadCustomQuestions() {
+    const saved = localStorage.getItem('betweenUs_custom');
+    if (saved) this.customQuestions = JSON.parse(saved);
+  },
+
+  renderCustomQuestions() {
+    const list = document.getElementById('custom-q-list');
+    const playBtn = document.getElementById('play-custom-btn');
+
+    if (this.customQuestions.length === 0) {
+      list.innerHTML = '<p class="empty-state">No custom questions yet. Add your own above.</p>';
+      playBtn.style.display = 'none';
+      return;
+    }
+
+    playBtn.style.display = 'inline-block';
+    list.innerHTML = this.customQuestions.map((q, i) => {
+      return `<div class="custom-q-card">
+        <span class="custom-q-text">${this.escapeHtml(q)}</span>
+        <button class="custom-q-remove" data-idx="${i}">&times;</button>
+      </div>`;
+    }).join('');
+
+    list.querySelectorAll('.custom-q-remove').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        this.removeCustomQuestion(parseInt(e.target.dataset.idx));
+      });
+    });
+  },
+
+  // ============ NOTES VAULT ============
+  renderNotesVault() {
+    const notes = JSON.parse(localStorage.getItem('betweenUs_notes') || '[]');
+    const list = document.getElementById('notes-list');
+
+    if (notes.length === 0) {
+      list.innerHTML = '<p class="empty-state">No notes yet. Complete the Final Card to save your first note.</p>';
+      return;
+    }
+
+    list.innerHTML = notes.slice().reverse().map(n => {
+      const date = new Date(n.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      return `<div class="note-card">
+        <p class="note-text">${this.escapeHtml(n.text)}</p>
+        <span class="note-date">${date}</span>
+      </div>`;
+    }).join('');
+  },
+
+  // ============ TIMER ============
+  showTimer(seconds) {
+    this.timerSeconds = seconds;
+    const overlay = document.getElementById('timer-overlay');
+    const countEl = document.getElementById('timer-count');
+    const progressEl = document.getElementById('timer-progress');
+    const startBtn = document.getElementById('timer-start-btn');
+
+    countEl.textContent = seconds;
+    countEl.classList.remove('timer-done');
+    progressEl.style.strokeDashoffset = '0';
+    startBtn.style.display = 'inline-block';
+    overlay.style.display = 'flex';
+  },
+
+  startTimer() {
+    const seconds = this.timerSeconds;
+    const countEl = document.getElementById('timer-count');
+    const progressEl = document.getElementById('timer-progress');
+    const startBtn = document.getElementById('timer-start-btn');
+    const circumference = 283;
+
+    startBtn.style.display = 'none';
+    let remaining = seconds;
+    countEl.textContent = remaining;
+
+    this.timerInterval = setInterval(() => {
+      remaining--;
+      if (remaining <= 0) {
+        clearInterval(this.timerInterval);
+        this.timerInterval = null;
+        countEl.textContent = 'Done';
+        countEl.classList.add('timer-done');
+        progressEl.style.strokeDashoffset = circumference;
+        this.haptic('heavy');
+        // Auto-hide after 2s
+        setTimeout(() => this.hideTimer(), 2000);
+        return;
+      }
+      countEl.textContent = remaining;
+      const pct = 1 - (remaining / seconds);
+      progressEl.style.strokeDashoffset = circumference * pct;
+    }, 1000);
+  },
+
+  hideTimer() {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
+    document.getElementById('timer-overlay').style.display = 'none';
+  },
+
+  // ============ AUDIO ============
+  initAudio() {
+    if (!this.audioCtx) {
+      this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (this.audioCtx.state === 'suspended') {
+      this.audioCtx.resume();
+    }
+  },
+
+  playFlipSound() {
+    if (!this.soundEnabled) return;
+    try {
+      this.initAudio();
+      const ctx = this.audioCtx;
+      const now = ctx.currentTime;
+
+      // Short filtered noise burst — soft card flip
+      const bufferSize = Math.floor(ctx.sampleRate * 0.07);
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+      }
+
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.value = 2000;
+
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.06, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+
+      source.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+      source.start(now);
+    } catch (e) {
+      // Audio not available, fail silently
+    }
+  },
+
+  toggleAmbientSound() {
+    this.initAudio();
+
+    if (this.ambientPlaying) {
+      // Stop
+      if (this.ambientNode) {
+        this.ambientNode.stop();
+        this.ambientNode = null;
+      }
+      this.ambientPlaying = false;
+    } else {
+      // Start brown noise
+      const ctx = this.audioCtx;
+      const bufferSize = 2 * ctx.sampleRate;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      let lastOut = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        data[i] = (lastOut + (0.02 * white)) / 1.02;
+        lastOut = data[i];
+        data[i] *= 3.5;
+      }
+
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      source.loop = true;
+
+      const gain = ctx.createGain();
+      gain.gain.value = 0.15;
+
+      source.connect(gain);
+      gain.connect(ctx.destination);
+      source.start();
+
+      this.ambientNode = source;
+      this.ambientGain = gain;
+      this.ambientPlaying = true;
+    }
+
+    this.updateToggleUI();
+    this.saveSettings();
+  },
+
+  // ============ HAPTIC FEEDBACK ============
+  haptic(style) {
+    if (!navigator.vibrate) return;
+    switch (style) {
+      case 'light': navigator.vibrate(10); break;
+      case 'medium': navigator.vibrate(20); break;
+      case 'heavy': navigator.vibrate([30, 50, 30]); break;
+    }
+  },
+
+  // ============ SCREEN DIMMING ============
+  toggleDim() {
+    this.screenDimmed = !this.screenDimmed;
+    document.body.classList.toggle('dimmed', this.screenDimmed);
+    this.updateToggleUI();
+    this.saveSettings();
+  },
+
+  // ============ QUICK PLAY ============
+  toggleQuickPlay() {
+    this.quickPlayMode = !this.quickPlayMode;
+    this.updateToggleUI();
+    this.saveSettings();
+  },
+
+  // ============ SETTINGS PERSISTENCE ============
+  saveSettings() {
+    localStorage.setItem('betweenUs_settings', JSON.stringify({
+      quickPlayMode: this.quickPlayMode,
+      screenDimmed: this.screenDimmed,
+      soundEnabled: this.soundEnabled
+    }));
+  },
+
+  loadSettings() {
+    const saved = localStorage.getItem('betweenUs_settings');
+    if (saved) {
+      const s = JSON.parse(saved);
+      this.quickPlayMode = s.quickPlayMode || false;
+      this.screenDimmed = s.screenDimmed || false;
+      this.soundEnabled = s.soundEnabled !== false;
+      document.body.classList.toggle('dimmed', this.screenDimmed);
+    }
   },
 
   // ============ UTILITIES ============
@@ -427,8 +867,15 @@ const App = {
     return arr;
   },
 
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  },
+
   // ============ EVENTS ============
   bindEvents() {
+    // Welcome
     document.getElementById('start-btn').addEventListener('click', () => {
       this.showScreen('level-intro', 'level1');
     });
@@ -437,14 +884,50 @@ const App = {
       if (this.currentLevel) this.showScreen('level-intro', this.currentLevel);
     });
 
+    document.getElementById('quick-start-btn').addEventListener('click', () => {
+      this.quickPlayMode = true;
+      this.saveSettings();
+      this.showScreen('level-intro', 'level1');
+    });
+
+    // Level intro
     document.getElementById('begin-level-btn').addEventListener('click', () => {
       this.showScreen('game');
     });
 
+    // Card interaction
     document.getElementById('card-container').addEventListener('click', () => {
+      if (this.swiped) {
+        this.swiped = false;
+        return;
+      }
       this.flipCard();
     });
 
+    // Swipe gestures
+    const cardArea = document.querySelector('.card-area');
+    cardArea.addEventListener('touchstart', (e) => {
+      this.touchStartX = e.touches[0].clientX;
+      this.touchStartY = e.touches[0].clientY;
+      this.touchStartTime = Date.now();
+      this.swiped = false;
+    }, { passive: true });
+
+    cardArea.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - this.touchStartX;
+      const dy = e.changedTouches[0].clientY - this.touchStartY;
+      const dt = Date.now() - this.touchStartTime;
+
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5 && dt < 400) {
+        if (this.isFlipped && dx < 0) {
+          this.swiped = true;
+          e.preventDefault();
+          this.nextCard();
+        }
+      }
+    }, { passive: false });
+
+    // Game buttons
     document.getElementById('dig-btn').addEventListener('click', (e) => {
       e.stopPropagation();
       this.playDigDeeper();
@@ -455,6 +938,18 @@ const App = {
       this.advanceLevel();
     });
 
+    document.getElementById('fav-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.toggleFavorite();
+    });
+
+    // Timer
+    document.getElementById('timer-start-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.startTimer();
+    });
+
+    // Level complete
     document.getElementById('lc-next-btn').addEventListener('click', () => {
       this.goToNextLevel();
     });
@@ -467,6 +962,7 @@ const App = {
       this.goToFinalCard();
     });
 
+    // Final card
     document.getElementById('save-note-btn').addEventListener('click', () => {
       this.saveNote();
     });
@@ -475,10 +971,12 @@ const App = {
       this.showScreen('end');
     });
 
+    // End
     document.getElementById('play-again-btn').addEventListener('click', () => {
       this.resetGame();
     });
 
+    // Menu
     document.getElementById('menu-btn').addEventListener('click', (e) => {
       e.stopPropagation();
       this.showMenu();
@@ -504,12 +1002,76 @@ const App = {
       this.showScreen('level-intro', 'bonus');
     });
 
+    document.getElementById('menu-spicy').addEventListener('click', () => {
+      this.showScreen('level-intro', 'spicy');
+    });
+
+    document.getElementById('menu-anniversary').addEventListener('click', () => {
+      this.showScreen('level-intro', 'anniversary');
+    });
+
+    document.getElementById('menu-custom').addEventListener('click', () => {
+      this.showScreen('custom-qs');
+    });
+
+    document.getElementById('menu-notes').addEventListener('click', () => {
+      this.showScreen('notes-vault');
+    });
+
+    document.getElementById('menu-favorites').addEventListener('click', () => {
+      this.showScreen('favorites-screen');
+    });
+
+    document.getElementById('menu-sound-toggle').addEventListener('click', () => {
+      this.toggleAmbientSound();
+    });
+
+    document.getElementById('menu-dim-toggle').addEventListener('click', () => {
+      this.toggleDim();
+    });
+
+    document.getElementById('menu-quick-toggle').addEventListener('click', () => {
+      this.toggleQuickPlay();
+    });
+
     document.getElementById('menu-restart').addEventListener('click', () => {
       this.resetGame();
     });
 
     document.getElementById('menu-close').addEventListener('click', () => {
       this.showScreen('game');
+    });
+
+    // Notes vault back
+    document.getElementById('notes-back').addEventListener('click', () => {
+      this.showScreen('menu');
+    });
+
+    // Favorites back
+    document.getElementById('fav-back').addEventListener('click', () => {
+      this.showScreen('menu');
+    });
+
+    // Custom questions
+    document.getElementById('add-custom-q').addEventListener('click', () => {
+      this.addCustomQuestion();
+    });
+
+    document.getElementById('custom-q-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        this.addCustomQuestion();
+      }
+    });
+
+    document.getElementById('play-custom-btn').addEventListener('click', () => {
+      if (this.customQuestions.length >= 3) {
+        this.showScreen('level-intro', 'custom');
+      }
+    });
+
+    document.getElementById('custom-back').addEventListener('click', () => {
+      this.showScreen('menu');
     });
 
     // Prevent zoom on double tap (iOS)

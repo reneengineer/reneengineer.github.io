@@ -1,4 +1,4 @@
-const CACHE_NAME = 'between-us-v6';
+const CACHE_NAME = 'between-us-v7';
 const ASSETS = [
   '/cardgame/',
   '/cardgame/index.html',
@@ -32,14 +32,14 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch — serve from cache, fall back to network
+// Fetch — network first for HTML/JS/CSS, cache fallback for everything else
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
+  const url = new URL(event.request.url);
 
-      return fetch(event.request).then((response) => {
-        // Cache new requests dynamically
+  // For same-origin navigations and core assets, try network first
+  if (url.origin === location.origin) {
+    event.respondWith(
+      fetch(event.request).then((response) => {
         if (response.status === 200) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
@@ -48,11 +48,29 @@ self.addEventListener('fetch', (event) => {
         }
         return response;
       }).catch(() => {
-        // Offline fallback
-        if (event.request.destination === 'document') {
-          return caches.match('/cardgame/index.html');
-        }
-      });
-    })
-  );
+        return caches.match(event.request).then((cached) => {
+          if (cached) return cached;
+          if (event.request.destination === 'document') {
+            return caches.match('/cardgame/index.html');
+          }
+        });
+      })
+    );
+  } else {
+    // External resources (fonts, etc.) — cache first
+    event.respondWith(
+      caches.match(event.request).then((cached) => {
+        if (cached) return cached;
+        return fetch(event.request).then((response) => {
+          if (response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, clone);
+            });
+          }
+          return response;
+        });
+      })
+    );
+  }
 });
