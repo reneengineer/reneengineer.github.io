@@ -410,26 +410,26 @@ body::before {
 /* ============ TIMER ============ */
 .timer-overlay {
   position: absolute;
-  top: 50%;
+  bottom: 140px;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
   z-index: 20;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 8px;
-  background: rgba(12, 12, 16, 0.85);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
+  gap: 12px;
+  background: rgba(12, 12, 16, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius);
-  padding: 32px;
+  border-radius: 50px;
+  padding: 10px 20px;
 }
 
 .timer-ring {
   position: relative;
-  width: 120px;
-  height: 120px;
+  width: 44px;
+  height: 44px;
 }
 
 .timer-ring svg {
@@ -443,7 +443,7 @@ body::before {
   left: 50%;
   transform: translate(-50%, -50%);
   font-family: var(--font-display);
-  font-size: 32px;
+  font-size: 18px;
   font-weight: 500;
   color: var(--text);
 }
