@@ -289,6 +289,24 @@ body::before {
   box-shadow: 0 4px 24px rgba(232, 124, 160, 0.12);
 }
 
+/* ============ NAME ENTRY SCREEN ============ */
+#name-entry {
+  gap: 24px;
+  text-align: center;
+}
+
+.name-entry-title {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+}
+
+.name-input-area {
+  width: 100%;
+  max-width: 280px;
+}
+
 /* ============ LEVEL INTRO SCREEN ============ */
 #level-intro {
   gap: 20px;
@@ -973,6 +991,7 @@ body::before {
   padding: 40px 32px;
   justify-content: flex-start;
   padding-top: max(60px, calc(env(safe-area-inset-top) + 40px));
+  padding-bottom: max(40px, calc(env(safe-area-inset-bottom) + 24px));
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }

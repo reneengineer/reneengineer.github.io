@@ -1,4 +1,4 @@
-const CACHE_NAME = 'just-two-of-us-v18';
+const CACHE_NAME = 'just-two-of-us-v19';
 const ASSETS = [
   '/cardgame/',
   '/cardgame/index.html',

@@ -32,6 +32,17 @@
     </div>
   </div>
 
+  <!-- ============ NAME ENTRY ============ -->
+  <div id="name-entry" class="screen">
+    <div class="welcome-icon">&#10084;&#65039;</div>
+    <h2 class="name-entry-title">Who's playing?</h2>
+    <div id="name-turn-label" class="final-turn-label">Player 1</div>
+    <div class="name-input-area">
+      <input id="name-entry-input" type="text" class="note-name-input" placeholder="Enter your name" maxlength="30" autocomplete="off">
+    </div>
+    <button id="name-save-btn" class="btn btn-primary btn-small">Save &amp; Next</button>
+  </div>
+
   <!-- ============ LEVEL INTRO ============ -->
   <div id="level-intro" class="screen">
     <div id="li-badge" class="level-badge">Level 1</div>
@@ -88,7 +99,8 @@
     <div class="game-footer">
       <button id="fav-btn" class="footer-btn fav-btn">&hearts;</button>
       <button id="share-btn" class="footer-btn share-btn" style="display:none;">&#8599;</button>
-      <button id="dig-btn" class="footer-btn dig-btn">Dig Deeper</button>
+      <button id="dig-btn-1" class="footer-btn dig-btn">Dig Deeper</button>
+      <button id="dig-btn-2" class="footer-btn dig-btn">Dig Deeper</button>
       <button id="next-level-btn" class="footer-btn next-level-btn" style="display:none;">Next Level</button>
     </div>
   </div>
@@ -117,7 +129,6 @@
     <div id="final-turn-label" class="final-turn-label">Your turn</div>
     <div class="note-area">
       <textarea id="note-input" placeholder="Write your note..." rows="5"></textarea>
-      <input id="note-name" type="text" class="note-name-input" placeholder="Your name" maxlength="30">
     </div>
     <button id="save-note-btn" class="btn btn-primary btn-small">Save &amp; Pass</button>
     <button id="skip-note-btn" class="btn btn-outline btn-small">Skip</button>

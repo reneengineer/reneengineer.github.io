@@ -5,7 +5,12 @@ const App = {
   deck: [],
   cardIndex: 0,
   cardsPlayed: 0,
-  digDeepersLeft: 2,
+  dig1Left: 1,
+  dig2Left: 1,
+  player1Name: '',
+  player2Name: '',
+  nameEntryTurn: 1,
+  pendingLevel: null,
   totalCardsPlayed: 0,
   isFlipped: false,
   isAnimating: false,
@@ -24,7 +29,6 @@ const App = {
   timerSeconds: 0,
   finalCardTurn: 1,
   tempNote: null,
-  tempName: null,
   swiped: false,
   touchStartX: 0,
   touchStartY: 0,
@@ -47,6 +51,7 @@ const App = {
     this.loadPlayedCards();
     this.loadCustomQuestions();
     this.loadSettings();
+    this.loadPlayerNames();
     this.swipeHintShown = localStorage.getItem('betweenUs_swipeHint') === 'true';
     this.bindEvents();
 
@@ -72,6 +77,7 @@ const App = {
 
     switch (screenId) {
       case 'welcome': this.updateWelcomeMusicBtn(); break;
+      case 'name-entry': this.setupNameEntry(); break;
       case 'level-intro': this.setupLevelIntro(data); break;
       case 'game': if (!this.gameSetUp) this.setupGame(); break;
       case 'level-complete': this.setupLevelComplete(); break;
@@ -129,7 +135,8 @@ const App = {
     this.deck = isOrdered ? this.buildOrderedDeck(data) : this.buildDeck(data, !noWildcards);
     this.cardIndex = 0;
     this.cardsPlayed = 0;
-    this.digDeepersLeft = noWildcards ? 0 : 2;
+    this.dig1Left = noWildcards ? 0 : 1;
+    this.dig2Left = noWildcards ? 0 : 1;
     this.isFlipped = false;
     this.hideTimer();
 
@@ -142,7 +149,7 @@ const App = {
     document.getElementById('progress-fill').style.color = data.color;
 
     this.updateProgress();
-    this.updateDigButton();
+    this.updateDigButtons();
     this.updateNextLevelButton();
     this.showCard();
   },
@@ -324,10 +331,14 @@ const App = {
   },
 
   // ============ DIG DEEPER ============
-  playDigDeeper() {
-    if (this.digDeepersLeft <= 0 || this.isAnimating) return;
-    this.digDeepersLeft--;
-    this.updateDigButton();
+  playDigDeeper(player) {
+    if (this.isAnimating) return;
+    if (player === 1 && this.dig1Left <= 0) return;
+    if (player === 2 && this.dig2Left <= 0) return;
+
+    if (player === 1) this.dig1Left--;
+    else this.dig2Left--;
+    this.updateDigButtons();
     this.haptic('medium');
 
     const prompts = QUESTIONS.digDeeper;
@@ -337,20 +348,35 @@ const App = {
     this.nextCard();
   },
 
-  updateDigButton() {
-    const btn = document.getElementById('dig-btn');
+  updateDigButtons() {
+    const btn1 = document.getElementById('dig-btn-1');
+    const btn2 = document.getElementById('dig-btn-2');
     const noWildcards = ['bonus', 'spicy', 'anniversary', 'custom'].includes(this.currentLevel);
     if (noWildcards) {
-      btn.style.display = 'none';
+      btn1.style.display = 'none';
+      btn2.style.display = 'none';
       return;
     }
-    btn.style.display = 'flex';
-    if (this.digDeepersLeft <= 0) {
-      btn.classList.add('used');
-      btn.textContent = 'Dig Deeper (used)';
+
+    const name1 = this.player1Name || 'P1';
+    const name2 = this.player2Name || 'P2';
+
+    btn1.style.display = 'flex';
+    if (this.dig1Left <= 0) {
+      btn1.classList.add('used');
+      btn1.textContent = `${name1} (used)`;
     } else {
-      btn.classList.remove('used');
-      btn.textContent = `Dig Deeper (${this.digDeepersLeft})`;
+      btn1.classList.remove('used');
+      btn1.textContent = `${name1}: Dig`;
+    }
+
+    btn2.style.display = 'flex';
+    if (this.dig2Left <= 0) {
+      btn2.classList.add('used');
+      btn2.textContent = `${name2} (used)`;
+    } else {
+      btn2.classList.remove('used');
+      btn2.textContent = `${name2}: Dig`;
     }
   },
 
@@ -441,7 +467,6 @@ const App = {
     document.getElementById('final-prompt').textContent = prompt;
     this.finalCardTurn = 1;
     this.tempNote = null;
-    this.tempName = null;
     this.showFinalCardTurn();
     this.saveProgress();
   },
@@ -449,32 +474,28 @@ const App = {
   showFinalCardTurn() {
     const label = document.getElementById('final-turn-label');
     const noteInput = document.getElementById('note-input');
-    const nameInput = document.getElementById('note-name');
     const saveBtn = document.getElementById('save-note-btn');
 
     noteInput.value = '';
-    nameInput.value = '';
 
     if (this.finalCardTurn === 1) {
-      label.textContent = 'Player 1';
-      noteInput.placeholder = 'Write your note...';
-      nameInput.placeholder = 'Your name';
+      const name = this.player1Name || 'Player 1';
+      label.textContent = `${name}'s turn`;
+      noteInput.placeholder = `${name}, write your note...`;
       saveBtn.innerHTML = 'Save &amp; Pass';
     } else {
-      label.textContent = 'Player 2';
-      noteInput.placeholder = 'Your turn — write your note...';
-      nameInput.placeholder = 'Your name';
+      const name = this.player2Name || 'Player 2';
+      label.textContent = `${name}'s turn`;
+      noteInput.placeholder = `${name}, write your note...`;
       saveBtn.textContent = 'Save';
     }
   },
 
   saveNote() {
     const note = document.getElementById('note-input').value.trim();
-    const name = document.getElementById('note-name').value.trim();
 
     if (this.finalCardTurn === 1) {
       this.tempNote = note;
-      this.tempName = name || 'Player 1';
       this.finalCardTurn = 2;
       this.showFinalCardTurn();
       this.haptic('light');
@@ -483,9 +504,9 @@ const App = {
 
     // Player 2 done — save both
     const p1Note = this.tempNote || '';
-    const p1Name = this.tempName || 'Player 1';
+    const p1Name = this.player1Name || 'Player 1';
     const p2Note = note;
-    const p2Name = name || 'Player 2';
+    const p2Name = this.player2Name || 'Player 2';
 
     if (p1Note || p2Note) {
       const notes = JSON.parse(localStorage.getItem('betweenUs_notes') || '[]');
@@ -498,7 +519,6 @@ const App = {
     }
 
     this.tempNote = null;
-    this.tempName = null;
     this.showScreen('end');
   },
 
@@ -544,6 +564,65 @@ const App = {
     const status = document.getElementById('welcome-music-status');
     status.textContent = this.ambientPlaying ? 'ON' : 'OFF';
     status.classList.toggle('on', this.ambientPlaying);
+  },
+
+  // ============ NAME ENTRY ============
+  setupNameEntry() {
+    this.nameEntryTurn = 1;
+    this.showNameEntryTurn();
+  },
+
+  showNameEntryTurn() {
+    const label = document.getElementById('name-turn-label');
+    const input = document.getElementById('name-entry-input');
+    const btn = document.getElementById('name-save-btn');
+    input.value = '';
+
+    if (this.nameEntryTurn === 1) {
+      label.textContent = 'Player 1';
+      input.placeholder = 'Enter your name';
+      btn.innerHTML = 'Save &amp; Next';
+    } else {
+      label.textContent = 'Player 2';
+      input.placeholder = 'Enter your name';
+      btn.textContent = 'Save';
+    }
+
+    setTimeout(() => input.focus(), 300);
+  },
+
+  savePlayerName() {
+    const input = document.getElementById('name-entry-input');
+    const name = input.value.trim();
+
+    if (this.nameEntryTurn === 1) {
+      this.player1Name = name || 'Player 1';
+      this.nameEntryTurn = 2;
+      this.showNameEntryTurn();
+      this.haptic('light');
+      return;
+    }
+
+    this.player2Name = name || 'Player 2';
+    this.savePlayerNames();
+    this.haptic('light');
+    this.showScreen('level-intro', this.pendingLevel);
+  },
+
+  savePlayerNames() {
+    localStorage.setItem('betweenUs_players', JSON.stringify({
+      player1: this.player1Name,
+      player2: this.player2Name
+    }));
+  },
+
+  loadPlayerNames() {
+    const saved = localStorage.getItem('betweenUs_players');
+    if (saved) {
+      const data = JSON.parse(saved);
+      this.player1Name = data.player1 || '';
+      this.player2Name = data.player2 || '';
+    }
   },
 
   updateToggleUI() {
@@ -600,7 +679,8 @@ const App = {
     this.cardIndex = 0;
     this.cardsPlayed = 0;
     this.totalCardsPlayed = 0;
-    this.digDeepersLeft = 2;
+    this.dig1Left = 1;
+    this.dig2Left = 1;
     this.gameSetUp = false;
     this.hideTimer();
     this.showScreen('welcome');
@@ -1014,17 +1094,27 @@ const App = {
   bindEvents() {
     // Welcome
     document.getElementById('start-btn').addEventListener('click', () => {
-      this.showScreen('level-intro', 'level1');
+      this.pendingLevel = 'level1';
+      this.showScreen('name-entry');
     });
 
     document.getElementById('continue-btn').addEventListener('click', () => {
-      if (this.currentLevel) this.showScreen('level-intro', this.currentLevel);
+      if (this.currentLevel) {
+        // Skip name entry if names already saved
+        if (this.player1Name && this.player2Name) {
+          this.showScreen('level-intro', this.currentLevel);
+        } else {
+          this.pendingLevel = this.currentLevel;
+          this.showScreen('name-entry');
+        }
+      }
     });
 
     document.getElementById('quick-start-btn').addEventListener('click', () => {
       this.quickPlayMode = true;
       this.saveSettings();
-      this.showScreen('level-intro', 'level1');
+      this.pendingLevel = 'level1';
+      this.showScreen('name-entry');
     });
 
     document.getElementById('welcome-notes-btn').addEventListener('click', () => {
@@ -1034,6 +1124,18 @@ const App = {
     document.getElementById('welcome-music-btn').addEventListener('click', () => {
       this.toggleAmbientSound();
       this.updateWelcomeMusicBtn();
+    });
+
+    // Name entry
+    document.getElementById('name-save-btn').addEventListener('click', () => {
+      this.savePlayerName();
+    });
+
+    document.getElementById('name-entry-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        this.savePlayerName();
+      }
     });
 
     // Level intro
@@ -1075,9 +1177,14 @@ const App = {
     }, { passive: false });
 
     // Game buttons
-    document.getElementById('dig-btn').addEventListener('click', (e) => {
+    document.getElementById('dig-btn-1').addEventListener('click', (e) => {
       e.stopPropagation();
-      this.playDigDeeper();
+      this.playDigDeeper(1);
+    });
+
+    document.getElementById('dig-btn-2').addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.playDigDeeper(2);
     });
 
     document.getElementById('next-level-btn').addEventListener('click', (e) => {
@@ -1123,7 +1230,6 @@ const App = {
       if (this.finalCardTurn === 1) {
         // Player 1 skipped — move to player 2
         this.tempNote = '';
-        this.tempName = 'Player 1';
         this.finalCardTurn = 2;
         this.showFinalCardTurn();
         this.haptic('light');
@@ -1132,14 +1238,13 @@ const App = {
         if (this.tempNote) {
           const notes = JSON.parse(localStorage.getItem('betweenUs_notes') || '[]');
           notes.push({
-            player1: this.tempNote, name1: this.tempName || 'Player 1',
-            player2: '', name2: 'Player 2',
+            player1: this.tempNote, name1: this.player1Name || 'Player 1',
+            player2: '', name2: this.player2Name || 'Player 2',
             date: new Date().toISOString()
           });
           localStorage.setItem('betweenUs_notes', JSON.stringify(notes));
         }
         this.tempNote = null;
-        this.tempName = null;
         this.showScreen('end');
       }
     });
