@@ -435,15 +435,17 @@ const App = {
     const prompts = QUESTIONS.finalCard.prompts;
     const prompt = prompts[Math.floor(Math.random() * prompts.length)];
     document.getElementById('final-prompt').textContent = prompt;
-    document.getElementById('note-input').value = '';
+    document.getElementById('note-input-1').value = '';
+    document.getElementById('note-input-2').value = '';
     this.saveProgress();
   },
 
   saveNote() {
-    const note = document.getElementById('note-input').value.trim();
-    if (note) {
+    const note1 = document.getElementById('note-input-1').value.trim();
+    const note2 = document.getElementById('note-input-2').value.trim();
+    if (note1 || note2) {
       const notes = JSON.parse(localStorage.getItem('betweenUs_notes') || '[]');
-      notes.push({ text: note, date: new Date().toISOString() });
+      notes.push({ player1: note1, player2: note2, date: new Date().toISOString() });
       localStorage.setItem('betweenUs_notes', JSON.stringify(notes));
     }
     this.showScreen('end');
@@ -696,8 +698,34 @@ const App = {
 
     list.innerHTML = notes.slice().reverse().map(n => {
       const date = new Date(n.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+      // Support old single-note format and new paired format
+      if (n.text) {
+        return `<div class="note-card">
+          <p class="note-text">${this.escapeHtml(n.text)}</p>
+          <span class="note-date">${date}</span>
+        </div>`;
+      }
+
+      const entries = [];
+      if (n.player1) {
+        entries.push(`<div class="note-entry">
+          <div class="note-entry-label">Player 1</div>
+          <p class="note-text">${this.escapeHtml(n.player1)}</p>
+        </div>`);
+      }
+      if (n.player1 && n.player2) {
+        entries.push('<div class="note-divider"></div>');
+      }
+      if (n.player2) {
+        entries.push(`<div class="note-entry">
+          <div class="note-entry-label">Player 2</div>
+          <p class="note-text">${this.escapeHtml(n.player2)}</p>
+        </div>`);
+      }
+
       return `<div class="note-card">
-        <p class="note-text">${this.escapeHtml(n.text)}</p>
+        <div class="note-pair">${entries.join('')}</div>
         <span class="note-date">${date}</span>
       </div>`;
     }).join('');
