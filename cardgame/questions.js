@@ -332,6 +332,14 @@ const QUESTIONS = {
   ],
 
   finalCard: {
-    prompt: "Write your partner a note. Say something you've been meaning to say, something you're afraid to say, or something you want them to carry with them. Fold it. Exchange them. Open it later — not now. Let it find you when you need it."
+    prompts: [
+      "Write your partner a note. Say something you've been meaning to say, something you're afraid to say, or something you want them to carry with them. Fold it. Exchange them. Open it later — not now. Let it find you when you need it.",
+      "Look into each other's eyes for four minutes. No talking. No looking away. Just be present. When it's over, say one thing you felt.",
+      "Each of you write down three things you've never said to the other person. Exchange papers. Read them in silence. Then talk.",
+      "Make one promise to each other right now — not about forever, just about tomorrow. Something small. Something real.",
+      "Take turns completing this sentence five times each: 'I love you because...' Don't think. Just say it.",
+      "Write down your favorite memory together on separate pieces of paper. Read them out loud. Keep them somewhere you'll find them later.",
+      "Tell your partner the exact moment you knew. They'll know what you mean."
+    ]
   }
 };

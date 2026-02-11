@@ -407,7 +407,9 @@ const App = {
 
   // ============ FINAL CARD ============
   setupFinalCard() {
-    document.getElementById('final-prompt').textContent = QUESTIONS.finalCard.prompt;
+    const prompts = QUESTIONS.finalCard.prompts;
+    const prompt = prompts[Math.floor(Math.random() * prompts.length)];
+    document.getElementById('final-prompt').textContent = prompt;
     document.getElementById('note-input').value = '';
     this.saveProgress();
   },
