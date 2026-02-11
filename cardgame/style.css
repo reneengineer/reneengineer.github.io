@@ -1071,6 +1071,7 @@ body::before {
 
 .menu-close {
   margin-top: 8px;
+  align-self: center;
 }
 
 /* ============ SECTION SCREENS (Notes Vault, Favorites, Custom) ============ */
