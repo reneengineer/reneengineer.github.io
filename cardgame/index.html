@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Between Us">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>Between Us</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ============ WELCOME ============ -->
+  <div id="welcome" class="screen">
+    <div class="welcome-icon">&#10084;&#65039;</div>
+    <h1 class="app-title">Between Us</h1>
+    <p class="app-subtitle">A card game for two people who want to go deeper.</p>
+    <div class="welcome-rule">
+      <div class="rule-label">The Only Rule</div>
+      <div class="rule-text">Be honest.</div>
+    </div>
+    <button id="start-btn" class="btn">Begin</button>
+    <button id="continue-btn" class="btn btn-outline btn-small" style="display:none;">Continue Where You Left Off</button>
+  </div>
+
+  <!-- ============ LEVEL INTRO ============ -->
+  <div id="level-intro" class="screen">
+    <div id="li-badge" class="level-badge">Level 1</div>
+    <h2 id="li-name" class="level-name">Perception</h2>
+    <p id="li-subtitle" class="level-subtitle">How well do you really see me?</p>
+    <p id="li-description" class="level-subtitle" style="display:none; font-size:13px; color:#666; max-width:300px; margin-top:8px;"></p>
+    <p id="li-count" class="level-count">40 cards</p>
+    <button id="begin-level-btn" class="btn" style="margin-top: 16px;">Start</button>
+  </div>
+
+  <!-- ============ GAME ============ -->
+  <div id="game" class="screen">
+    <div class="game-header">
+      <span id="game-level-tag" class="game-level-tag">Perception</span>
+      <span id="game-progress" class="game-progress">0 / 40</span>
+      <button id="menu-btn" class="footer-btn" style="padding: 8px 14px; font-size: 12px; border-radius: 8px;">Menu</button>
+    </div>
+
+    <div class="card-area">
+      <div id="card-container" class="card-container">
+        <!-- Back -->
+        <div class="card-face card-back">
+          <div class="card-back-inner">
+            <div class="card-back-icon">&#10084;&#65039;</div>
+            <div class="card-back-text">Tap to reveal</div>
+          </div>
+        </div>
+        <!-- Front -->
+        <div id="card-front" class="card-face card-front">
+          <div id="card-type-label" class="card-type-label">Level 1</div>
+          <p id="card-question" class="card-question"></p>
+          <span id="card-number" class="card-number"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-footer">
+      <button id="dig-btn" class="footer-btn dig-btn">Dig Deeper</button>
+      <button id="next-level-btn" class="footer-btn next-level-btn" style="display:none;">Next Level</button>
+    </div>
+  </div>
+
+  <!-- ============ LEVEL COMPLETE ============ -->
+  <div id="level-complete" class="screen">
+    <div class="level-done-badge">&#10024;</div>
+    <h2 id="lc-title" class="level-done-title">Perception complete</h2>
+    <p id="lc-subtitle" class="level-done-subtitle">Take a breath. The next level goes deeper.</p>
+    <div class="level-stats">
+      <div class="stat">
+        <div id="lc-cards-num" class="stat-num">15</div>
+        <div class="stat-label">Cards played</div>
+      </div>
+    </div>
+    <button id="lc-next-btn" class="btn" style="margin-top: 8px;">Begin Connection</button>
+    <button id="lc-bonus-btn" class="btn" style="margin-top: 8px; display:none; background: #E84393; color: #fff;">Play Bonus: 36 Questions</button>
+    <button id="lc-final-btn" class="btn btn-outline btn-small" style="display:none;">Skip to Final Card</button>
+  </div>
+
+  <!-- ============ FINAL CARD ============ -->
+  <div id="final-card" class="screen">
+    <div class="final-icon">&#9997;&#65039;</div>
+    <h2 class="final-title">The Final Card</h2>
+    <p id="final-prompt" class="final-prompt"></p>
+    <div class="note-area">
+      <textarea id="note-input" placeholder="Write your note here..." rows="6"></textarea>
+    </div>
+    <button id="save-note-btn" class="btn btn-small">Save Note</button>
+    <button id="skip-note-btn" class="btn btn-outline btn-small">Skip</button>
+  </div>
+
+  <!-- ============ END ============ -->
+  <div id="end" class="screen">
+    <div class="end-icon">&#10084;&#65039;</div>
+    <h2 class="end-title">That was us.</h2>
+    <p class="end-message">You played <span id="end-total">0</span> cards tonight. Some things are harder to say than others. Thank you for saying them anyway.</p>
+    <div class="end-buttons">
+      <button id="play-again-btn" class="btn">Play Again</button>
+    </div>
+  </div>
+
+  <!-- ============ MENU ============ -->
+  <div id="menu" class="screen">
+    <h2 class="menu-title">Menu</h2>
+    <button id="menu-resume" class="menu-item">
+      Resume Game <span class="mi-right">&rarr;</span>
+    </button>
+    <div id="menu-l1" class="menu-item" style="pointer-events:none;">
+      Level 1 &mdash; Perception <span class="mi-right"></span>
+    </div>
+    <div id="menu-l2" class="menu-item" style="pointer-events:none;">
+      Level 2 &mdash; Connection <span class="mi-right"></span>
+    </div>
+    <div id="menu-l3" class="menu-item" style="pointer-events:none;">
+      Level 3 &mdash; Reflection <span class="mi-right"></span>
+    </div>
+    <div id="menu-bonus" class="menu-item" style="pointer-events:none;">
+      Bonus &mdash; 36 Questions <span class="mi-right"></span>
+    </div>
+    <button id="menu-restart" class="menu-item" style="color: #e74c3c;">
+      Start Over <span class="mi-right">&rarr;</span>
+    </button>
+    <button id="menu-close" class="btn btn-outline btn-small menu-close">Close</button>
+  </div>
+
+  <script src="questions.js"></script>
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
+</body>
+</html>

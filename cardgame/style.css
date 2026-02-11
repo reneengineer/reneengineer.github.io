@@ -1,0 +1,612 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+:root {
+  --bg: #0a0a0a;
+  --surface: #151515;
+  --surface2: #1e1e1e;
+  --text: #f5f5f5;
+  --text-dim: #888;
+  --text-muted: #555;
+  --purple: #9B59B6;
+  --purple-light: #C39BD3;
+  --orange: #E67E22;
+  --orange-light: #F0B27A;
+  --blue: #3498DB;
+  --blue-light: #85C1E9;
+  --gold: #F1C40F;
+  --radius: 20px;
+  --radius-sm: 12px;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* ============ SCREENS ============ */
+.screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100dvh;
+  padding: 40px 24px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.screen.active {
+  display: flex;
+  opacity: 1;
+}
+
+/* ============ WELCOME SCREEN ============ */
+#welcome {
+  gap: 32px;
+  text-align: center;
+}
+
+.welcome-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--purple), var(--orange));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.app-title {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  line-height: 1.1;
+}
+
+.app-subtitle {
+  font-size: 15px;
+  color: var(--text-dim);
+  line-height: 1.5;
+  max-width: 280px;
+}
+
+.welcome-rule {
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  max-width: 300px;
+  text-align: center;
+}
+
+.welcome-rule .rule-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.welcome-rule .rule-text {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.btn {
+  background: var(--text);
+  color: var(--bg);
+  border: none;
+  padding: 18px 48px;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  letter-spacing: 0.5px;
+}
+
+.btn:active {
+  transform: scale(0.96);
+  opacity: 0.9;
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--text);
+  border: 1.5px solid #333;
+  padding: 14px 32px;
+  font-size: 14px;
+}
+
+.btn-small {
+  padding: 12px 28px;
+  font-size: 14px;
+}
+
+/* ============ LEVEL INTRO SCREEN ============ */
+#level-intro {
+  gap: 24px;
+  text-align: center;
+}
+
+.level-badge {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.level-name {
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -2px;
+}
+
+.level-subtitle {
+  font-size: 16px;
+  color: var(--text-dim);
+  max-width: 260px;
+  line-height: 1.5;
+}
+
+.level-count {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+
+/* ============ GAME SCREEN ============ */
+#game {
+  padding: 0;
+  gap: 0;
+}
+
+.game-header {
+  width: 100%;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  padding-top: max(16px, env(safe-area-inset-top));
+}
+
+.game-level-tag {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+
+.game-progress {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.card-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 80px 24px 140px;
+  perspective: 1000px;
+}
+
+/* ============ CARD ============ */
+.card-container {
+  width: 100%;
+  max-width: 340px;
+  aspect-ratio: 3/4;
+  position: relative;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-container.flipped {
+  transform: rotateY(180deg);
+}
+
+.card-container.dealing {
+  animation: dealIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes dealIn {
+  0% {
+    transform: translateY(40px) scale(0.9) rotateZ(-3deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1) rotateZ(0);
+    opacity: 1;
+  }
+}
+
+.card-face {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  text-align: center;
+}
+
+.card-back {
+  background: var(--surface);
+  border: 1.5px solid #222;
+}
+
+.card-back-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.card-back-icon {
+  font-size: 40px;
+  opacity: 0.3;
+}
+
+.card-back-text {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.25;
+}
+
+.card-front {
+  transform: rotateY(180deg);
+  border: 1.5px solid;
+}
+
+.card-type-label {
+  position: absolute;
+  top: 20px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+
+.card-question {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.5;
+  max-width: 280px;
+}
+
+.card-number {
+  position: absolute;
+  bottom: 20px;
+  font-size: 12px;
+  opacity: 0.3;
+  font-weight: 500;
+}
+
+/* Wildcard styling */
+.card-front.wildcard {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  border-color: var(--gold);
+}
+
+.card-front.wildcard .card-type-label {
+  color: var(--gold);
+}
+
+.card-front.wildcard .card-question {
+  font-size: 18px;
+}
+
+/* Dig deeper styling */
+.card-front.dig-deeper {
+  background: var(--surface);
+  border-color: #e74c3c;
+}
+
+.card-front.dig-deeper .card-type-label {
+  color: #e74c3c;
+}
+
+.card-front.dig-deeper .card-question {
+  font-style: italic;
+  font-size: 19px;
+}
+
+/* ============ GAME FOOTER ============ */
+.game-footer {
+  width: 100%;
+  padding: 16px 24px 24px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  z-index: 10;
+}
+
+.footer-btn {
+  background: var(--surface);
+  color: var(--text);
+  border: 1.5px solid #222;
+  padding: 14px 20px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.footer-btn:active {
+  transform: scale(0.96);
+}
+
+.footer-btn.dig-btn {
+  border-color: #e74c3c44;
+  color: #e74c3c;
+}
+
+.footer-btn.dig-btn.used {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.footer-btn.next-level-btn {
+  border-color: #333;
+  color: var(--text);
+  background: var(--surface2);
+}
+
+/* ============ LEVEL COMPLETE SCREEN ============ */
+#level-complete {
+  gap: 24px;
+  text-align: center;
+}
+
+.level-done-badge {
+  font-size: 48px;
+}
+
+.level-done-title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+.level-done-subtitle {
+  font-size: 15px;
+  color: var(--text-dim);
+  max-width: 280px;
+  line-height: 1.5;
+}
+
+.level-stats {
+  display: flex;
+  gap: 32px;
+  margin: 8px 0;
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-num {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* ============ FINAL CARD SCREEN ============ */
+#final-card {
+  gap: 24px;
+  text-align: center;
+  padding: 40px 28px;
+}
+
+.final-icon {
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+
+.final-title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+.final-prompt {
+  font-size: 16px;
+  color: var(--text-dim);
+  line-height: 1.7;
+  max-width: 300px;
+}
+
+.note-area {
+  width: 100%;
+  max-width: 320px;
+}
+
+.note-area textarea {
+  width: 100%;
+  min-height: 180px;
+  background: var(--surface);
+  border: 1.5px solid #222;
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.6;
+  resize: none;
+  outline: none;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.note-area textarea:focus {
+  border-color: #444;
+}
+
+.note-area textarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* ============ END SCREEN ============ */
+#end {
+  gap: 24px;
+  text-align: center;
+}
+
+.end-icon {
+  font-size: 56px;
+}
+
+.end-title {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+.end-message {
+  font-size: 16px;
+  color: var(--text-dim);
+  line-height: 1.7;
+  max-width: 300px;
+}
+
+.end-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* ============ MENU SCREEN ============ */
+#menu {
+  gap: 16px;
+  padding: 40px 32px;
+  justify-content: flex-start;
+  padding-top: max(60px, calc(env(safe-area-inset-top) + 40px));
+}
+
+.menu-title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  margin-bottom: 16px;
+}
+
+.menu-item {
+  width: 100%;
+  max-width: 340px;
+  background: var(--surface);
+  border: 1.5px solid #222;
+  border-radius: var(--radius-sm);
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  text-align: left;
+}
+
+.menu-item:active {
+  border-color: #444;
+}
+
+.menu-item .mi-right {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.menu-close {
+  margin-top: 16px;
+}
+
+/* ============ TRANSITIONS ============ */
+.fade-in {
+  animation: fadeIn 0.4s ease forwards;
+}
+
+.fade-out {
+  animation: fadeOut 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-10px); }
+}
+
+/* ============ SAFE AREAS ============ */
+@supports (padding: max(0px)) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
