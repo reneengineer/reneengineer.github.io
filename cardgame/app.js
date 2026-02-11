@@ -524,7 +524,11 @@ const App = {
 
   // ============ END SCREEN ============
   setupEnd() {
-    document.getElementById('end-total').textContent = this.totalCardsPlayed;
+    const messages = QUESTIONS.endMessages;
+    const msg = messages[Math.floor(Math.random() * messages.length)];
+    const count = this.totalCardsPlayed;
+    document.getElementById('end-title').textContent = msg.title;
+    document.getElementById('end-message').textContent = msg.text.replace(/\{count\}/g, count);
     this.clearProgress();
   },
 
