@@ -29,7 +29,6 @@ const App = {
   touchStartTime: 0,
   previousScreen: null,
   gameSetUp: false,
-  playerNames: ['', ''],
   swipeHintShown: false,
 
   // Constants
@@ -46,7 +45,6 @@ const App = {
     this.loadPlayedCards();
     this.loadCustomQuestions();
     this.loadSettings();
-    this.loadNames();
     this.swipeHintShown = localStorage.getItem('betweenUs_swipeHint') === 'true';
     this.bindEvents();
 
@@ -254,6 +252,7 @@ const App = {
     this.updateProgress();
     this.updateNextLevelButton();
     this.updateFavButton();
+    document.getElementById('share-btn').style.display = 'none';
     this.hideTimer();
   },
 
@@ -267,6 +266,9 @@ const App = {
       this.isFlipped = true;
       this.haptic('light');
       this.playFlipSound();
+
+      // Show share button now that there's a question visible
+      document.getElementById('share-btn').style.display = 'flex';
 
       // Show swipe hint on first flip ever
       if (!this.swipeHintShown) {
@@ -451,15 +453,6 @@ const App = {
   // ============ END SCREEN ============
   setupEnd() {
     document.getElementById('end-total').textContent = this.totalCardsPlayed;
-    // Personalize with names
-    const names = this.getDisplayNames();
-    const hasNames = this.playerNames[0] || this.playerNames[1];
-    const title = document.querySelector('.end-title');
-    if (hasNames) {
-      title.textContent = `That was ${names.name1} & ${names.name2}.`;
-    } else {
-      title.textContent = 'That was us.';
-    }
     this.clearProgress();
   },
 
@@ -898,34 +891,9 @@ const App = {
     }
   },
 
-  // ============ COUPLE NAMES ============
-  saveNames() {
-    const n1 = document.getElementById('name-1').value.trim();
-    const n2 = document.getElementById('name-2').value.trim();
-    this.playerNames = [n1, n2];
-    localStorage.setItem('betweenUs_names', JSON.stringify(this.playerNames));
-  },
-
-  loadNames() {
-    const saved = localStorage.getItem('betweenUs_names');
-    if (saved) {
-      this.playerNames = JSON.parse(saved);
-      const n1 = document.getElementById('name-1');
-      const n2 = document.getElementById('name-2');
-      if (this.playerNames[0]) n1.value = this.playerNames[0];
-      if (this.playerNames[1]) n2.value = this.playerNames[1];
-    }
-  },
-
-  getDisplayNames() {
-    const n1 = this.playerNames[0] || 'Player 1';
-    const n2 = this.playerNames[1] || 'Player 2';
-    return { name1: n1, name2: n2 };
-  },
-
   // ============ SHARE ============
   shareQuestion() {
-    if (!this.isFlipped || !this.deck[this.cardIndex]) return;
+    if (!this.deck[this.cardIndex]) return;
     const card = this.deck[this.cardIndex];
     const text = card.text;
     const shareData = {
@@ -981,17 +949,14 @@ const App = {
   bindEvents() {
     // Welcome
     document.getElementById('start-btn').addEventListener('click', () => {
-      this.saveNames();
       this.showScreen('level-intro', 'level1');
     });
 
     document.getElementById('continue-btn').addEventListener('click', () => {
-      this.saveNames();
       if (this.currentLevel) this.showScreen('level-intro', this.currentLevel);
     });
 
     document.getElementById('quick-start-btn').addEventListener('click', () => {
-      this.saveNames();
       this.quickPlayMode = true;
       this.saveSettings();
       this.showScreen('level-intro', 'level1');
