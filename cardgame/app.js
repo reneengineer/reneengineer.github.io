@@ -5,7 +5,7 @@ const App = {
   deck: [],
   cardIndex: 0,
   cardsPlayed: 0,
-  digDeepersLeft: 1,
+  digDeepersLeft: 2,
   totalCardsPlayed: 0,
   isFlipped: false,
   isAnimating: false,
@@ -129,7 +129,7 @@ const App = {
     this.deck = isOrdered ? this.buildOrderedDeck(data) : this.buildDeck(data, !noWildcards);
     this.cardIndex = 0;
     this.cardsPlayed = 0;
-    this.digDeepersLeft = noWildcards ? 0 : 1;
+    this.digDeepersLeft = noWildcards ? 0 : 2;
     this.isFlipped = false;
     this.hideTimer();
 
@@ -350,7 +350,7 @@ const App = {
       btn.textContent = 'Dig Deeper (used)';
     } else {
       btn.classList.remove('used');
-      btn.textContent = 'Dig Deeper';
+      btn.textContent = `Dig Deeper (${this.digDeepersLeft})`;
     }
   },
 
@@ -600,7 +600,7 @@ const App = {
     this.cardIndex = 0;
     this.cardsPlayed = 0;
     this.totalCardsPlayed = 0;
-    this.digDeepersLeft = 1;
+    this.digDeepersLeft = 2;
     this.gameSetUp = false;
     this.hideTimer();
     this.showScreen('welcome');
