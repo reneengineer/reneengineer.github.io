@@ -1,6 +1,6 @@
 {
-  "name": "Between Us",
-  "short_name": "Between Us",
+  "name": "Just the Two of Us",
+  "short_name": "Just the Two of Us",
   "description": "A couples card game for deeper connection",
   "start_url": "/cardgame/",
   "scope": "/cardgame/",

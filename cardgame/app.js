@@ -19,8 +19,7 @@ const App = {
   soundEnabled: true,
   screenDimmed: false,
   audioCtx: null,
-  ambientNode: null,
-  ambientGain: null,
+  ambientAudio: null,
   timerInterval: null,
   timerSeconds: 0,
   swiped: false,
@@ -803,42 +802,21 @@ const App = {
   },
 
   toggleAmbientSound() {
-    this.initAudio();
-
     if (this.ambientPlaying) {
       // Stop
-      if (this.ambientNode) {
-        this.ambientNode.stop();
-        this.ambientNode = null;
+      if (this.ambientAudio) {
+        this.ambientAudio.pause();
+        this.ambientAudio.currentTime = 0;
       }
       this.ambientPlaying = false;
     } else {
-      // Start brown noise
-      const ctx = this.audioCtx;
-      const bufferSize = 2 * ctx.sampleRate;
-      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-      let lastOut = 0;
-      for (let i = 0; i < bufferSize; i++) {
-        const white = Math.random() * 2 - 1;
-        data[i] = (lastOut + (0.02 * white)) / 1.02;
-        lastOut = data[i];
-        data[i] *= 3.5;
+      // Start playing instrumental
+      if (!this.ambientAudio) {
+        this.ambientAudio = new Audio('ambient.mp3');
+        this.ambientAudio.loop = true;
+        this.ambientAudio.volume = 0.25;
       }
-
-      const source = ctx.createBufferSource();
-      source.buffer = buffer;
-      source.loop = true;
-
-      const gain = ctx.createGain();
-      gain.gain.value = 0.15;
-
-      source.connect(gain);
-      gain.connect(ctx.destination);
-      source.start();
-
-      this.ambientNode = source;
-      this.ambientGain = gain;
+      this.ambientAudio.play().catch(() => {});
       this.ambientPlaying = true;
     }
 
@@ -897,8 +875,8 @@ const App = {
     const card = this.deck[this.cardIndex];
     const text = card.text;
     const shareData = {
-      title: 'Between Us',
-      text: `"${text}" — from Between Us, a card game for two.`
+      title: 'Just the Two of Us',
+      text: `"${text}" — from Just the Two of Us, a card game for two.`
     };
 
     if (navigator.share) {
