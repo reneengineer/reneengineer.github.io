@@ -1,8 +1,11 @@
-const CACHE_NAME='nath-review-v1';
+const CACHE_NAME='nath-review-v2';
 const ASSETS=[
   '/kinder-review/',
   '/kinder-review/index.html',
-  '/kinder-review/manifest.json'
+  '/kinder-review/manifest.json',
+  '/kinder-review/icon-192.png',
+  '/kinder-review/icon-512.png',
+  '/kinder-review/apple-touch-icon.png'
 ];
 
 self.addEventListener('install',e=>{
@@ -16,11 +19,22 @@ self.addEventListener('activate',e=>{
 });
 
 self.addEventListener('fetch',e=>{
-  e.respondWith(
-    fetch(e.request).then(r=>{
-      const clone=r.clone();
-      caches.open(CACHE_NAME).then(c=>c.put(e.request,clone));
-      return r;
-    }).catch(()=>caches.match(e.request))
-  );
+  // Network-first for HTML, cache-first for assets
+  if(e.request.url.endsWith('.html')||e.request.url.endsWith('/')){
+    e.respondWith(
+      fetch(e.request).then(r=>{
+        const clone=r.clone();
+        caches.open(CACHE_NAME).then(c=>c.put(e.request,clone));
+        return r;
+      }).catch(()=>caches.match(e.request))
+    );
+  }else{
+    e.respondWith(
+      caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{
+        const clone=res.clone();
+        caches.open(CACHE_NAME).then(c=>c.put(e.request,clone));
+        return res;
+      }))
+    );
+  }
 });

@@ -2,20 +2,24 @@
 <html lang="fil">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Review Game">
-<meta name="theme-color" content="#1a1a2e">
+<meta name="theme-color" content="#FFF8F0">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>Nathaniel's Family Review Game!</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-touch-callout:none;touch-action:manipulation;}
+html,body{overscroll-behavior:none;}
 body{font-family:'Nunito',Arial,sans-serif;min-height:100vh;overflow-x:hidden;
-  background:#1a1a2e;color:#e0e0e0;}
-body.light-mode{background:#fdf8f3;color:#333;}
+  background:#FFF8F0;color:#333;
+  padding-top:env(safe-area-inset-top,0);padding-bottom:env(safe-area-inset-bottom,0);
+  padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-right,0);}
+body.dark-mode{background:#1a1a2e;color:#e0e0e0;}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important;}}
 
 /* ===== FLOATING BACKGROUND ===== */
 .bg-decor{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
@@ -61,25 +65,33 @@ body.light-mode{background:#fdf8f3;color:#333;}
 .story-box .prompt-label{font-size:0.8em;color:#93c5a8;margin-bottom:3px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
 .story-box .story-text{font-size:1em;color:#555;line-height:1.45;margin-bottom:4px;}
 .story-box .story-scene{display:flex;justify-content:center;align-items:flex-end;gap:8px;flex-wrap:wrap;margin:6px 0;min-height:70px;}
-.story-box .main-q{font-size:1.25em;font-weight:900;color:#3a6b5a;margin-top:6px;}
+.story-box .main-q{font-size:1.4em;font-weight:900;color:#3a6b5a;margin-top:6px;}
 .story-box .visual-row{font-size:2.5em;margin:4px 0;}
 .story-box .hint-text{font-size:0.85em;color:#bbb;margin-top:3px;}
 .story-box .tools-text{margin-top:4px;font-size:0.85em;color:#5ba4c9;font-weight:600;}
 
 /* CHOICES */
-.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:460px;margin:0 auto;}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:500px;margin:0 auto;}
 .choices.three-col{grid-template-columns:1fr 1fr 1fr;}
 .choice-btn{
-  padding:14px 8px;border:3px solid #d4e8dc;border-radius:18px;
+  padding:16px 10px;border:3px solid #d4e8dc;border-radius:20px;
   background:rgba(255,255,255,0.9);backdrop-filter:blur(4px);
-  font-size:1.05em;font-weight:700;cursor:pointer;transition:all 0.15s;
+  font-size:1.15em;font-weight:700;cursor:pointer;transition:all 0.15s;
   display:flex;flex-direction:column;align-items:center;gap:2px;
-  box-shadow:0 3px 12px rgba(0,0,0,0.05);color:#333;
+  box-shadow:0 4px 12px rgba(0,0,0,0.06);color:#333;min-height:72px;justify-content:center;
 }
-.choice-btn .choice-icon{font-size:1.5em;}
+.choice-btn .choice-icon{font-size:1.6em;}
 .choice-btn:active{transform:scale(0.95)}
 .choice-btn.correct{background:#c8e6c9;border-color:#66bb6a;animation:pop 0.4s;}
+.choice-btn.correct::after{content:' ✓';font-weight:900;}
 .choice-btn.wrong{background:#ffcdd2;border-color:#ef5350;animation:shake 0.4s;}
+.choice-btn.wrong::after{content:' ✗';font-weight:900;}
+@media (min-width:768px){
+  .story-box .main-q{font-size:1.6em;}
+  .story-box .story-text{font-size:1.1em;}
+  .choice-btn{min-height:80px;font-size:1.25em;padding:20px 12px;}
+  .menu-btn{padding:18px 20px;font-size:1.2em;}
+}
 
 @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.1)}100%{transform:scale(1)}}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
@@ -341,50 +353,50 @@ body.light-mode{background:#fdf8f3;color:#333;}
 .chapter-enter{animation:chapterFade 0.5s ease;}
 
 /* ===== DARK MODE (default) ===== */
-body:not(.light-mode) .bg-shape{opacity:0.08;}
-body:not(.light-mode) .menu h1{color:#81d4fa;text-shadow:0 2px 8px rgba(129,212,250,0.2);}
-body:not(.light-mode) .menu .subtitle{color:#a5d6a7;}
-body:not(.light-mode) .family-row .mini-sprite .spr-name{color:#aaa;}
-body:not(.light-mode) .score-log-btn{background:rgba(40,40,60,0.85);border-color:#455a64;color:#81d4fa;}
-body:not(.light-mode) .menu-btn{box-shadow:0 4px 18px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.1);}
-body:not(.light-mode) .back-btn{background:rgba(40,40,60,0.85);color:#e0e0e0;}
-body:not(.light-mode) .score-display{background:rgba(40,40,60,0.85);color:#81d4fa;}
-body:not(.light-mode) .progress-bar{background:rgba(255,255,255,0.1);}
-body:not(.light-mode) .story-box{background:rgba(30,30,50,0.92);border-color:rgba(80,80,120,0.3);backdrop-filter:blur(8px);}
-body:not(.light-mode) .story-box .prompt-label{color:#66bb6a;}
-body:not(.light-mode) .story-box .story-text{color:#ccc;}
-body:not(.light-mode) .story-box .main-q{color:#81d4fa;}
-body:not(.light-mode) .story-box .tools-text{color:#4fc3f7;}
-body:not(.light-mode) .story-box .hint-text{color:#777;}
-body:not(.light-mode) .choice-btn{background:rgba(40,40,60,0.9);border-color:#37474f;color:#e0e0e0;box-shadow:0 3px 12px rgba(0,0,0,0.2);}
-body:not(.light-mode) .choice-btn.correct{background:#1b5e20;border-color:#66bb6a;color:#fff;}
-body:not(.light-mode) .choice-btn.wrong{background:#b71c1c;border-color:#ef5350;color:#fff;}
-body:not(.light-mode) .result-card{background:#1e1e32;color:#e0e0e0;}
-body:not(.light-mode) .result-card h2{color:#81d4fa;}
-body:not(.light-mode) .result-card p{color:#aaa;}
-body:not(.light-mode) .log-card{background:#1e1e32;color:#e0e0e0;}
-body:not(.light-mode) .log-card h2{color:#81d4fa;}
-body:not(.light-mode) .log-card th{background:#263238;color:#4fc3f7;}
-body:not(.light-mode) .log-card td{color:#ccc;border-bottom-color:#333;}
-body:not(.light-mode) .store-card{background:#1e1e32;color:#e0e0e0;}
-body:not(.light-mode) .store-card h2{color:#81d4fa;}
-body:not(.light-mode) .store-item{background:rgba(40,40,60,0.9);border-color:#37474f;color:#e0e0e0;}
-body:not(.light-mode) .store-item.owned{background:#1b5e20;border-color:#4caf50;}
-body:not(.light-mode) .store-item .item-name{color:#bbb;}
-body:not(.light-mode) .drag-basket{border-color:#455a64;background:rgba(40,40,60,0.6);}
-body:not(.light-mode) .drag-basket.highlight{border-color:#66bb6a;background:rgba(102,187,106,0.15);}
-body:not(.light-mode) .drag-basket .basket-label{color:#aaa;}
-body:not(.light-mode) .drag-count{color:#4fc3f7;}
-body:not(.light-mode) .bill-card{color:#81d4fa;}
-body:not(.light-mode) .encourage-bubble{background:rgba(30,30,50,0.95);color:#81d4fa;border-color:#455a64;}
-body:not(.light-mode) .sprite-label{color:#aaa;}
-body:not(.light-mode) .wallet-bill{background:rgba(40,40,60,0.9);border-color:#37474f;color:#81c784;}
-body:not(.light-mode) .wallet-bill.selected{background:#1b5e20;border-color:#4caf50;}
-body:not(.light-mode) .glass-fill{border-color:#455a64;background:#1e1e32;}
-body:not(.light-mode) .story-mode .chapter-title{color:#81d4fa;}
-body:not(.light-mode) .lesson-summary{background:rgba(76,175,80,0.08);border-color:#2e7d32;}
-body:not(.light-mode) .story-mode .chapter-narrative{color:#ccc;}
-body:not(.light-mode) .story-mode .chapter-instruction{color:#4fc3f7;}
+body.dark-mode .bg-shape{opacity:0.08;}
+body.dark-mode .menu h1{color:#81d4fa;text-shadow:0 2px 8px rgba(129,212,250,0.2);}
+body.dark-mode .menu .subtitle{color:#a5d6a7;}
+body.dark-mode .family-row .mini-sprite .spr-name{color:#aaa;}
+body.dark-mode .score-log-btn{background:rgba(40,40,60,0.85);border-color:#455a64;color:#81d4fa;}
+body.dark-mode .menu-btn{box-shadow:0 4px 18px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.1);}
+body.dark-mode .back-btn{background:rgba(40,40,60,0.85);color:#e0e0e0;}
+body.dark-mode .score-display{background:rgba(40,40,60,0.85);color:#81d4fa;}
+body.dark-mode .progress-bar{background:rgba(255,255,255,0.1);}
+body.dark-mode .story-box{background:rgba(30,30,50,0.92);border-color:rgba(80,80,120,0.3);backdrop-filter:blur(8px);}
+body.dark-mode .story-box .prompt-label{color:#66bb6a;}
+body.dark-mode .story-box .story-text{color:#ccc;}
+body.dark-mode .story-box .main-q{color:#81d4fa;}
+body.dark-mode .story-box .tools-text{color:#4fc3f7;}
+body.dark-mode .story-box .hint-text{color:#777;}
+body.dark-mode .choice-btn{background:rgba(40,40,60,0.9);border-color:#37474f;color:#e0e0e0;box-shadow:0 3px 12px rgba(0,0,0,0.2);}
+body.dark-mode .choice-btn.correct{background:#1b5e20;border-color:#66bb6a;color:#fff;}
+body.dark-mode .choice-btn.wrong{background:#b71c1c;border-color:#ef5350;color:#fff;}
+body.dark-mode .result-card{background:#1e1e32;color:#e0e0e0;}
+body.dark-mode .result-card h2{color:#81d4fa;}
+body.dark-mode .result-card p{color:#aaa;}
+body.dark-mode .log-card{background:#1e1e32;color:#e0e0e0;}
+body.dark-mode .log-card h2{color:#81d4fa;}
+body.dark-mode .log-card th{background:#263238;color:#4fc3f7;}
+body.dark-mode .log-card td{color:#ccc;border-bottom-color:#333;}
+body.dark-mode .store-card{background:#1e1e32;color:#e0e0e0;}
+body.dark-mode .store-card h2{color:#81d4fa;}
+body.dark-mode .store-item{background:rgba(40,40,60,0.9);border-color:#37474f;color:#e0e0e0;}
+body.dark-mode .store-item.owned{background:#1b5e20;border-color:#4caf50;}
+body.dark-mode .store-item .item-name{color:#bbb;}
+body.dark-mode .drag-basket{border-color:#455a64;background:rgba(40,40,60,0.6);}
+body.dark-mode .drag-basket.highlight{border-color:#66bb6a;background:rgba(102,187,106,0.15);}
+body.dark-mode .drag-basket .basket-label{color:#aaa;}
+body.dark-mode .drag-count{color:#4fc3f7;}
+body.dark-mode .bill-card{color:#81d4fa;}
+body.dark-mode .encourage-bubble{background:rgba(30,30,50,0.95);color:#81d4fa;border-color:#455a64;}
+body.dark-mode .sprite-label{color:#aaa;}
+body.dark-mode .wallet-bill{background:rgba(40,40,60,0.9);border-color:#37474f;color:#81c784;}
+body.dark-mode .wallet-bill.selected{background:#1b5e20;border-color:#4caf50;}
+body.dark-mode .glass-fill{border-color:#455a64;background:#1e1e32;}
+body.dark-mode .story-mode .chapter-title{color:#81d4fa;}
+body.dark-mode .lesson-summary{background:rgba(76,175,80,0.08);border-color:#2e7d32;}
+body.dark-mode .story-mode .chapter-narrative{color:#ccc;}
+body.dark-mode .story-mode .chapter-instruction{color:#4fc3f7;}
 
 /* Money compare game */
 .compare-visual{display:flex;align-items:center;justify-content:center;gap:6px;margin:10px 0;}
@@ -414,14 +426,76 @@ body:not(.light-mode) .story-mode .chapter-instruction{color:#4fc3f7;}
 .md-clear-float{position:fixed;top:48px;right:10px;background:rgba(255,100,100,0.85);border:none;border-radius:14px;padding:3px 10px;font-size:0.7em;color:#fff;cursor:pointer;font-weight:700;z-index:92;display:none;}
 .md-clear-float.open{display:block;}
 
+/* Memory Match game */
+.memory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:400px;margin:10px auto;}
+.memory-card{aspect-ratio:1;border-radius:16px;background:linear-gradient(135deg,#5ba4c9,#6db89a);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:2em;transition:transform 0.3s,background 0.3s;user-select:none;border:3px solid rgba(255,255,255,0.2);box-shadow:0 3px 12px rgba(0,0,0,0.1);}
+.memory-card.flipped{background:#fff;border-color:#66bb6a;transform:rotateY(0deg);}
+.memory-card.matched{background:#c8e6c9;border-color:#43a047;opacity:0.7;pointer-events:none;}
+.memory-card:active{transform:scale(0.95);}
+.memory-card .card-face{display:none;font-size:0.9em;text-align:center;color:#333;padding:4px;}
+.memory-card.flipped .card-face{display:block;}
+.memory-card .card-back{font-size:1.2em;}
+.memory-card.flipped .card-back{display:none;}
+.memory-status{text-align:center;font-size:1em;font-weight:700;color:#3a6b5a;margin:8px 0;}
+
+/* Tap-All game */
+.tapall-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:400px;margin:10px auto;}
+.tapall-item{aspect-ratio:1;border-radius:16px;background:rgba(255,255,255,0.9);border:3px solid #d4e8dc;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:1.8em;transition:all 0.2s;user-select:none;box-shadow:0 3px 12px rgba(0,0,0,0.06);}
+.tapall-item:active{transform:scale(0.95);}
+.tapall-item.selected{background:#c8e6c9;border-color:#66bb6a;box-shadow:0 0 12px rgba(102,187,106,0.4);}
+.tapall-item .tapall-label{font-size:0.4em;font-weight:700;color:#555;margin-top:2px;}
+.tapall-submit{display:block;margin:10px auto 0;padding:10px 28px;border:none;border-radius:16px;background:linear-gradient(135deg,#5ba4c9,#6db89a);color:#fff;font-size:1.05em;font-weight:700;cursor:pointer;}
+body.dark-mode .tapall-item{background:rgba(40,40,60,0.9);border-color:#37474f;color:#e0e0e0;}
+body.dark-mode .tapall-item.selected{background:#1b5e20;border-color:#4caf50;}
+body.dark-mode .tapall-item .tapall-label{color:#bbb;}
+body.dark-mode .memory-card{background:linear-gradient(135deg,#37474f,#455a64);}
+body.dark-mode .memory-card.flipped{background:rgba(40,40,60,0.9);border-color:#66bb6a;}
+body.dark-mode .memory-card .card-face{color:#e0e0e0;}
+body.dark-mode .memory-card.matched{background:#1b5e20;}
+body.dark-mode .memory-status{color:#81d4fa;}
+
 /* Theme toggle button */
 .theme-toggle{position:fixed;top:10px;right:10px;z-index:200;background:rgba(40,40,60,0.8);border:2px solid #455a64;border-radius:50%;width:36px;height:36px;font-size:1.1em;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.2);}
-body.light-mode .theme-toggle{background:rgba(255,255,255,0.8);border-color:#c5ddd0;}
+body:not(.dark-mode) .theme-toggle{background:rgba(255,255,255,0.8);border-color:#c5ddd0;}
 .mute-btn{position:fixed;top:10px;right:52px;z-index:200;background:rgba(40,40,60,0.8);border:2px solid #455a64;border-radius:50%;width:36px;height:36px;font-size:1.1em;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.2);}
-body.light-mode .mute-btn{background:rgba(255,255,255,0.8);border-color:#c5ddd0;}
+body:not(.dark-mode) .mute-btn{background:rgba(255,255,255,0.8);border-color:#c5ddd0;}
+
+/* ===== BRAIN BREAK ===== */
+.brain-break-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#1a237e,#0d47a1);z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;}
+.bb-title{font-size:1.5em;font-weight:900;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,0.3);}
+.bb-subtitle{font-size:0.9em;color:rgba(255,255,255,0.7);}
+.bb-arena{position:relative;width:100%;max-width:400px;height:300px;margin:10px 0;}
+.bb-bubble{position:absolute;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.5em;
+  animation:bbFloat 3s ease-in-out infinite;box-shadow:0 4px 15px rgba(0,0,0,0.2);transition:transform 0.15s ease;}
+.bb-bubble:active{transform:scale(0.5)!important;}
+@keyframes bbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
+.bb-skip{margin-top:8px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:8px 20px;border-radius:20px;font-size:0.85em;cursor:pointer;}
+
+/* ===== PARENT DASHBOARD ===== */
+.dashboard-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9500;display:flex;align-items:center;justify-content:center;padding:16px;}
+.dashboard-card{background:#fff;border-radius:20px;padding:20px;max-width:420px;width:100%;max-height:85vh;overflow-y:auto;color:#333;}
+body.dark-mode .dashboard-card{background:#1e1e2e;color:#e0e0e0;}
+.dash-title{font-size:1.3em;font-weight:900;text-align:center;margin-bottom:12px;}
+.dash-topic{background:#f5f5f5;border-radius:12px;padding:10px 14px;margin-bottom:8px;}
+body.dark-mode .dash-topic{background:#2a2a3e;}
+.dash-topic-name{font-weight:700;font-size:0.95em;}
+.dash-stat{font-size:0.8em;color:#666;margin-top:4px;}
+body.dark-mode .dash-stat{color:#aaa;}
+.dash-bar{height:6px;border-radius:3px;background:#e0e0e0;margin-top:4px;overflow:hidden;}
+body.dark-mode .dash-bar{background:#444;}
+.dash-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#66bb6a,#43a047);transition:width 0.5s ease;}
+.dash-close{display:block;margin:12px auto 0;padding:10px 24px;border:none;border-radius:14px;background:#42a5f5;color:#fff;font-weight:700;cursor:pointer;font-size:1em;}
 </style>
 </head>
 <body>
+
+<!-- SPLASH SCREEN -->
+<div id="splash" style="position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#a8d5c8,#81d4fa);color:#fff;z-index:10000;transition:opacity 0.5s ease;">
+  <div style="font-size:2.5em;margin-bottom:8px;">⭐</div>
+  <div style="font-size:1.3em;font-weight:900;text-shadow:0 2px 8px rgba(0,0,0,0.15);">Nathaniel's Review Game</div>
+  <div style="margin-top:12px;width:40px;height:40px;border:3px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:splashSpin 0.7s linear infinite;"></div>
+</div>
+<style>@keyframes splashSpin{to{transform:rotate(360deg)}}</style>
 
 <!-- THEME TOGGLE -->
 <button class="mute-btn" id="muteBtn" onclick="toggleMute()">🔊</button>
@@ -469,7 +543,28 @@ body.light-mode .mute-btn{background:rgba(255,255,255,0.8);border-color:#c5ddd0;
     <span class="icon">👮</span>
     <div>Mga Tumutulong<span class="btn-desc">Pulis, Doktor, Guro, Bumbero at iba pa!</span></div>
   </button>
-  <div style="display:flex;gap:12px;justify-content:center;margin-top:12px;">
+  <button class="menu-btn" style="background:linear-gradient(135deg,#ef9a9a,#ef5350);" onclick="playTap();startGame('shapes')">
+    <span class="icon">🔺</span>
+    <div>Mga Hugis<span class="btn-desc">Bilog, Parisukat, Tatsulok, Parihaba!</span></div>
+  </button>
+  <button class="menu-btn" style="background:linear-gradient(135deg,#fff176,#fdd835);" onclick="playTap();startGame('colors')">
+    <span class="icon">🌈</span>
+    <div>Mga Kulay<span class="btn-desc">Pula, Asul, Dilaw, Berde at iba pa!</span></div>
+  </button>
+  <button class="menu-btn" style="background:linear-gradient(135deg,#b0bec5,#78909c);" onclick="playTap();startGame('counting')">
+    <span class="icon">🔢</span>
+    <div>Counting<span class="btn-desc">Magbilang tayo! Addition at subtraction!</span></div>
+  </button>
+  <button class="menu-btn" style="background:linear-gradient(135deg,#80deea,#00acc1);" onclick="playTap();startMemoryMatch()">
+    <span class="icon">🃏</span>
+    <div>Memory Match<span class="btn-desc">Hanapin ang magkapareha!</span></div>
+  </button>
+  <button class="menu-btn" style="background:linear-gradient(135deg,#c5e1a5,#7cb342);" onclick="playTap();startTapAll()">
+    <span class="icon">👆</span>
+    <div>Tap Lahat!<span class="btn-desc">I-tap ang lahat ng tamang sagot!</span></div>
+  </button>
+  <div style="display:flex;gap:12px;justify-content:center;margin-top:12px;flex-wrap:wrap;">
+    <button style="background:none;border:none;color:#999;font-size:0.7em;cursor:pointer;" onclick="playTap();showParentDashboard()">📋 Parent Dashboard</button>
     <button style="background:none;border:none;color:#ccc;font-size:0.7em;cursor:pointer;" onclick="resetGame()">Reset Game</button>
     <button style="background:none;border:none;color:#ccc;font-size:0.7em;cursor:pointer;" onclick="toggleStoryLock()">🔓 Unlock Story</button>
   </div>
@@ -521,14 +616,15 @@ body.light-mode .mute-btn{background:rgba(255,255,255,0.8);border-color:#c5ddd0;
 <script>
 // ===== THEME =====
 function toggleTheme(){
-  document.body.classList.toggle('light-mode');
-  const isLight=document.body.classList.contains('light-mode');
-  document.getElementById('themeToggle').textContent=isLight?'🌙':'☀️';
-  try{localStorage.setItem('nathaniel_theme',isLight?'light':'dark');}catch(e){}
+  document.body.classList.toggle('dark-mode');
+  const isDark=document.body.classList.contains('dark-mode');
+  document.getElementById('themeToggle').textContent=isDark?'☀️':'🌙';
+  try{localStorage.setItem('nathaniel_theme',isDark?'dark':'light');}catch(e){}
 }
 (function(){
   const saved=localStorage.getItem('nathaniel_theme');
-  if(saved==='light'){document.body.classList.add('light-mode');document.getElementById('themeToggle').textContent='🌙';}
+  if(saved==='dark'){document.body.classList.add('dark-mode');document.getElementById('themeToggle').textContent='☀️';}
+  else{document.getElementById('themeToggle').textContent='🌙';}
 })();
 
 // ===== BACKGROUND SHAPES =====
@@ -960,7 +1056,55 @@ const DATA={
     items.push(cq('May 3 na ₱10 si Kuya Wal. Si Mommy may ₱50.',[{id:'wal',a:'sprite-slidel'},{id:'mommy',a:'sprite-slider'}],'3 × ₱10 = ₱30','₱50',side(3,'₱10','money/coin10.jpeg',true),side(1,'₱50','money/bill50.jpg',false)));
     items.push(cq('Si Lola Neng: ₱20 + ₱50. Si Dada: ₱100.',[{id:'lola_neng',a:'sprite-slidel'},{id:'dada',a:'sprite-slider'}],'₱20 + ₱50 = ₱70','₱100',mix('money/bill20.jpg','money/bill50.jpg',false,70),side(1,'₱100','money/bill100.jpg',false)));
     return items;
-  })()
+  })(),
+  shapes:[
+    {story:'Tingnan mo ang gulong ng jeepney!',chars:[{id:'nathaniel',a:'sprite-bounce'}],q:'Ano ang hugis ng gulong?',emoji:'⭕🚌',answer:'Bilog',choices:['Bilog','Parisukat','Tatsulok','Parihaba']},
+    {story:'May bintana sa bahay ni Nathaniel.',chars:[{id:'nathaniel',a:'sprite-wave'}],q:'Ano ang hugis ng bintana?',emoji:'🪟',answer:'Parisukat',choices:['Bilog','Parisukat','Tatsulok','Parihaba']},
+    {story:'Nakita ni Ate Thea ang yield sign sa kalsada!',chars:[{id:'thea',a:'sprite-wiggle'}],q:'Ano ang hugis nito?',emoji:'⚠️',answer:'Tatsulok',choices:['Bilog','Parisukat','Tatsulok','Parihaba']},
+    {story:'May pinto ang classroom ni Nathaniel.',chars:[{id:'nathaniel',a:'sprite-bounce'}],q:'Ano ang hugis ng pinto?',emoji:'🚪',answer:'Parihaba',choices:['Bilog','Parisukat','Tatsulok','Parihaba']},
+    {story:'May bola si Kuya Danielle!',chars:[{id:'danielle',a:'sprite-bounce'}],q:'Ano ang hugis ng bola?',emoji:'⚽',answer:'Bilog',choices:['Bilog','Parisukat','Tatsulok','Parihaba']},
+    {story:'Nag-drawing si Nathaniel ng bubong.',chars:[{id:'nathaniel',a:'sprite-wiggle'}],q:'Ano ang hugis ng bubong?',emoji:'🏠',answer:'Tatsulok',choices:['Bilog','Parihaba','Tatsulok','Parisukat']},
+    {story:'Nakita ni Lola Bong ang relo sa dingding.',chars:[{id:'lola_bong',a:'sprite-wave'}],q:'Ano ang hugis ng relo?',emoji:'🕐',answer:'Bilog',choices:['Bilog','Parisukat','Tatsulok','Parihaba']},
+    {story:'Kinuha ni Nathaniel ang libro sa bag.',chars:[{id:'nathaniel',a:'sprite-bounce'}],q:'Ano ang hugis ng libro?',emoji:'📖',answer:'Parihaba',choices:['Bilog','Parisukat','Tatsulok','Parihaba']},
+    {story:'May pizza si Kuya Wal! May isang slice.',chars:[{id:'wal',a:'sprite-give'}],q:'Ano ang hugis ng isang slice ng pizza?',emoji:'🍕',answer:'Tatsulok',choices:['Bilog','Parisukat','Tatsulok','Parihaba']},
+    {story:'Kinuha ni Dada ang TV remote.',chars:[{id:'dada',a:'sprite-wiggle'}],q:'Ano ang hugis ng TV?',emoji:'📺',answer:'Parihaba',choices:['Bilog','Parisukat','Tatsulok','Parihaba']},
+    {story:'May keso sa ref!',chars:[{id:'nathaniel',a:'sprite-bounce'}],q:'Ano ang hugis ng slice ng keso?',emoji:'🧀',answer:'Tatsulok',choices:['Bilog','Tatsulok','Parisukat','Parihaba']},
+    {story:'May tiles sa sahig ng bahay.',chars:[{id:'lola_neng',a:'sprite-wave'}],q:'Ano ang hugis ng tile?',emoji:'🟫',answer:'Parisukat',choices:['Bilog','Parisukat','Tatsulok','Parihaba']},
+    {story:'Kinuha ni Nathaniel ang plato para kumain.',chars:[{id:'nathaniel',a:'sprite-bounce'}],q:'Ano ang hugis ng plato?',emoji:'🍽️',answer:'Bilog',choices:['Bilog','Parisukat','Tatsulok','Parihaba']},
+    {story:'Nag-drawing si Ate Uwi ng bahay.',chars:[{id:'uwi',a:'sprite-wiggle'}],q:'Ano ang hugis ng katawan ng bahay?',emoji:'🏡',answer:'Parisukat',choices:['Bilog','Parisukat','Tatsulok','Parihaba']},
+  ],
+  colors:[
+    {story:'Tingnan mo ang langit!',chars:[{id:'nathaniel',a:'sprite-wave'}],q:'Ano ang kulay ng langit?',emoji:'☀️🌤️',answer:'Asul',choices:['Pula','Asul','Dilaw','Berde']},
+    {story:'Kumain si Kuya Wal ng saging!',chars:[{id:'wal',a:'sprite-give'}],q:'Ano ang kulay ng saging?',emoji:'🍌',answer:'Dilaw',choices:['Pula','Asul','Dilaw','Berde']},
+    {story:'May mansanas si Ate Thea.',chars:[{id:'thea',a:'sprite-wiggle'}],q:'Ano ang kulay ng mansanas?',emoji:'🍎',answer:'Pula',choices:['Pula','Asul','Dilaw','Berde']},
+    {story:'Tumitingin si Nathaniel sa mga dahon.',chars:[{id:'nathaniel',a:'sprite-bounce'}],q:'Ano ang kulay ng mga dahon?',emoji:'🌿🍃',answer:'Berde',choices:['Pula','Asul','Dilaw','Berde']},
+    {story:'Bumili si Lola Bong ng kalabasa sa palengke.',chars:[{id:'lola_bong',a:'sprite-give'}],q:'Ano ang kulay ng kalabasa?',emoji:'🎃',answer:'Kahel',choices:['Pula','Kahel','Dilaw','Berde']},
+    {story:'May nag-abot ng bulaklak kay Mommy!',chars:[{id:'mommy',a:'sprite-wave'}],q:'Ano ang kulay ng rosas?',emoji:'🌹',answer:'Pula',choices:['Pula','Asul','Dilaw','Rosas']},
+    {story:'Nag-drawing si Nathaniel ng araw.',chars:[{id:'nathaniel',a:'sprite-wiggle'}],q:'Ano ang kulay ng araw?',emoji:'☀️',answer:'Dilaw',choices:['Pula','Asul','Dilaw','Kahel']},
+    {story:'Kumain si Kuya Danielle ng ubas.',chars:[{id:'danielle',a:'sprite-bounce'}],q:'Ano ang kulay ng ubas?',emoji:'🍇',answer:'Lila',choices:['Asul','Berde','Pula','Lila']},
+    {story:'Nakita ni Nathaniel ang ulap.',chars:[{id:'nathaniel',a:'sprite-wave'}],q:'Ano ang kulay ng ulap?',emoji:'☁️',answer:'Puti',choices:['Asul','Puti','Dilaw','Berde']},
+    {story:'Gabi na! Madilim sa labas.',chars:[{id:'nathaniel',a:'sprite-wiggle'}],q:'Ano ang kulay ng gabi?',emoji:'🌙',answer:'Itim',choices:['Puti','Asul','Itim','Lila']},
+    {story:'Binigyan si Nathaniel ng chocolate ni Dada.',chars:[{id:'dada',a:'sprite-give'},{id:'nathaniel',a:'sprite-bounce'}],q:'Ano ang kulay ng chocolate?',emoji:'🍫',answer:'Kayumanggi',choices:['Itim','Kayumanggi','Pula','Kahel']},
+    {story:'May nakita si Ate Uwi na palaka sa parke!',chars:[{id:'uwi',a:'sprite-wiggle'}],q:'Ano ang kulay ng palaka?',emoji:'🐸',answer:'Berde',choices:['Asul','Berde','Dilaw','Kayumanggi']},
+    {story:'Nag-drawing si Lola Neng ng puso.',chars:[{id:'lola_neng',a:'sprite-wave'}],q:'Ano ang kulay ng puso?',emoji:'💗',answer:'Rosas',choices:['Pula','Rosas','Lila','Kahel']},
+    {story:'Kumain ng gatas si Nathaniel.',chars:[{id:'nathaniel',a:'sprite-bounce'}],q:'Ano ang kulay ng gatas?',emoji:'🥛',answer:'Puti',choices:['Dilaw','Puti','Asul','Kayumanggi']},
+  ],
+  counting:[
+    {story:'May 3 mansanas si Nathaniel at binigyan siya ni Mommy ng 2 pa.',chars:[{id:'nathaniel',a:'sprite-bounce'},{id:'mommy',a:'sprite-give'}],q:'Ilan lahat ang mansanas?',emoji:'🍎🍎🍎 🍎🍎',answer:'5',choices:['4','5','6','3']},
+    {story:'May 7 bituin sa langit. Nawala ang 2.',chars:[{id:'nathaniel',a:'sprite-wave'}],q:'Ilan na lang ang bituin?',emoji:'⭐⭐⭐⭐⭐ ⭐⭐',answer:'5',choices:['4','5','6','3']},
+    {story:'Binilang ni Nathaniel ang daliri sa isang kamay.',chars:[{id:'nathaniel',a:'sprite-wiggle'}],q:'Ilan ang daliri sa isang kamay?',emoji:'✋',answer:'5',choices:['4','5','10','3']},
+    {story:'May 2 pusa at 3 aso sa parke.',chars:[{id:'nathaniel',a:'sprite-bounce'}],q:'Ilan lahat ang hayop?',emoji:'🐱🐱 🐶🐶🐶',answer:'5',choices:['4','5','6','3']},
+    {story:'Si Kuya Wal ay may 10 candy. Binigay niya ang 4.',chars:[{id:'wal',a:'sprite-give'}],q:'Ilan na lang ang candy niya?',emoji:'🍬🍬🍬🍬🍬🍬',answer:'6',choices:['5','6','7','4']},
+    {story:'May 8 ibon sa puno. Lumipad ang 3.',chars:[{id:'nathaniel',a:'sprite-wave'}],q:'Ilan na lang ang ibon?',emoji:'🐦🐦🐦🐦🐦',answer:'5',choices:['4','5','6','3']},
+    {story:'Binilang ni Ate Thea ang mga upuan sa klase. May 4 na row, tig-2 bawat row.',chars:[{id:'thea',a:'sprite-wiggle'}],q:'Ilan lahat ang upuan?',emoji:'🪑🪑 🪑🪑 🪑🪑 🪑🪑',answer:'8',choices:['6','7','8','10']},
+    {story:'Ang daliri sa dalawang kamay...',chars:[{id:'nathaniel',a:'sprite-bounce'}],q:'Ilan ang daliri sa dalawang kamay?',emoji:'✋✋',answer:'10',choices:['8','10','12','5']},
+    {story:'May 6 na lapis si Nathaniel. Hiniram ni Kuya Danielle ang 2.',chars:[{id:'nathaniel',a:'sprite-bounce'},{id:'danielle',a:'sprite-wave'}],q:'Ilan na lang ang lapis ni Nathaniel?',emoji:'✏️✏️✏️✏️',answer:'4',choices:['3','4','5','2']},
+    {story:'Si Lola Bong ay namili ng 3 isda at 4 na gulay.',chars:[{id:'lola_bong',a:'sprite-give'}],q:'Ilan lahat ang binili niya?',emoji:'🐟🐟🐟 🥬🥬🥬🥬',answer:'7',choices:['6','7','8','5']},
+    {story:'May 9 na bata sa playground. Umalis ang 3.',chars:[{id:'nathaniel',a:'sprite-wiggle'}],q:'Ilan na lang ang naglalaro?',emoji:'👧👦👧👦👧👦',answer:'6',choices:['5','6','7','4']},
+    {story:'Ano ang susunod? 2, 4, 6, __',chars:[{id:'nathaniel',a:'sprite-bounce'}],q:'Ano ang susunod na numero?',emoji:'2️⃣ 4️⃣ 6️⃣ ❓',answer:'8',choices:['7','8','9','10']},
+    {story:'Ano ang susunod? 1, 3, 5, __',chars:[{id:'nathaniel',a:'sprite-wave'}],q:'Ano ang susunod na numero?',emoji:'1️⃣ 3️⃣ 5️⃣ ❓',answer:'7',choices:['6','7','8','9']},
+    {story:'Si Dada ay may 5 libro at binigyan pa siya ng 5.',chars:[{id:'dada',a:'sprite-give'}],q:'Ilan lahat ang libro ni Dada?',emoji:'📚📚📚📚📚 📚📚📚📚📚',answer:'10',choices:['8','9','10','12']},
+  ]
 };
 
 // ===== DIFFICULTY TAGS =====
@@ -995,7 +1139,7 @@ const wenc=['Okay lang!','Try ulit!','Kaya mo yan!','Halos na!','Next time!'];
 function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
 
 function startGame(type){
-  currentGame=type;currentQ=0;score=0;streak=0;firstTryCorrect=true;totalStars=0;gameStartTime=Date.now();
+  currentGame=type;currentQ=0;score=0;streak=0;firstTryCorrect=true;totalStars=0;gameStartTime=Date.now();brainBreakShown=new Set();
   // Show money drawer button only for money-related games
   const mdBtn=document.getElementById('moneyDrawerBtn');
   mdBtn.style.display=(type==='money'||type==='compare')?'flex':'none';
@@ -1266,6 +1410,8 @@ function replayGame(){document.getElementById('resultOverlay').classList.remove(
 function showQuestion(){
   clearScribble();
   if(currentQ>=questions.length){showResult();return;}
+  // Brain break every 3 questions
+  if(maybeShowBrainBreak())return;
   answered=false;
   const q=questions[currentQ];
   document.getElementById('scoreDisplay').textContent='⭐ '+totalStars;
@@ -1301,7 +1447,17 @@ function showQuestion(){
   if(q.tools) h+=`<div class="tools-text">Mga gamit: ${q.tools}</div>`;
 
   const sb=document.getElementById('storyBox');
-  sb.innerHTML=h;sb.style.animation='none';sb.offsetHeight;sb.style.animation='floatIn 0.3s ease';
+  const cb2=document.getElementById('choicesBox');
+  // Smooth transition: fade out, swap content, fade in
+  sb.style.opacity='0';sb.style.transform='scale(0.97)';
+  cb2.style.opacity='0';
+  setTimeout(()=>{
+    sb.innerHTML=h;
+    sb.style.transition='opacity 0.25s ease,transform 0.25s ease';
+    sb.style.opacity='1';sb.style.transform='scale(1)';
+    cb2.style.transition='opacity 0.25s ease';
+    cb2.style.opacity='1';
+  },150);
 
   const cb=document.getElementById('choicesBox');
   if(isDrag){
@@ -1854,6 +2010,24 @@ function getLessonSummary(q){
   if(q.answer==='Bumbero') return `🚒 BUMBERO — pumapatay ng apoy. Gamit nila: fire truck, fire hose, at flashlight.`;
   if(q.answer==='Pandero') return `🍞 PANDERO — gumagawa ng tinapay at pandesal. Gamit nila: oven, harina, at palayok.`;
   if(q.answer==='Mangingisda') return `🎣 MANGINGISDA — nanghuhuli ng isda. Gamit nila: bangka, lambat, at pamingwit.`;
+  // Shapes
+  if(q.answer==='Bilog') return `⭕ BILOG — walang sulok, parang gulong o bola. Halimbawa: relo, plato, barya.`;
+  if(q.answer==='Parisukat') return `⬜ PARISUKAT — may 4 na pantay na gilid at 4 na sulok. Halimbawa: tile, bintana, dice.`;
+  if(q.answer==='Tatsulok') return `🔺 TATSULOK — may 3 gilid at 3 sulok. Halimbawa: bubong, pizza slice, yield sign.`;
+  if(q.answer==='Parihaba') return `📐 PARIHABA — may 4 na sulok pero hindi pantay ang gilid. Halimbawa: pinto, libro, TV.`;
+  // Colors
+  if(q.answer==='Pula') return `🔴 PULA — kulay ng mansanas, puso, at fire truck.`;
+  if(q.answer==='Asul') return `🔵 ASUL — kulay ng langit at dagat.`;
+  if(q.answer==='Dilaw') return `🟡 DILAW — kulay ng saging, araw, at bituin.`;
+  if(q.answer==='Berde') return `🟢 BERDE — kulay ng dahon, damo, at palaka.`;
+  if(q.answer==='Kahel') return `🟠 KAHEL — kulay ng kalabasa at orange fruit.`;
+  if(q.answer==='Lila') return `🟣 LILA — kulay ng ubas at eggplant.`;
+  if(q.answer==='Rosas') return `💗 ROSAS — kulay ng bulaklak at puso.`;
+  if(q.answer==='Puti') return `⚪ PUTI — kulay ng ulap, gatas, at niyebe.`;
+  if(q.answer==='Itim') return `⚫ ITIM — kulay ng gabi at anino.`;
+  if(q.answer==='Kayumanggi') return `🟤 KAYUMANGGI — kulay ng lupa, chocolate, at kahoy.`;
+  // Counting
+  if(currentGame==='counting') return `🔢 Ang sagot ay ${q.answer}. Pag nag-add, pinagsasama. Pag nag-subtract, binabawas.`;
   return `✅ Ang tamang sagot ay: ${q.answer}`;
 }
 
@@ -1919,6 +2093,157 @@ function showWrongHint(q){
   hintEl.style.cssText='grid-column:1/-1;background:rgba(255,152,0,0.12);border:2px solid #ffa726;border-radius:14px;padding:12px 14px;text-align:center;animation:floatIn 0.3s ease;margin-top:4px;';
   hintEl.innerHTML=`<div style="font-size:0.75em;color:#ffb74d;font-weight:700;margin-bottom:4px;">💡 HINT</div><div style="font-size:0.85em;color:#ffe0b2;line-height:1.4;">${hint}</div>`;
   document.getElementById('choicesBox').appendChild(hintEl);
+}
+
+// ===== MEMORY MATCH GAME =====
+function startMemoryMatch(){
+  const topics=[
+    {label:'👮 Pulis',match:'🚔 Patrol car'},{label:'👨‍⚕️ Doktor',match:'🩺 Stethoscope'},
+    {label:'👩‍🏫 Guro',match:'📚 Libro'},{label:'🚒 Bumbero',match:'🧯 Fire hose'},
+    {label:'🍞 Pandero',match:'🍳 Oven'},{label:'🎣 Mangingisda',match:'⛵ Bangka'},
+  ];
+  const pairs=shuffle(topics).slice(0,4);
+  let cards=[];
+  pairs.forEach((p,i)=>{
+    cards.push({id:i,text:p.label,matchId:i});
+    cards.push({id:i,text:p.match,matchId:i});
+  });
+  cards=shuffle(cards);
+  currentGame='memory';gameStartTime=Date.now();totalStars=0;score=0;
+  let flipped=[],matched=0,tries=0;
+  document.getElementById('menu').style.display='none';
+  document.getElementById('gameScreen').classList.add('active');
+  const mdBtn=document.getElementById('moneyDrawerBtn');mdBtn.style.display='none';
+  document.getElementById('progressFill').style.width='0%';
+  document.getElementById('scoreDisplay').textContent='⭐ 0';
+  const sb=document.getElementById('storyBox');
+  sb.innerHTML=`<div class="prompt-label">MEMORY MATCH</div><div class="main-q">Hanapin ang magkapareha!</div><div class="memory-status" id="memStatus">Pairs: 0 / ${pairs.length}</div>`;
+  const cb=document.getElementById('choicesBox');
+  cb.className='';
+  cb.innerHTML=`<div class="memory-grid">${cards.map((c,i)=>
+    `<div class="memory-card" data-idx="${i}" onclick="flipCard(this,${i})">
+      <div class="card-back">❓</div>
+      <div class="card-face">${c.text}</div>
+    </div>`).join('')}</div>`;
+  window._memCards=cards;window._memFlipped=flipped;window._memMatched=0;window._memPairs=pairs.length;window._memTries=0;
+}
+function flipCard(el,idx){
+  if(el.classList.contains('flipped')||el.classList.contains('matched'))return;
+  if(window._memFlipped.length>=2)return;
+  el.classList.add('flipped');
+  playTap();
+  window._memFlipped.push({el,idx,matchId:window._memCards[idx].matchId});
+  if(window._memFlipped.length===2){
+    window._memTries++;
+    const[a,b]=window._memFlipped;
+    if(a.matchId===b.matchId){
+      setTimeout(()=>{
+        a.el.classList.add('matched');b.el.classList.add('matched');
+        window._memMatched++;
+        playCorrect();
+        totalStars+=2;score++;
+        document.getElementById('scoreDisplay').textContent='⭐ '+totalStars;
+        document.getElementById('memStatus').textContent=`Pairs: ${window._memMatched} / ${window._memPairs}`;
+        document.getElementById('progressFill').style.width=((window._memMatched/window._memPairs)*100)+'%';
+        window._memFlipped=[];
+        if(window._memMatched===window._memPairs){
+          questions=Array(window._memPairs).fill({});
+          setTimeout(()=>showResult(),800);
+        }
+      },400);
+    }else{
+      setTimeout(()=>{
+        a.el.classList.remove('flipped');b.el.classList.remove('flipped');
+        playWrong();
+        window._memFlipped=[];
+      },800);
+    }
+  }
+}
+
+// ===== TAP-ALL GAME =====
+function startTapAll(){
+  const rounds=[
+    {q:'Tap lahat ng LIQUID!',items:[
+      {text:'💧 Tubig',correct:true},{text:'🪨 Bato',correct:false},{text:'🥛 Gatas',correct:true},
+      {text:'👟 Sapatos',correct:false},{text:'🧃 Juice',correct:true},{text:'✏️ Lapis',correct:false},
+      {text:'☕ Kape',correct:true},{text:'🧊 Yelo',correct:false},{text:'🫗 Toyo',correct:true},
+    ]},
+    {q:'Tap lahat ng SOLID!',items:[
+      {text:'🪨 Bato',correct:true},{text:'💧 Tubig',correct:false},{text:'👟 Sapatos',correct:true},
+      {text:'🥛 Gatas',correct:false},{text:'✏️ Lapis',correct:true},{text:'💨 Hangin',correct:false},
+      {text:'🧊 Yelo',correct:true},{text:'🍞 Tinapay',correct:true},{text:'☕ Kape',correct:false},
+    ]},
+    {q:'Tap lahat ng BILOG!',items:[
+      {text:'⚽ Bola',correct:true},{text:'📖 Libro',correct:false},{text:'🍽️ Plato',correct:true},
+      {text:'🚪 Pinto',correct:false},{text:'🕐 Relo',correct:true},{text:'⚠️ Yield sign',correct:false},
+      {text:'💿 CD',correct:true},{text:'🪟 Bintana',correct:false},{text:'🍊 Orange',correct:true},
+    ]},
+    {q:'Tap lahat ng BERDE!',items:[
+      {text:'🐸 Palaka',correct:true},{text:'🍎 Mansanas',correct:false},{text:'🌿 Dahon',correct:true},
+      {text:'🍌 Saging',correct:false},{text:'🥒 Pipino',correct:true},{text:'🍇 Ubas',correct:false},
+      {text:'🥦 Broccoli',correct:true},{text:'🍫 Chocolate',correct:false},{text:'🌵 Cactus',correct:true},
+    ]},
+    {q:'Tap lahat ng gamit ng DOKTOR!',items:[
+      {text:'🩺 Stethoscope',correct:true},{text:'🚒 Fire truck',correct:false},{text:'💊 Gamot',correct:true},
+      {text:'📚 Libro',correct:false},{text:'🌡️ Thermometer',correct:true},{text:'🎣 Pamingwit',correct:false},
+      {text:'💉 Syringe',correct:true},{text:'🔫 Baril',correct:false},{text:'🏥 Ospital',correct:true},
+    ]},
+  ];
+  const round=rounds[Math.floor(Math.random()*rounds.length)];
+  const items=shuffle(round.items);
+  currentGame='tapall';gameStartTime=Date.now();totalStars=0;score=0;
+  document.getElementById('menu').style.display='none';
+  document.getElementById('gameScreen').classList.add('active');
+  document.getElementById('moneyDrawerBtn').style.display='none';
+  document.getElementById('progressFill').style.width='0%';
+  document.getElementById('scoreDisplay').textContent='⭐ 0';
+  const sb=document.getElementById('storyBox');
+  sb.innerHTML=`<div class="prompt-label">TAP LAHAT!</div><div class="main-q">${round.q}</div>`;
+  const cb=document.getElementById('choicesBox');
+  cb.className='';
+  const selected=new Set();
+  cb.innerHTML=`<div class="tapall-grid">${items.map((it,i)=>
+    `<div class="tapall-item" data-idx="${i}" onclick="toggleTapItem(this,${i})">
+      <span>${it.text.split(' ')[0]}</span>
+      <span class="tapall-label">${it.text.split(' ').slice(1).join(' ')}</span>
+    </div>`).join('')}</div>
+    <button class="tapall-submit" onclick="checkTapAll()">Tapos na!</button>`;
+  window._tapItems=items;window._tapSelected=selected;window._tapRound=round;
+}
+function toggleTapItem(el,idx){
+  playTap();
+  if(window._tapSelected.has(idx)){
+    window._tapSelected.delete(idx);
+    el.classList.remove('selected');
+  }else{
+    window._tapSelected.add(idx);
+    el.classList.add('selected');
+  }
+}
+function checkTapAll(){
+  const items=window._tapItems;
+  const selected=window._tapSelected;
+  const correctSet=new Set(items.map((it,i)=>it.correct?i:-1).filter(i=>i>=0));
+  let correct=0,wrong=0;
+  const grid=document.querySelector('.tapall-grid');
+  grid.querySelectorAll('.tapall-item').forEach((el,i)=>{
+    if(items[i].correct&&selected.has(i)){el.style.background='#c8e6c9';el.style.borderColor='#66bb6a';correct++;}
+    else if(items[i].correct&&!selected.has(i)){el.style.background='#fff9c4';el.style.borderColor='#fdd835';} // missed
+    else if(!items[i].correct&&selected.has(i)){el.style.background='#ffcdd2';el.style.borderColor='#ef5350';wrong++;} // wrong tap
+    else{el.style.opacity='0.5';}
+    el.style.pointerEvents='none';
+  });
+  const total=correctSet.size;
+  score=Math.max(0,correct-wrong);
+  totalStars=score*2;
+  document.getElementById('scoreDisplay').textContent='⭐ '+totalStars;
+  if(correct===total&&wrong===0){playCorrect();spawnConfetti(15);showEncouragement('Perfect!');}
+  else if(correct>wrong){playCorrect();showEncouragement('Magaling!');}
+  else{playWrong();}
+  questions=Array(total).fill({});
+  document.querySelector('.tapall-submit').style.display='none';
+  setTimeout(()=>showResult(),1500);
 }
 
 function showResult(){
@@ -2608,8 +2933,123 @@ function resetGame(){
   }
 }
 
+// ===== BRAIN BREAK (BUBBLE POP) =====
+let brainBreakShown=new Set();
+function maybeShowBrainBreak(){
+  // Show a brain break every 3 questions (after Q3, Q6, etc.)
+  if(currentQ>0 && currentQ%3===0 && !brainBreakShown.has(currentQ)){
+    brainBreakShown.add(currentQ);
+    showBrainBreak();
+    return true;
+  }
+  return false;
+}
+function showBrainBreak(){
+  const overlay=document.createElement('div');
+  overlay.className='brain-break-overlay';
+  overlay.id='brainBreak';
+  const colors=['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#ff922b','#cc5de8','#20c997','#ff8787'];
+  const emojis=['🌟','💫','🎈','🫧','✨','🎉','⭐','🌸','💖','🎊'];
+  let popped=0,total=8;
+  let html=`<div class="bb-title">Brain Break!</div>
+    <div class="bb-subtitle">Pop ${total} bubbles! 🫧</div>
+    <div class="bb-arena" id="bbArena">`;
+  for(let i=0;i<total;i++){
+    const size=50+Math.random()*30;
+    const x=10+Math.random()*70;
+    const y=5+Math.random()*75;
+    const color=colors[i%colors.length];
+    const emoji=emojis[i%emojis.length];
+    const delay=(Math.random()*2).toFixed(1);
+    html+=`<div class="bb-bubble" style="width:${size}px;height:${size}px;left:${x}%;top:${y}%;background:${color};animation-delay:${delay}s;" onclick="popBubble(this)">${emoji}</div>`;
+  }
+  html+=`</div><div class="bb-subtitle" id="bbCount">${popped} / ${total}</div>
+    <button class="bb-skip" onclick="closeBrainBreak()">Skip ➡️</button>`;
+  overlay.innerHTML=html;
+  document.body.appendChild(overlay);
+  window._bbPopped=0;window._bbTotal=total;
+}
+function popBubble(el){
+  if(el.dataset.popped)return;
+  el.dataset.popped='1';
+  playTap();
+  el.style.transform='scale(0)';el.style.opacity='0';el.style.transition='all 0.3s ease';
+  window._bbPopped++;
+  const cnt=document.getElementById('bbCount');
+  if(cnt)cnt.textContent=window._bbPopped+' / '+window._bbTotal;
+  if(window._bbPopped>=window._bbTotal){
+    totalStars+=2;
+    document.getElementById('scoreDisplay').textContent='⭐ '+totalStars;
+    setTimeout(()=>closeBrainBreak(),500);
+  }
+}
+function closeBrainBreak(){
+  const bb=document.getElementById('brainBreak');
+  if(bb){bb.style.opacity='0';bb.style.transition='opacity 0.3s ease';setTimeout(()=>bb.remove(),300);}
+  showQuestion();
+}
+
+// ===== PARENT DASHBOARD =====
+function showParentDashboard(){
+  const pw=prompt('Enter PIN for Parent Dashboard:');
+  if(pw!=='2020'){if(pw!==null)alert('Wrong PIN!');return;}
+  const log=getSessionLog();
+  const topics=['fractions','money','compare','matter','komunidad','helpers','shapes','colors','counting'];
+  const topicNames={fractions:'Fractions',money:'Philippine Money',compare:'Alin ang Mas Malaki?',matter:'Solid/Liquid/Gas',komunidad:'Komunidad',helpers:'Mga Tumutulong',shapes:'Mga Hugis',colors:'Mga Kulay',counting:'Counting'};
+  let topicStats={};
+  topics.forEach(t=>{topicStats[t]={sessions:0,totalPct:0,bestPct:0,lastDate:null};});
+  log.forEach(s=>{
+    if(topicStats[s.topic]){
+      topicStats[s.topic].sessions++;
+      topicStats[s.topic].totalPct+=s.pct;
+      if(s.pct>topicStats[s.topic].bestPct)topicStats[s.topic].bestPct=s.pct;
+      topicStats[s.topic].lastDate=s.date;
+    }
+  });
+  // Wrong questions
+  const wrong=getWrongIds();
+  const wrongCount=Object.keys(wrong).length;
+  let html=`<div class="dashboard-overlay" id="dashOverlay" onclick="if(event.target===this)this.remove()">
+    <div class="dashboard-card">
+      <div class="dash-title">📋 Parent Dashboard</div>
+      <div style="text-align:center;font-size:0.85em;color:#888;margin-bottom:10px;">Total sessions: ${log.length} | Questions to review: ${wrongCount}</div>`;
+  topics.forEach(t=>{
+    const st=topicStats[t];
+    if(st.sessions===0){
+      html+=`<div class="dash-topic"><div class="dash-topic-name">${topicNames[t]}</div><div class="dash-stat">Not started yet</div></div>`;
+    }else{
+      const avg=Math.round(st.totalPct/st.sessions);
+      html+=`<div class="dash-topic">
+        <div class="dash-topic-name">${topicNames[t]}</div>
+        <div class="dash-stat">Sessions: ${st.sessions} | Average: ${avg}% | Best: ${st.bestPct}%</div>
+        <div class="dash-bar"><div class="dash-bar-fill" style="width:${avg}%"></div></div>
+      </div>`;
+    }
+  });
+  // Wrong questions list
+  if(wrongCount>0){
+    html+=`<div style="margin-top:12px;font-weight:700;font-size:0.9em;">Questions to Review:</div>`;
+    const wrongIds=Object.keys(wrong);
+    wrongIds.slice(0,10).forEach(id=>{
+      const parts=id.split('_');
+      const topic=parts.slice(0,-1).join('_');
+      const idx=parseInt(parts[parts.length-1]);
+      if(DATA[topic]&&DATA[topic][idx]){
+        html+=`<div style="font-size:0.75em;color:#888;padding:2px 0;">• [${topicNames[topic]||topic}] ${DATA[topic][idx].q}</div>`;
+      }
+    });
+    if(wrongCount>10) html+=`<div style="font-size:0.75em;color:#888;">...and ${wrongCount-10} more</div>`;
+  }
+  html+=`<button class="dash-close" onclick="document.getElementById('dashOverlay').remove()">Close</button>
+    </div></div>`;
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+
 // Init on load
 updateStoryBtn();
+
+// Dismiss splash screen
+window.addEventListener('load',()=>{setTimeout(()=>{const s=document.getElementById('splash');if(s){s.style.opacity='0';setTimeout(()=>s.remove(),500);}},600);});
 
 // Register service worker for PWA
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
