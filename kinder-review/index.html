@@ -1,0 +1,2592 @@
+<!DOCTYPE html>
+<html lang="fil">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Review Game">
+<meta name="theme-color" content="#1a1a2e">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Nathaniel's Family Review Game!</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+body{font-family:'Nunito',Arial,sans-serif;min-height:100vh;overflow-x:hidden;
+  background:#1a1a2e;color:#e0e0e0;}
+body.light-mode{background:#fdf8f3;color:#333;}
+
+/* ===== FLOATING BACKGROUND ===== */
+.bg-decor{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.bg-shape{position:absolute;border-radius:50%;opacity:0.25;animation:bgFloat linear infinite;}
+@keyframes bgFloat{0%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-30px) rotate(180deg)}100%{transform:translateY(0) rotate(360deg)}}
+
+/* ===== MENU ===== */
+.menu{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-height:100vh;padding:30px 16px 40px;gap:10px;position:relative;z-index:1;}
+.menu h1{font-size:1.8em;color:#3d7a68;text-align:center;margin-bottom:0;text-shadow:0 2px 8px rgba(61,122,104,0.12);}
+.menu .subtitle{font-size:0.95em;color:#6db89a;margin-bottom:6px;text-align:center;}
+.family-row{display:flex;gap:2px;justify-content:center;flex-wrap:wrap;margin-bottom:8px;max-width:420px;}
+.family-row .mini-sprite{width:38px;display:inline-flex;flex-direction:column;align-items:center;overflow:visible;}
+.family-row .mini-sprite svg{width:32px;height:40px;}
+.family-row .mini-sprite .spr-name{font-size:6.5px;color:#888;white-space:nowrap;margin-top:1px;text-align:center;}
+.menu-btn{
+  width:94%;max-width:400px;padding:14px 16px;border:none;border-radius:18px;
+  font-size:1.1em;font-weight:700;color:#fff;cursor:pointer;
+  display:flex;align-items:center;gap:12px;
+  box-shadow:0 4px 18px rgba(0,0,0,0.1),inset 0 1px 0 rgba(255,255,255,0.25);
+  transition:transform 0.1s;text-align:left;position:relative;z-index:1;
+}
+.menu-btn:active{transform:scale(0.96)}
+.menu-btn .icon{font-size:1.3em;flex-shrink:0}
+.menu-btn .btn-desc{font-size:0.65em;font-weight:400;opacity:0.9;display:block}
+
+/* ===== GAME SCREEN ===== */
+.game-screen{display:none;min-height:100vh;padding:12px;padding-bottom:100px;position:relative;z-index:1;}
+.game-screen.active{display:block}
+.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-right:90px;position:relative;z-index:88;}
+.back-btn{background:rgba(255,255,255,0.85);border:none;border-radius:50%;width:44px;height:44px;font-size:1.3em;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+.scribble-btn{background:rgba(255,255,255,0.85);border:none;border-radius:50%;width:44px;height:44px;font-size:1.3em;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);margin-left:6px;transition:background 0.2s,box-shadow 0.2s;}
+.scribble-btn.active{background:#ff6f00;color:#fff;box-shadow:0 2px 12px rgba(255,111,0,0.4);}
+.score-display{font-size:1.1em;font-weight:700;color:#3d7a68;background:rgba(255,255,255,0.85);padding:5px 14px;border-radius:20px;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.progress-bar{width:100%;height:8px;background:rgba(255,255,255,0.5);border-radius:4px;margin-bottom:10px;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.06);}
+.progress-fill{height:100%;background:linear-gradient(90deg,#6db89a,#5ba4c9,#81d4fa);border-radius:4px;transition:width 0.4s ease;}
+
+/* STORY BOX */
+.story-box{
+  background:rgba(255,255,255,0.92);border-radius:24px;padding:16px 14px;margin-bottom:12px;
+  box-shadow:0 4px 24px rgba(0,0,0,0.06);text-align:center;position:relative;
+  backdrop-filter:blur(8px);border:2px solid rgba(255,255,255,0.6);
+}
+.story-box .prompt-label{font-size:0.8em;color:#93c5a8;margin-bottom:3px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.story-box .story-text{font-size:1em;color:#555;line-height:1.45;margin-bottom:4px;}
+.story-box .story-scene{display:flex;justify-content:center;align-items:flex-end;gap:8px;flex-wrap:wrap;margin:6px 0;min-height:70px;}
+.story-box .main-q{font-size:1.25em;font-weight:900;color:#3a6b5a;margin-top:6px;}
+.story-box .visual-row{font-size:2.5em;margin:4px 0;}
+.story-box .hint-text{font-size:0.85em;color:#bbb;margin-top:3px;}
+.story-box .tools-text{margin-top:4px;font-size:0.85em;color:#5ba4c9;font-weight:600;}
+
+/* CHOICES */
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:460px;margin:0 auto;}
+.choices.three-col{grid-template-columns:1fr 1fr 1fr;}
+.choice-btn{
+  padding:14px 8px;border:3px solid #d4e8dc;border-radius:18px;
+  background:rgba(255,255,255,0.9);backdrop-filter:blur(4px);
+  font-size:1.05em;font-weight:700;cursor:pointer;transition:all 0.15s;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  box-shadow:0 3px 12px rgba(0,0,0,0.05);color:#333;
+}
+.choice-btn .choice-icon{font-size:1.5em;}
+.choice-btn:active{transform:scale(0.95)}
+.choice-btn.correct{background:#c8e6c9;border-color:#66bb6a;animation:pop 0.4s;}
+.choice-btn.wrong{background:#ffcdd2;border-color:#ef5350;animation:shake 0.4s;}
+
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.1)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+@keyframes floatIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-5deg)}75%{transform:rotate(5deg)}}
+@keyframes slideInLeft{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+@keyframes handWave{0%,100%{transform:rotate(0)}25%{transform:rotate(15deg)}50%{transform:rotate(-10deg)}75%{transform:rotate(12deg)}}
+@keyframes giveItem{0%{transform:translateX(0) scale(1)}50%{transform:translateX(15px) scale(1.15)}100%{transform:translateX(0) scale(1)}}
+
+/* Sprite animations - idle */
+.sprite-bounce{animation:bounce 1s ease-in-out infinite;}
+.sprite-wiggle{animation:wiggle 0.8s ease-in-out infinite;}
+.sprite-wave{animation:handWave 1s ease-in-out 2;}
+.sprite-give{animation:giveItem 0.8s ease-in-out;}
+.sprite-slidel{animation:slideInLeft 0.5s ease-out;}
+.sprite-slider{animation:slideInRight 0.5s ease-out;}
+
+/* ===== REACTION OVERLAY ===== */
+.reaction-overlay{
+  position:fixed;left:0;right:0;bottom:0;z-index:90;pointer-events:none;
+  display:flex;flex-direction:column;justify-content:flex-end;align-items:center;
+  height:120px;overflow:visible;
+  animation:reactionFade var(--reaction-dur, 1.4s) ease-out forwards;
+}
+@keyframes reactionFade{0%{opacity:0}10%{opacity:1}70%{opacity:1}100%{opacity:0}}
+
+/* CORRECT - party scene */
+.reaction-correct{
+  background:linear-gradient(transparent,rgba(102,187,106,0.12));
+}
+.reaction-correct .reaction-stage{
+  display:flex;gap:4px;align-items:flex-end;justify-content:center;
+  padding:4px 8px;
+}
+.reaction-correct .reaction-stage .sprite{animation:partyDance 0.4s ease-in-out infinite alternate;}
+.reaction-correct .reaction-stage .sprite:nth-child(2){animation-delay:0.1s;animation-name:partyJump;}
+.reaction-correct .reaction-stage .sprite:nth-child(3){animation-delay:0.2s;animation-name:partySpin;}
+.reaction-correct .reaction-stage .sprite:nth-child(4){animation-delay:0.15s;}
+.reaction-correct .party-emoji{font-size:1.2em;animation:partyFloat 0.6s ease-in-out infinite alternate;}
+.reaction-correct .party-text{
+  font-size:1.1em;font-weight:900;
+  color:#43a047;text-shadow:0 2px 8px rgba(67,160,71,0.3);
+  animation:partyTextPop 0.5s ease-out;margin-bottom:8px;
+}
+
+@keyframes partyDance{
+  0%{transform:translateY(0) rotate(-8deg)}
+  100%{transform:translateY(-12px) rotate(8deg)}
+}
+@keyframes partyJump{
+  0%{transform:translateY(0) scale(1)}
+  100%{transform:translateY(-20px) scale(1.1)}
+}
+@keyframes partySpin{
+  0%{transform:rotate(-10deg) translateY(0)}
+  100%{transform:rotate(10deg) translateY(-14px)}
+}
+@keyframes partyFloat{
+  0%{transform:translateY(0) scale(1)}
+  100%{transform:translateY(-15px) scale(1.2)}
+}
+@keyframes partyTextPop{
+  0%{transform:scale(0);opacity:0}
+  60%{transform:scale(1.2);opacity:1}
+  100%{transform:scale(1);opacity:1}
+}
+
+/* WRONG - sad scene */
+.reaction-wrong{
+  background:linear-gradient(transparent,rgba(239,83,80,0.08));
+}
+.reaction-wrong .reaction-stage{
+  display:flex;gap:4px;align-items:flex-end;justify-content:center;
+  padding:4px 8px;
+}
+.reaction-wrong .reaction-stage .sprite{animation:sadDroop 0.6s ease-in-out infinite alternate;}
+.reaction-wrong .reaction-stage .sprite:nth-child(2){animation-delay:0.15s;animation-name:sadShake;}
+.reaction-wrong .reaction-stage .sprite:nth-child(3){animation-delay:0.1s;}
+.reaction-wrong .sad-emoji{font-size:1.2em;animation:sadBounce 0.8s ease-in-out infinite alternate;}
+.reaction-wrong .sad-text{
+  font-size:1em;font-weight:700;
+  color:#e57373;text-shadow:0 2px 8px rgba(229,115,115,0.2);
+  animation:sadTextSlide 0.4s ease-out;margin-bottom:8px;
+}
+
+@keyframes sadDroop{
+  0%{transform:translateY(0) rotate(0)}
+  100%{transform:translateY(4px) rotate(-3deg)}
+}
+@keyframes sadShake{
+  0%{transform:translateX(-3px)}
+  100%{transform:translateX(3px)}
+}
+@keyframes sadBounce{
+  0%{transform:translateY(0)}
+  100%{transform:translateY(5px)}
+}
+@keyframes sadTextSlide{
+  0%{transform:translateY(10px);opacity:0}
+  100%{transform:translateY(0);opacity:1}
+}
+
+/* Confetti */
+.confetti-container{position:fixed;inset:0;pointer-events:none;z-index:200;overflow:hidden;}
+.confetti{position:absolute;width:10px;height:10px;border-radius:2px;animation:confettiFall linear forwards;}
+@keyframes confettiFall{0%{transform:translateY(-10vh) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+
+/* Streak badge */
+.streak-badge{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:2.2em;font-weight:900;color:#ff6f00;text-shadow:0 2px 8px rgba(255,111,0,0.3);z-index:150;pointer-events:none;animation:streakPop 0.8s ease-out forwards;}
+@keyframes streakPop{0%{opacity:0;transform:translate(-50%,-50%) scale(0.5)}30%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}60%{transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-70%) scale(0.8)}}
+
+/* Encourage bubble */
+.encourage-bubble{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.95);color:#3d7a68;padding:8px 20px;border-radius:20px;font-weight:700;font-size:1.05em;z-index:150;pointer-events:none;animation:bubbleUp 1.4s ease-out forwards;box-shadow:0 4px 18px rgba(61,122,104,0.15);border:2px solid #c5ddd0;}
+@keyframes bubbleUp{0%{opacity:0;transform:translateX(-50%) translateY(20px)}20%{opacity:1;transform:translateX(-50%) translateY(0)}80%{opacity:1}100%{opacity:0;transform:translateX(-50%) translateY(-30px)}}
+
+/* RESULT */
+.result-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);justify-content:center;align-items:center;z-index:100;backdrop-filter:blur(4px);}
+.result-overlay.active{display:flex}
+.result-card{background:#fff;border-radius:28px;padding:28px 20px;text-align:center;max-width:380px;width:92%;animation:floatIn 0.4s ease;box-shadow:0 8px 40px rgba(0,0,0,0.12);}
+.result-card .big-emoji{font-size:3em}
+.result-card h2{font-size:1.4em;margin:6px 0;color:#3a6b5a;}
+.result-card p{font-size:0.95em;color:#666;margin-bottom:12px}
+.result-card .stars{color:#ffc107;font-size:1.5em;letter-spacing:3px;margin:4px 0}
+.result-card button{padding:12px 24px;border:none;border-radius:16px;background:linear-gradient(135deg,#5ba4c9,#6db89a);color:#fff;font-size:1em;font-weight:700;cursor:pointer;margin:4px;box-shadow:0 3px 12px rgba(91,164,201,0.25);}
+.result-card button.green{background:linear-gradient(135deg,#43a047,#66bb6a);}
+.result-card .result-scene{display:flex;justify-content:center;gap:4px;margin:8px 0;flex-wrap:wrap;}
+
+/* SPRITE */
+.sprite{display:inline-block;position:relative;}
+.sprite svg{display:block;}
+.sprite-label{font-size:0.6em;text-align:center;font-weight:700;color:#777;margin-top:1px;white-space:nowrap;}
+
+/* FOOD */
+.food-grid{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:8px 0;}
+.food-item{font-size:2em;transition:all 0.3s;display:inline-block;position:relative;}
+.food-item.eaten{opacity:0.35;filter:grayscale(0.8);}
+.food-item.eaten::after{content:'✕';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:0.9em;color:#ef5350;font-weight:900;text-shadow:0 0 4px #fff,0 0 4px #fff,0 0 4px #fff;}
+.food-item.avail{animation:foodPulse 1.5s ease-in-out infinite;}
+@keyframes foodPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+
+/* SCORE LOG */
+.score-log-btn{background:rgba(255,255,255,0.85);border:2px solid #c5ddd0;border-radius:14px;padding:6px 14px;font-size:0.85em;font-weight:700;color:#3d7a68;cursor:pointer;margin-top:6px;}
+.log-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);justify-content:center;align-items:center;z-index:100;backdrop-filter:blur(4px);}
+.log-overlay.active{display:flex}
+.log-card{background:#fff;border-radius:24px;padding:24px 16px;max-width:400px;width:92%;max-height:80vh;overflow-y:auto;animation:floatIn 0.3s ease;}
+.log-card h2{font-size:1.3em;color:#3a6b5a;text-align:center;margin-bottom:12px;}
+.log-card table{width:100%;border-collapse:collapse;font-size:0.85em;}
+.log-card th{background:#e5f0ea;color:#3d7a68;padding:8px 6px;text-align:left;border-radius:4px;}
+.log-card td{padding:6px;border-bottom:1px solid #f0f0f0;color:#555;}
+.log-card .log-perfect{color:#43a047;font-weight:700;}
+.log-card .log-close{display:block;margin:12px auto 0;padding:10px 28px;border:none;border-radius:14px;background:linear-gradient(135deg,#5ba4c9,#6db89a);color:#fff;font-weight:700;font-size:1em;cursor:pointer;}
+.log-card .log-empty{text-align:center;color:#bbb;padding:20px;font-size:1em;}
+
+/* BILL */
+.bill-card{display:inline-block;padding:10px 24px;border-radius:12px;font-size:1.5em;font-weight:900;border:3px dashed;margin:6px 0;}
+
+/* PIE */
+.pie-visual{margin:8px auto;width:90px;height:90px;border-radius:50%;border:3px solid #6db89a;box-shadow:0 3px 12px rgba(109,184,154,0.2);}
+
+/* DRAG INTERACTIVE */
+.drag-zone{display:flex;justify-content:center;align-items:flex-start;gap:16px;margin:10px 0;flex-wrap:wrap;}
+.drag-basket{
+  min-width:100px;min-height:80px;padding:8px;border-radius:16px;
+  border:3px dashed #c5ddd0;background:rgba(255,255,255,0.6);
+  display:flex;flex-wrap:wrap;gap:4px;justify-content:center;align-items:center;
+  transition:all 0.2s;position:relative;
+}
+.drag-basket.highlight{border-color:#6db89a;background:rgba(109,184,154,0.1);transform:scale(1.03);}
+.drag-basket .basket-label{position:absolute;bottom:-18px;font-size:0.7em;font-weight:700;color:#888;white-space:nowrap;}
+.drag-item{
+  font-size:1.8em;cursor:grab;transition:transform 0.15s;touch-action:none;user-select:none;
+}
+.drag-item:active{cursor:grabbing;transform:scale(1.2);}
+.drag-item.dragging{opacity:0.5;transform:scale(0.9);}
+.drag-arrow{font-size:1.5em;color:#c5ddd0;align-self:center;}
+.drag-submit{
+  display:block;margin:8px auto 0;padding:8px 24px;border:none;border-radius:14px;
+  background:linear-gradient(135deg,#6db89a,#5ba4c9);color:#fff;font-weight:700;
+  font-size:0.95em;cursor:pointer;opacity:0.5;pointer-events:none;transition:all 0.2s;
+}
+.drag-submit.ready{opacity:1;pointer-events:auto;animation:foodPulse 1.5s ease-in-out infinite;}
+.drag-count{font-size:0.8em;color:#6db89a;font-weight:700;margin-top:2px;}
+
+/* STAR STORE */
+.store-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);justify-content:center;align-items:center;z-index:100;backdrop-filter:blur(4px);}
+.store-overlay.active{display:flex}
+.store-card{background:#fff;border-radius:24px;padding:20px 14px;max-width:420px;width:94%;max-height:85vh;overflow-y:auto;animation:floatIn 0.3s ease;}
+.store-card h2{font-size:1.3em;color:#3a6b5a;text-align:center;margin-bottom:4px;}
+.store-balance{text-align:center;font-size:1.1em;font-weight:700;color:#ff8f00;margin-bottom:10px;}
+.store-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;}
+.store-item{
+  text-align:center;padding:8px 4px;border-radius:14px;border:2px solid #e8e8e8;
+  background:rgba(255,255,255,0.9);cursor:pointer;transition:all 0.2s;position:relative;
+}
+.store-item.locked{opacity:0.6;filter:grayscale(0.3);}
+.store-item.locked::after{content:'🔒';position:absolute;top:2px;right:4px;font-size:0.8em;}
+.store-item.owned{border-color:#6db89a;background:#e5f0ea;}
+.store-item .item-emoji{font-size:2.2em;display:block;}
+.store-item .item-name{font-size:0.65em;font-weight:700;color:#666;margin-top:2px;}
+.store-item .item-price{font-size:0.7em;color:#ff8f00;font-weight:700;}
+.store-close{display:block;margin:8px auto 0;padding:10px 28px;border:none;border-radius:14px;background:linear-gradient(135deg,#5ba4c9,#6db89a);color:#fff;font-weight:700;font-size:1em;cursor:pointer;}
+.store-item-view{text-align:center;padding:16px;}
+.store-item-view .big-item{font-size:5em;display:block;margin:10px 0;animation:pop 0.5s ease;}
+.store-item-view .item-msg{font-size:0.95em;color:#666;margin:8px 0;}
+
+/* ===== STORY MODE ===== */
+.story-mode .chapter-title{font-size:1.3em;font-weight:900;color:#3a6b5a;text-align:center;margin-bottom:8px;animation:floatIn 0.5s ease;}
+.story-mode .chapter-narrative{font-size:1em;color:#555;line-height:1.5;text-align:center;margin-bottom:10px;animation:floatIn 0.4s ease;}
+.story-mode .chapter-scene{display:flex;justify-content:center;align-items:flex-end;gap:8px;flex-wrap:wrap;margin:10px 0;min-height:70px;}
+.story-mode .chapter-instruction{font-size:0.9em;color:#5ba4c9;font-weight:700;text-align:center;margin:8px 0;}
+.story-progress{display:flex;gap:4px;justify-content:center;margin-bottom:8px;}
+.story-progress .ch-dot{width:28px;height:6px;border-radius:3px;background:#e0e0e0;transition:all 0.3s;}
+.story-progress .ch-dot.done{background:#66bb6a;}
+.story-progress .ch-dot.current{background:#42a5f5;animation:foodPulse 1.5s ease-in-out infinite;}
+
+/* Cake canvas for swipe-slice */
+.cake-canvas{position:relative;width:200px;height:200px;margin:10px auto;touch-action:none;}
+.cake-canvas svg{width:100%;height:100%;}
+.cake-canvas .slice-line{stroke:#e57373;stroke-width:3;stroke-linecap:round;}
+
+/* Glass fill for pour interaction */
+.glass-container{text-align:center;margin:10px auto;}
+.glass-fill{width:80px;height:160px;border:4px solid #90caf9;border-top:none;border-radius:0 0 12px 12px;margin:0 auto;position:relative;overflow:hidden;background:#fff;}
+.glass-liquid{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(180deg,#ffcc80,#ff9800);transition:height 0.1s;border-radius:0 0 8px 8px;}
+.glass-markers{position:absolute;left:-30px;top:0;bottom:0;width:26px;}
+.glass-marker{position:absolute;right:0;font-size:0.6em;color:#999;font-weight:700;}
+.glass-level-text{font-size:1.1em;font-weight:900;color:#e65100;margin-top:8px;}
+
+/* Wallet for money-pick */
+.wallet-zone{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0;}
+.wallet-bill{padding:8px 16px;border-radius:10px;border:2px solid #c8e6c9;background:rgba(255,255,255,0.9);font-weight:700;font-size:1em;cursor:pointer;transition:all 0.15s;color:#2e7d32;}
+.wallet-bill:active{transform:scale(0.95);}
+.wallet-bill.selected{background:#c8e6c9;border-color:#43a047;box-shadow:0 2px 8px rgba(67,160,71,0.3);}
+.wallet-total{font-size:1.3em;font-weight:900;color:#e65100;text-align:center;margin:8px 0;}
+
+/* Story map */
+.story-map{position:relative;width:100%;max-width:340px;margin:10px auto;}
+.story-map svg{width:100%;height:auto;}
+.map-building{cursor:pointer;transition:all 0.2s;}
+.map-building:hover,.map-building:active{opacity:0.8;transform:scale(1.05);}
+.map-building.correct{animation:pop 0.4s;}
+.map-building.wrong{animation:shake 0.4s;}
+
+/* Story narrative scene */
+.story-narrative{text-align:center;padding:20px 10px;}
+.story-narrative .angel-glow{animation:angelGlow 2s ease-in-out infinite alternate;}
+@keyframes angelGlow{0%{filter:drop-shadow(0 0 8px rgba(255,215,0,0.4))}100%{filter:drop-shadow(0 0 20px rgba(255,215,0,0.8))}}
+
+/* Story susunod button */
+.story-next-btn{display:block;margin:12px auto 0;padding:12px 32px;border:none;border-radius:16px;background:linear-gradient(135deg,#5ba4c9,#6db89a);color:#fff;font-size:1.05em;font-weight:700;cursor:pointer;box-shadow:0 3px 12px rgba(91,164,201,0.25);animation:foodPulse 2s ease-in-out infinite;}
+.story-next-btn:active{transform:scale(0.95);}
+.story-reset-btn{display:inline-block;margin:6px auto 0;padding:5px 14px;border:2px solid #90a4ae;border-radius:12px;background:rgba(144,164,174,0.1);color:#78909c;font-size:0.75em;font-weight:700;cursor:pointer;transition:all 0.15s;}
+.story-reset-btn:active{transform:scale(0.95);}
+
+/* Chapter transition */
+@keyframes chapterFade{0%{opacity:0;transform:scale(0.95)}100%{opacity:1;transform:scale(1)}}
+.chapter-enter{animation:chapterFade 0.5s ease;}
+
+/* ===== DARK MODE (default) ===== */
+body:not(.light-mode) .bg-shape{opacity:0.08;}
+body:not(.light-mode) .menu h1{color:#81d4fa;text-shadow:0 2px 8px rgba(129,212,250,0.2);}
+body:not(.light-mode) .menu .subtitle{color:#a5d6a7;}
+body:not(.light-mode) .family-row .mini-sprite .spr-name{color:#aaa;}
+body:not(.light-mode) .score-log-btn{background:rgba(40,40,60,0.85);border-color:#455a64;color:#81d4fa;}
+body:not(.light-mode) .menu-btn{box-shadow:0 4px 18px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.1);}
+body:not(.light-mode) .back-btn{background:rgba(40,40,60,0.85);color:#e0e0e0;}
+body:not(.light-mode) .score-display{background:rgba(40,40,60,0.85);color:#81d4fa;}
+body:not(.light-mode) .progress-bar{background:rgba(255,255,255,0.1);}
+body:not(.light-mode) .story-box{background:rgba(30,30,50,0.92);border-color:rgba(80,80,120,0.3);backdrop-filter:blur(8px);}
+body:not(.light-mode) .story-box .prompt-label{color:#66bb6a;}
+body:not(.light-mode) .story-box .story-text{color:#ccc;}
+body:not(.light-mode) .story-box .main-q{color:#81d4fa;}
+body:not(.light-mode) .story-box .tools-text{color:#4fc3f7;}
+body:not(.light-mode) .story-box .hint-text{color:#777;}
+body:not(.light-mode) .choice-btn{background:rgba(40,40,60,0.9);border-color:#37474f;color:#e0e0e0;box-shadow:0 3px 12px rgba(0,0,0,0.2);}
+body:not(.light-mode) .choice-btn.correct{background:#1b5e20;border-color:#66bb6a;color:#fff;}
+body:not(.light-mode) .choice-btn.wrong{background:#b71c1c;border-color:#ef5350;color:#fff;}
+body:not(.light-mode) .result-card{background:#1e1e32;color:#e0e0e0;}
+body:not(.light-mode) .result-card h2{color:#81d4fa;}
+body:not(.light-mode) .result-card p{color:#aaa;}
+body:not(.light-mode) .log-card{background:#1e1e32;color:#e0e0e0;}
+body:not(.light-mode) .log-card h2{color:#81d4fa;}
+body:not(.light-mode) .log-card th{background:#263238;color:#4fc3f7;}
+body:not(.light-mode) .log-card td{color:#ccc;border-bottom-color:#333;}
+body:not(.light-mode) .store-card{background:#1e1e32;color:#e0e0e0;}
+body:not(.light-mode) .store-card h2{color:#81d4fa;}
+body:not(.light-mode) .store-item{background:rgba(40,40,60,0.9);border-color:#37474f;color:#e0e0e0;}
+body:not(.light-mode) .store-item.owned{background:#1b5e20;border-color:#4caf50;}
+body:not(.light-mode) .store-item .item-name{color:#bbb;}
+body:not(.light-mode) .drag-basket{border-color:#455a64;background:rgba(40,40,60,0.6);}
+body:not(.light-mode) .drag-basket.highlight{border-color:#66bb6a;background:rgba(102,187,106,0.15);}
+body:not(.light-mode) .drag-basket .basket-label{color:#aaa;}
+body:not(.light-mode) .drag-count{color:#4fc3f7;}
+body:not(.light-mode) .bill-card{color:#81d4fa;}
+body:not(.light-mode) .encourage-bubble{background:rgba(30,30,50,0.95);color:#81d4fa;border-color:#455a64;}
+body:not(.light-mode) .sprite-label{color:#aaa;}
+body:not(.light-mode) .wallet-bill{background:rgba(40,40,60,0.9);border-color:#37474f;color:#81c784;}
+body:not(.light-mode) .wallet-bill.selected{background:#1b5e20;border-color:#4caf50;}
+body:not(.light-mode) .glass-fill{border-color:#455a64;background:#1e1e32;}
+body:not(.light-mode) .story-mode .chapter-title{color:#81d4fa;}
+body:not(.light-mode) .lesson-summary{background:rgba(76,175,80,0.08);border-color:#2e7d32;}
+body:not(.light-mode) .story-mode .chapter-narrative{color:#ccc;}
+body:not(.light-mode) .story-mode .chapter-instruction{color:#4fc3f7;}
+
+/* Money compare game */
+.compare-visual{display:flex;align-items:center;justify-content:center;gap:6px;margin:10px 0;}
+.compare-side{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px;padding:8px;background:rgba(255,255,255,0.06);border-radius:16px;border:2px solid rgba(255,255,255,0.1);min-width:100px;max-width:160px;flex-direction:column;}
+.compare-drop{width:56px;height:56px;border:3px dashed rgba(255,255,255,0.3);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.8em;font-weight:900;color:#ff6f00;flex-shrink:0;transition:border-color 0.2s,background 0.2s;}
+.compare-drop.filled{border-color:#ff6f00;background:rgba(255,111,0,0.15);}
+.compare-symbols{display:flex;gap:12px;justify-content:center;margin-top:8px;}
+.compare-sym{width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:1.6em;font-weight:900;color:#fff;cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none;transition:transform 0.15s,box-shadow 0.15s;}
+.compare-sym:active{transform:scale(1.1);box-shadow:0 4px 16px rgba(255,111,0,0.3);}
+.compare-sym.used{opacity:0.35;}
+.compare-check{display:block;margin:10px auto 0;padding:10px 28px;border:none;border-radius:16px;background:linear-gradient(135deg,#5ba4c9,#6db89a);color:#fff;font-size:1.05em;font-weight:700;cursor:pointer;opacity:0.4;pointer-events:none;}
+.compare-check.ready{opacity:1;pointer-events:auto;animation:foodPulse 2s ease-in-out infinite;}
+
+/* Image zoom overlay */
+.img-zoom-overlay{display:none;position:fixed;inset:0;z-index:180;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);justify-content:center;align-items:center;cursor:pointer;}
+.img-zoom-overlay.active{display:flex;}
+.img-zoom-overlay img{max-width:92vw;max-height:85vh;border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,0.5);object-fit:contain;}
+.img-zoom-hint{position:absolute;bottom:20px;color:rgba(255,255,255,0.6);font-size:0.85em;}
+
+/* Money drawer - fan tray at bottom */
+.money-fan-tray{position:fixed;bottom:-120px;left:0;right:0;z-index:90;background:rgba(30,30,50,0.45);border-top:1px solid rgba(69,90,100,0.5);padding:8px 8px 10px;display:flex;flex-wrap:nowrap;gap:10px;justify-content:flex-start;overflow-x:auto;overflow-y:hidden;max-height:110px;transition:bottom 0.3s ease;-webkit-overflow-scrolling:touch;}
+.money-fan-tray.open{bottom:0;}
+.money-fan-tray .md-item{display:flex;flex-direction:column;align-items:center;cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none;flex-shrink:0;opacity:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));}
+.md-floating{position:fixed;z-index:91;pointer-events:none;transition:none;}
+.md-total-float{position:fixed;top:46px;left:50%;transform:translateX(-50%);background:rgba(30,30,50,0.85);color:#4fc3f7;font-size:0.95em;font-weight:700;padding:3px 14px;border-radius:14px;z-index:92;display:none;}
+.md-total-float.open{display:block;}
+.md-clear-float{position:fixed;top:48px;right:10px;background:rgba(255,100,100,0.85);border:none;border-radius:14px;padding:3px 10px;font-size:0.7em;color:#fff;cursor:pointer;font-weight:700;z-index:92;display:none;}
+.md-clear-float.open{display:block;}
+
+/* Theme toggle button */
+.theme-toggle{position:fixed;top:10px;right:10px;z-index:200;background:rgba(40,40,60,0.8);border:2px solid #455a64;border-radius:50%;width:36px;height:36px;font-size:1.1em;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.2);}
+body.light-mode .theme-toggle{background:rgba(255,255,255,0.8);border-color:#c5ddd0;}
+.mute-btn{position:fixed;top:10px;right:52px;z-index:200;background:rgba(40,40,60,0.8);border:2px solid #455a64;border-radius:50%;width:36px;height:36px;font-size:1.1em;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.2);}
+body.light-mode .mute-btn{background:rgba(255,255,255,0.8);border-color:#c5ddd0;}
+</style>
+</head>
+<body>
+
+<!-- THEME TOGGLE -->
+<button class="mute-btn" id="muteBtn" onclick="toggleMute()">🔊</button>
+<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">☀️</button>
+
+<!-- FLOATING PASTEL BACKGROUND -->
+<div class="bg-decor" id="bgDecor"></div>
+
+<div class="menu" id="menu">
+  <h1>Nathaniel's Review Game!</h1>
+  <div class="subtitle">Kasama ang buong pamilya!</div>
+  <div class="family-row" id="familyRow"></div>
+  <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+    <button class="score-log-btn" onclick="playTap();showScoreLog()">📊 Score History</button>
+    <button class="score-log-btn" style="background:rgba(255,193,7,0.18);border-color:#ffb300;color:#e65100;" onclick="playTap();showStore()">🏪 Star Store</button>
+    <button class="score-log-btn" style="background:rgba(171,71,188,0.12);border-color:#ab47bc;color:#7b1fa2;" onclick="playTap();showCollection()">🏆 My Collection</button>
+  </div>
+
+  <button class="menu-btn" id="storyBtn" style="background:linear-gradient(135deg,#ff8a65,#ff5722);margin-top:4px;" onclick="playTap();tryStartStory()">
+    <span class="icon">🎂</span>
+    <div id="storyBtnLabel">Birthday Adventure<span class="btn-desc">Interactive na kwento ni Nathaniel!</span></div>
+  </button>
+
+  <button class="menu-btn" style="background:linear-gradient(135deg,#a8d5c8,#7cb89e);" onclick="playTap();startGame('fractions')">
+    <span class="icon">🍕</span>
+    <div>Fractions<span class="btn-desc">Hatiin ang pizza at cake kasama ang pamilya!</span></div>
+  </button>
+  <button class="menu-btn" style="background:linear-gradient(135deg,#f48fb1,#ec407a);" onclick="playTap();startGame('money')">
+    <span class="icon">💰</span>
+    <div>Philippine Money<span class="btn-desc">Barya at bills ng Pilipinas!</span></div>
+  </button>
+  <button class="menu-btn" style="background:linear-gradient(135deg,#ce93d8,#ab47bc);" onclick="playTap();startGame('compare')">
+    <span class="icon">⚖️</span>
+    <div>Alin ang Mas Malaki?<span class="btn-desc">Ihambing ang pera! &lt; &gt; =</span></div>
+  </button>
+  <button class="menu-btn" style="background:linear-gradient(135deg,#81d4fa,#42a5f5);" onclick="playTap();startGame('matter')">
+    <span class="icon">🧊</span>
+    <div>Solid, Liquid, Gas<span class="btn-desc">Mga bagay sa bahay — solid, liquid o gas?</span></div>
+  </button>
+  <button class="menu-btn" style="background:linear-gradient(135deg,#a5d6a7,#66bb6a);" onclick="playTap();startGame('komunidad')">
+    <span class="icon">🏘️</span>
+    <div>Komunidad<span class="btn-desc">Saan pupunta si Nathaniel?</span></div>
+  </button>
+  <button class="menu-btn" style="background:linear-gradient(135deg,#ffcc80,#ffa726);" onclick="playTap();startGame('helpers')">
+    <span class="icon">👮</span>
+    <div>Mga Tumutulong<span class="btn-desc">Pulis, Doktor, Guro, Bumbero at iba pa!</span></div>
+  </button>
+  <div style="display:flex;gap:12px;justify-content:center;margin-top:12px;">
+    <button style="background:none;border:none;color:#ccc;font-size:0.7em;cursor:pointer;" onclick="resetGame()">Reset Game</button>
+    <button style="background:none;border:none;color:#ccc;font-size:0.7em;cursor:pointer;" onclick="toggleStoryLock()">🔓 Unlock Story</button>
+  </div>
+</div>
+
+<div class="game-screen" id="gameScreen">
+  <div class="top-bar">
+    <button class="back-btn" onclick="playTap();goMenu()">&#8592;</button>
+    <button class="scribble-btn" id="scribbleBtn" onclick="toggleScribble()">&#9998;</button>
+    <button class="scribble-btn" id="moneyDrawerBtn" onclick="toggleMoneyDrawer()" title="Pera">&#8369;</button>
+    <div class="score-display" id="scoreDisplay"></div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="story-box" id="storyBox"></div>
+  <div class="choices" id="choicesBox"></div>
+</div>
+
+<div class="img-zoom-overlay" id="imgZoom" onclick="closeImgZoom()">
+  <img id="imgZoomImg" src="" alt="">
+  <div class="img-zoom-hint">I-tap para isara</div>
+</div>
+
+<div class="money-fan-tray" id="mdTray"></div>
+<div class="md-total-float" id="mdTotal">&#8369;0</div>
+<button class="md-clear-float" id="mdClearBtn" onclick="clearMoneyTable()">Burahin</button>
+
+<canvas id="scribbleCanvas" style="position:fixed;inset:0;z-index:2;pointer-events:none;display:none;"></canvas>
+
+<div class="result-overlay" id="resultOverlay">
+  <div class="result-card" id="resultCard"></div>
+</div>
+<div class="confetti-container" id="confettiBox"></div>
+
+<!-- SCORE LOG OVERLAY -->
+<div class="log-overlay" id="logOverlay">
+  <div class="log-card" id="logCard"></div>
+</div>
+
+<!-- STAR STORE OVERLAY -->
+<div class="store-overlay" id="storeOverlay">
+  <div class="store-card" id="storeCard"></div>
+</div>
+
+<!-- MY COLLECTION OVERLAY -->
+<div class="log-overlay" id="collectionOverlay">
+  <div class="log-card" id="collectionCard"></div>
+</div>
+
+<script>
+// ===== THEME =====
+function toggleTheme(){
+  document.body.classList.toggle('light-mode');
+  const isLight=document.body.classList.contains('light-mode');
+  document.getElementById('themeToggle').textContent=isLight?'🌙':'☀️';
+  try{localStorage.setItem('nathaniel_theme',isLight?'light':'dark');}catch(e){}
+}
+(function(){
+  const saved=localStorage.getItem('nathaniel_theme');
+  if(saved==='light'){document.body.classList.add('light-mode');document.getElementById('themeToggle').textContent='🌙';}
+})();
+
+// ===== BACKGROUND SHAPES =====
+(function(){
+  const box=document.getElementById('bgDecor');
+  const colors=['#f8d7d0','#c5ddd0','#c5dae9','#b3e5fc','#b2dfdb','#fff9c4','#ffe0b2','#f0f4c3','#d4e8dc','#bbdefb'];
+  const shapes=['50%','30%','40% 60%'];
+  for(let i=0;i<18;i++){
+    const d=document.createElement('div');
+    d.className='bg-shape';
+    d.style.width=d.style.height=(20+Math.random()*60)+'px';
+    d.style.left=Math.random()*100+'%';
+    d.style.top=Math.random()*100+'%';
+    d.style.background=colors[i%colors.length];
+    d.style.borderRadius=shapes[i%shapes.length];
+    d.style.animationDuration=(6+Math.random()*8)+'s';
+    d.style.animationDelay=(-Math.random()*8)+'s';
+    box.appendChild(d);
+  }
+})();
+
+// ===== SOUNDS =====
+let audioCtx, soundMuted=false;
+function getAC(){
+  if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==='suspended') audioCtx.resume();
+  return audioCtx;
+}
+// Unlock audio on first user interaction (iOS Safari requires this)
+document.addEventListener('touchstart',function unlockAudio(){
+  getAC();document.removeEventListener('touchstart',unlockAudio);
+},{once:true});
+document.addEventListener('click',function unlockAudio2(){
+  getAC();document.removeEventListener('click',unlockAudio2);
+},{once:true});
+function toggleMute(){
+  soundMuted=!soundMuted;
+  document.getElementById('muteBtn').textContent=soundMuted?'🔇':'🔊';
+}
+function playTone(f,d,t,v){if(soundMuted)return;try{const c=getAC(),o=c.createOscillator(),g=c.createGain();o.type=t||'sine';o.frequency.value=f;g.gain.value=v||0.13;g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+d);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+d);}catch(e){}}
+function playCorrect(){playTone(523,0.1,'sine',0.15);setTimeout(()=>playTone(659,0.1,'sine',0.15),90);setTimeout(()=>playTone(784,0.18,'sine',0.18),180);}
+function playWrong(){playTone(200,0.14,'sawtooth',0.08);setTimeout(()=>playTone(170,0.22,'sawtooth',0.08),110);}
+function playTap(){playTone(880,0.05,'sine',0.08);}
+function playStreak(){[523,587,659,784,880].forEach((f,i)=>setTimeout(()=>playTone(f,0.13,'sine',0.13),i*70));}
+function playFinish(){[523,659,784,1047,784,1047].forEach((f,i)=>setTimeout(()=>playTone(f,0.18,'triangle',0.15),i*110));}
+function playPerfect(){[523,659,784,880,1047,1319,1568].forEach((f,i)=>setTimeout(()=>playTone(f,0.22,'sine',0.13),i*90));}
+
+// ===== EFFECTS =====
+function spawnConfetti(n){const b=document.getElementById('confettiBox'),cl=['#ef5350','#ffd54f','#66bb6a','#42a5f5','#ff7043','#6db89a','#26c6da'];for(let i=0;i<(n||30);i++){const c=document.createElement('div');c.className='confetti';c.style.left=Math.random()*100+'vw';c.style.background=cl[i%cl.length];c.style.animationDuration=(1.5+Math.random()*2)+'s';c.style.animationDelay=Math.random()*0.5+'s';c.style.width=(6+Math.random()*8)+'px';c.style.height=(6+Math.random()*8)+'px';b.appendChild(c);}setTimeout(()=>{b.innerHTML='';},4000);}
+function showEncouragement(t){const e=document.createElement('div');e.className='encourage-bubble';e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),1500);}
+function showStreakBadge(t){const e=document.createElement('div');e.className='streak-badge';e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),900);}
+
+// ===== CHARACTER SPRITES =====
+const CHARS={
+  nathaniel:{name:'Nathaniel',svg:`<svg viewBox="0 0 80 96" width="56" height="68">
+    <rect x="24" y="50" width="32" height="28" rx="8" fill="#42a5f5"/>
+    <circle cx="40" cy="30" r="18" fill="#FFDAB9"/>
+    <path d="M22 26 Q27 12 40 10 Q53 12 58 26" fill="#3E2723"/>
+    <circle cx="34" cy="30" r="2.5" fill="#333"/><circle cx="46" cy="30" r="2.5" fill="#333"/>
+    <circle cx="35" cy="31" r="0.8" fill="#fff"/><circle cx="47" cy="31" r="0.8" fill="#fff"/>
+    <path d="M35 38 Q40 43 45 38" fill="none" stroke="#333" stroke-width="1.8" stroke-linecap="round"/>
+    <rect x="12" y="54" width="13" height="5" rx="2.5" fill="#42a5f5"/>
+    <rect x="55" y="54" width="13" height="5" rx="2.5" fill="#42a5f5"/>
+    <rect x="28" y="76" width="9" height="12" rx="4" fill="#5D4037"/>
+    <rect x="43" y="76" width="9" height="12" rx="4" fill="#5D4037"/>
+  </svg>`},
+  wal:{name:'Kuya Wal',svg:`<svg viewBox="0 0 80 96" width="56" height="68">
+    <rect x="22" y="50" width="36" height="30" rx="8" fill="#2E7D32"/>
+    <circle cx="40" cy="28" r="19" fill="#FFDAB9"/>
+    <circle cx="25" cy="16" r="7" fill="#4E342E"/><circle cx="40" cy="11" r="8" fill="#4E342E"/>
+    <circle cx="55" cy="16" r="7" fill="#4E342E"/><circle cx="32" cy="12" r="6" fill="#4E342E"/>
+    <circle cx="48" cy="12" r="6" fill="#4E342E"/><circle cx="36" cy="9" r="4.5" fill="#4E342E"/>
+    <circle cx="44" cy="9" r="4.5" fill="#4E342E"/>
+    <circle cx="34" cy="28" r="2.5" fill="#333"/><circle cx="46" cy="28" r="2.5" fill="#333"/>
+    <path d="M35 36 Q40 41 45 36" fill="none" stroke="#333" stroke-width="1.8" stroke-linecap="round"/>
+    <rect x="10" y="54" width="13" height="6" rx="3" fill="#2E7D32"/>
+    <rect x="57" y="54" width="13" height="6" rx="3" fill="#2E7D32"/>
+    <rect x="26" y="78" width="10" height="13" rx="4" fill="#37474F"/>
+    <rect x="44" y="78" width="10" height="13" rx="4" fill="#37474F"/>
+  </svg>`},
+  uwi:{name:'Ate Uwi',svg:`<svg viewBox="0 0 80 96" width="56" height="68">
+    <rect x="24" y="50" width="32" height="28" rx="8" fill="#E91E63"/>
+    <circle cx="40" cy="28" r="18" fill="#FFE0B2"/>
+    <path d="M20 28 Q22 8 40 6 Q58 8 60 28 L60 48 Q56 50 54 42 L54 26" fill="#1B0000"/>
+    <path d="M20 28 L20 48 Q24 50 26 42 L26 26" fill="#1B0000"/>
+    <path d="M31 27 Q34 24 37 27" fill="none" stroke="#333" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M43 27 Q46 24 49 27" fill="none" stroke="#333" stroke-width="2.2" stroke-linecap="round"/>
+    <ellipse cx="30" cy="31" rx="3.5" ry="2" fill="#FFCDD2" opacity="0.5"/>
+    <ellipse cx="50" cy="31" rx="3.5" ry="2" fill="#FFCDD2" opacity="0.5"/>
+    <path d="M37 34 Q40 38 43 34" fill="none" stroke="#E91E63" stroke-width="1.5" stroke-linecap="round"/>
+    <rect x="26" y="76" width="9" height="11" rx="4" fill="#E91E63"/>
+    <rect x="45" y="76" width="9" height="11" rx="4" fill="#E91E63"/>
+  </svg>`},
+  danielle:{name:'Kuya Danielle',svg:`<svg viewBox="0 0 80 100" width="56" height="70">
+    <rect x="16" y="50" width="48" height="32" rx="8" fill="#D32F2F"/>
+    <ellipse cx="14" cy="60" rx="8" ry="10" fill="#D32F2F"/>
+    <ellipse cx="66" cy="60" rx="8" ry="10" fill="#D32F2F"/>
+    <circle cx="40" cy="26" r="18" fill="#FFDAB9"/>
+    <rect x="26" y="6" width="28" height="12" rx="4" fill="#1565C0"/>
+    <rect x="20" y="15" width="40" height="5" rx="2" fill="#1565C0"/>
+    <circle cx="34" cy="26" r="2.5" fill="#333"/><circle cx="46" cy="26" r="2.5" fill="#333"/>
+    <path d="M35 34 Q40 39 45 34" fill="none" stroke="#333" stroke-width="1.8" stroke-linecap="round"/>
+    <rect x="24" y="80" width="11" height="14" rx="5" fill="#37474F"/>
+    <rect x="45" y="80" width="11" height="14" rx="5" fill="#37474F"/>
+  </svg>`},
+  mommy:{name:'Mommy',svg:`<svg viewBox="0 0 84 100" width="58" height="70">
+    <path d="M26 52 L23 86 L61 86 L58 52 Z" fill="#7B1FA2"/>
+    <circle cx="42" cy="28" r="18" fill="#FFE0B2"/>
+    <path d="M24 28 Q26 8 42 6 Q58 8 60 28 L60 50 Q56 48 54 40 L54 26" fill="#3E2723"/>
+    <path d="M24 28 L24 50 Q28 48 30 40 L30 26" fill="#3E2723"/>
+    <text x="17" y="36" font-size="7" fill="#E91E63">&#10084;</text>
+    <text x="60" y="36" font-size="7" fill="#E91E63">&#10084;</text>
+    <circle cx="36" cy="28" r="2.5" fill="#333"/><circle cx="48" cy="28" r="2.5" fill="#333"/>
+    <line x1="33" y1="25" x2="31" y2="23" stroke="#333" stroke-width="1.3"/>
+    <line x1="51" y1="25" x2="53" y2="23" stroke="#333" stroke-width="1.3"/>
+    <path d="M36 36 Q42 41 48 36" fill="none" stroke="#E91E63" stroke-width="1.8" stroke-linecap="round"/>
+    <g transform="translate(62,4) rotate(15)"><text font-size="12">&#9992;</text></g>
+    <rect x="28" y="84" width="9" height="9" rx="4" fill="#7B1FA2"/>
+    <rect x="47" y="84" width="9" height="9" rx="4" fill="#7B1FA2"/>
+  </svg>`},
+  lola_delia:{name:'Lola Delia',svg:`<svg viewBox="0 0 80 108" width="56" height="76">
+    <ellipse cx="40" cy="52" rx="32" ry="42" fill="#FFF9C4" opacity="0.2"/>
+    <ellipse cx="40" cy="8" rx="12" ry="3.5" fill="none" stroke="#FFD700" stroke-width="2.2"/>
+    <path d="M10 52 Q0 32 15 36 Q8 46 15 52 Z" fill="#FFFDE7" stroke="#FFD700" stroke-width="0.8" opacity="0.6"/>
+    <path d="M70 52 Q80 32 65 36 Q72 46 65 52 Z" fill="#FFFDE7" stroke="#FFD700" stroke-width="0.8" opacity="0.6"/>
+    <rect x="24" y="60" width="32" height="26" rx="8" fill="#CE93D8"/>
+    <circle cx="40" cy="40" r="17" fill="#FFDAB9"/>
+    <path d="M23 38 Q25 20 40 18 Q55 20 57 38" fill="#9E9E9E"/>
+    <circle cx="40" cy="16" r="7" fill="#9E9E9E"/>
+    <circle cx="34" cy="40" r="2" fill="#333"/><circle cx="46" cy="40" r="2" fill="#333"/>
+    <path d="M35 47 Q40 52 45 47" fill="none" stroke="#E91E63" stroke-width="1.8" stroke-linecap="round"/>
+    <text x="31" y="72" font-size="9" fill="#E91E63">&#10084;</text>
+    <rect x="28" y="84" width="9" height="9" rx="4" fill="#CE93D8"/>
+    <rect x="43" y="84" width="9" height="9" rx="4" fill="#CE93D8"/>
+  </svg>`},
+  lola_bong:{name:'Lola Bong',svg:`<svg viewBox="0 0 80 96" width="56" height="68">
+    <rect x="24" y="50" width="32" height="28" rx="8" fill="#F48FB1"/>
+    <circle cx="40" cy="28" r="17" fill="#FFDAB9"/>
+    <path d="M23 26 Q25 10 40 8 Q55 10 57 26" fill="#BDBDBD"/>
+    <ellipse cx="28" cy="20" rx="5.5" ry="7" fill="#BDBDBD"/>
+    <ellipse cx="52" cy="20" rx="5.5" ry="7" fill="#BDBDBD"/>
+    <circle cx="34" cy="28" r="6" fill="none" stroke="#795548" stroke-width="1.8"/>
+    <circle cx="46" cy="28" r="6" fill="none" stroke="#795548" stroke-width="1.8"/>
+    <line x1="40" y1="27" x2="40" y2="29" stroke="#795548" stroke-width="1.8"/>
+    <circle cx="34" cy="28" r="2" fill="#333"/><circle cx="46" cy="28" r="2" fill="#333"/>
+    <path d="M35 38 Q40 42 45 38" fill="none" stroke="#333" stroke-width="1.8" stroke-linecap="round"/>
+    <rect x="28" y="76" width="9" height="11" rx="4" fill="#F48FB1"/>
+    <rect x="43" y="76" width="9" height="11" rx="4" fill="#F48FB1"/>
+  </svg>`},
+  lola_neng:{name:'Lola Neng',svg:`<svg viewBox="0 0 80 96" width="56" height="68">
+    <rect x="24" y="50" width="32" height="28" rx="8" fill="#80CBC4"/>
+    <circle cx="40" cy="28" r="17" fill="#FFDAB9"/>
+    <path d="M23 26 Q25 10 40 8 Q55 10 57 26" fill="#BDBDBD"/>
+    <ellipse cx="27" cy="19" rx="6" ry="8" fill="#BDBDBD"/>
+    <ellipse cx="53" cy="19" rx="6" ry="8" fill="#BDBDBD"/>
+    <circle cx="34" cy="28" r="6" fill="none" stroke="#795548" stroke-width="1.8"/>
+    <circle cx="46" cy="28" r="6" fill="none" stroke="#795548" stroke-width="1.8"/>
+    <line x1="40" y1="27" x2="40" y2="29" stroke="#795548" stroke-width="1.8"/>
+    <circle cx="34" cy="28" r="2" fill="#333"/><circle cx="46" cy="28" r="2" fill="#333"/>
+    <path d="M35 38 Q40 42 45 38" fill="none" stroke="#333" stroke-width="1.8" stroke-linecap="round"/>
+    <text x="52" y="12" font-size="9">&#127804;</text>
+    <rect x="28" y="76" width="9" height="11" rx="4" fill="#80CBC4"/>
+    <rect x="43" y="76" width="9" height="11" rx="4" fill="#80CBC4"/>
+  </svg>`},
+  thea:{name:'Ate Thea',svg:`<svg viewBox="0 0 80 96" width="56" height="68">
+    <rect x="24" y="50" width="32" height="28" rx="8" fill="#FF7043"/>
+    <circle cx="40" cy="28" r="17" fill="#FFE0B2"/>
+    <path d="M23 26 Q25 10 40 8 Q55 10 57 26" fill="#5D4037"/>
+    <path d="M53 18 Q62 14 60 28 Q58 36 53 32" fill="#5D4037"/>
+    <circle cx="34" cy="28" r="2.5" fill="#333"/><circle cx="46" cy="28" r="2.5" fill="#333"/>
+    <path d="M35 37 Q40 42 45 37" fill="none" stroke="#333" stroke-width="1.8" stroke-linecap="round"/>
+    <rect x="56" y="54" width="12" height="18" rx="2.5" fill="#37474F"/>
+    <rect x="58" y="56" width="8" height="12" rx="1" fill="#81D4FA"/>
+    <rect x="28" y="76" width="9" height="11" rx="4" fill="#FF7043"/>
+    <rect x="43" y="76" width="9" height="11" rx="4" fill="#FF7043"/>
+  </svg>`},
+  dada:{name:'Dada',svg:`<svg viewBox="0 0 80 96" width="56" height="68">
+    <rect x="22" y="50" width="36" height="30" rx="8" fill="#455A64"/>
+    <circle cx="40" cy="28" r="18" fill="#FFDAB9"/>
+    <path d="M22 26 Q24 10 40 8 Q56 10 58 26" fill="#4E342E"/>
+    <circle cx="34" cy="28" r="2.5" fill="#333"/><circle cx="46" cy="28" r="2.5" fill="#333"/>
+    <path d="M34 38 Q40 43 46 38" fill="none" stroke="#333" stroke-width="1.8" stroke-linecap="round"/>
+    <rect x="10" y="54" width="13" height="6" rx="3" fill="#455A64"/>
+    <rect x="57" y="54" width="13" height="6" rx="3" fill="#455A64"/>
+    <rect x="26" y="78" width="10" height="13" rx="4" fill="#37474F"/>
+    <rect x="44" y="78" width="10" height="13" rx="4" fill="#37474F"/>
+  </svg>`}
+};
+
+function spriteHTML(id,sz,anim){
+  const c=CHARS[id];if(!c)return '';
+  const s=sz||52;
+  const cls=anim?' '+anim:'';
+  return `<div class="sprite${cls}" style="width:${s}px;">
+    ${c.svg}
+    <div class="sprite-label">${c.name}</div>
+  </div>`;
+}
+
+// Menu family row
+document.getElementById('familyRow').innerHTML=
+  ['nathaniel','wal','uwi','danielle','mommy','lola_delia','lola_bong','lola_neng','thea','dada']
+  .map(id=>{const c=CHARS[id];return `<div class="mini-sprite" onclick="bounceSpr(this)" style="cursor:pointer;">${c.svg}<div class="spr-name">${c.name.replace('Kuya ','').replace('Ate ','').replace('Lola ','')}</div></div>`;}).join('');
+function bounceSpr(el){
+  playTap();
+  const anims=['sprite-bounce','sprite-wiggle','sprite-wave'];
+  const a=anims[Math.floor(Math.random()*anims.length)];
+  const svg=el.querySelector('svg');
+  if(!svg)return;
+  svg.classList.remove('sprite-bounce','sprite-wiggle','sprite-wave');
+  void svg.offsetWidth;
+  svg.classList.add(a);
+  setTimeout(()=>svg.classList.remove(a),1000);
+}
+
+// ===== PHILIPPINE MONEY - LOCAL IMAGES =====
+const COIN_DATA={
+  '1¢':{img:'money/coin.1.jpg',size:60,label:'1¢',val:0.01},
+  '5¢':{img:'money/coin.5.jpeg',size:65,label:'5¢',val:0.05},
+  '25¢':{img:'money/coin.25.jpg',size:72,label:'25¢',val:0.25},
+  '₱1':{img:'money/coin1.jpg',size:80,label:'₱1',val:1},
+  '₱5':{img:'money/coin5.jpg',size:88,label:'₱5',val:5},
+  '₱10':{img:'money/coin10.jpeg',size:92,label:'₱10',val:10},
+};
+const BILL_DATA={
+  '₱20':{img:'money/bill20.jpg',val:20},
+  '₱50':{img:'money/bill50.jpg',val:50},
+  '₱100':{img:'money/bill100.jpg',val:100},
+  '₱200':{img:'money/bill200.jpeg',val:200},
+  '₱500':{img:'money/bill500.jpg',val:500},
+  '₱1,000':{img:'money/bill1000.png',val:1000},
+};
+
+// ===== TOPIC IMAGES (Wikimedia Commons) =====
+const TOPIC_IMG={
+  // Komunidad (local images)
+  'Simbahan':'img/church.jpg',
+  'Paaralan':'img/school.jpg',
+  'Pamilihan':'img/market.jpg',
+  'Bahay':'img/house.webp',
+  'Parke':'img/park.jpeg',
+  // Helpers (local images)
+  'Pulis':'img/police.jpg',
+  'Doktor':'img/doctor.jpg',
+  'Guro':'img/teacher.webp',
+  'Bumbero':'img/firefighter.png',
+  'Pandero':'img/baker.jpg',
+  'Mangingisda':'img/fisherman.jpg',
+  // Helper tools (local images)
+  'Fire truck':'img/firetruck.jpeg',
+  'Stethoscope':'img/stethoscope.jpeg',
+  'Patrol car':'img/policecar.webp',
+  'Bangka':'img/bangka.jpeg',
+  'Oven':'img/oven.webp',
+  // Matter items (local images)
+  'tubig':'img/tubig.jpeg',
+  'usok':'img/usok.avif',
+  'yelo':'img/yelo.webp',
+};
+
+// Map matter question keywords to image keys
+const MATTER_IMG_MAP={
+  'KUTSARA':'kutsara','TUBIG':'tubig','USOK':'usok','YELO':'yelo','GATAS':'gatas',
+  'BATO':'bato','SAPATOS':'sapatos','STEAM':'usok',
+};
+
+// ===== QUESTION DATA =====
+const DATA={
+  fractions:[
+    {story:'Bumili si Kuya Wal ng malaking pizza sa SNR!',chars:[{id:'wal',a:'sprite-give'}],visual:'pie',pieces:2,filled:1,q:'Hinati niya sa 2. Kinuha niya ang isa. Anong fraction?',answer:'1/2',choices:['1/2','1/3','1/4','2/3']},
+    {story:'May birthday cake si Nathaniel! Para kina Nathaniel, Kuya Danielle, at Ate Thea.',chars:[{id:'nathaniel',a:'sprite-bounce'},{id:'danielle',a:'sprite-slidel'},{id:'thea',a:'sprite-slider'}],visual:'pie',pieces:3,filled:1,q:'Tig-isa sila. Anong fraction ng bawat isa?',answer:'1/3',choices:['1/2','1/3','1/4','2/3']},
+    {story:'Nag-order si Dada ng 4 na leche flan. Kinain niya ang 1!',chars:[{id:'dada',a:'sprite-wiggle'}],visual:'food',items:['🍮','🍮','🍮','🍮'],eaten:1,q:'Anong fraction ang kinain ni Dada?',answer:'1/4',choices:['1/2','1/3','1/4','3/4']},
+    {story:'May 3 slices ng cake. Kinain nina Lola Bong at Lola Neng ang 2!',chars:[{id:'lola_bong',a:'sprite-slidel'},{id:'lola_neng',a:'sprite-slider'}],visual:'pie',pieces:3,filled:2,q:'Anong fraction ang kinain ng twin Lolas?',answer:'2/3',choices:['1/3','2/3','1/2','3/4']},
+    {story:'4 slices ang SNR pizza. Kinain ng pamilya ang 3!',chars:[{id:'nathaniel',a:'sprite-bounce'},{id:'danielle',a:'sprite-wiggle'},{id:'thea',a:'sprite-wave'}],visual:'pie',pieces:4,filled:3,q:'Anong fraction ang kinain nila?',answer:'3/4',choices:['1/4','2/3','3/4','1/2']},
+    {story:'Padala ni Mommy ng 4 ensaymada mula abroad! 1 na lang natira.',chars:[{id:'mommy',a:'sprite-wave'}],visual:'food',items:['🥐','🥐','🥐','🥐'],eaten:3,q:'Anong fraction ang NATIRA?',answer:'1/4',choices:['1/4','1/2','3/4','2/3']},
+    {story:'Si Lola Delia, nag-iwan ng cookies mula sa langit. 4 cookies, 2 para kay Nathaniel.',chars:[{id:'lola_delia',a:'sprite-bounce'},{id:'nathaniel',a:'sprite-wave'}],visual:'food',items:['🍪','🍪','🍪','🍪'],eaten:2,q:'Anong fraction ang para kay Nathaniel?',answer:'1/2',choices:['1/4','1/2','3/4','1/3']},
+    {story:'Nag-slice si Ate Uwi ng watermelon sa 3. Binigay ang 2 kina Kuya Wal at Nathaniel.',chars:[{id:'uwi',a:'sprite-give'},{id:'wal',a:'sprite-slidel'},{id:'nathaniel',a:'sprite-slider'}],visual:'pie',pieces:3,filled:2,q:'Anong fraction ang binigay?',answer:'2/3',choices:['1/3','2/3','1/2','3/4']},
+    {story:'Nag-bake si Ate Thea ng 4 cupcakes. Pinakita sa phone bago kainin ang 3!',chars:[{id:'thea',a:'sprite-wiggle'}],visual:'food',items:['🧁','🧁','🧁','🧁'],eaten:3,q:'Anong fraction ang kinain?',answer:'3/4',choices:['1/4','1/2','3/4','2/3']},
+    {story:'Dalawang pandesal. Kinuha ni Kuya Danielle ang isa para sa workout!',chars:[{id:'danielle',a:'sprite-give'}],visual:'food',items:['🍞','🍞'],eaten:1,q:'Anong fraction ang kinuha ni Kuya Danielle?',answer:'1/2',choices:['1/2','1/3','1/4','2/3']},
+    {story:'Nagdala si Lola Neng ng 4 saging. Binigay ang 1 kay Nathaniel.',chars:[{id:'lola_neng',a:'sprite-give'},{id:'nathaniel',a:'sprite-bounce'}],visual:'food',items:['🍌','🍌','🍌','🍌'],eaten:1,q:'Anong fraction ang binigay?',answer:'1/4',choices:['1/2','1/3','1/4','3/4']},
+    {story:'Nag-hati sila Kuya Wal at Ate Uwi ng pie sa 2.',chars:[{id:'wal',a:'sprite-slidel'},{id:'uwi',a:'sprite-slider'}],visual:'pie',pieces:2,filled:1,q:'Tig-kalahati sila. Anong fraction ng isa?',answer:'1/2',choices:['1/2','1/3','1/4','2/3']},
+    {story:'4 na mangga. Kinuha ng pamilya ang 3. Isa na lang!',chars:[{id:'nathaniel',a:'sprite-wiggle'}],visual:'food',items:['🥭','🥭','🥭','🥭'],eaten:3,q:'Anong fraction ang NATIRA?',answer:'1/4',choices:['3/4','1/4','1/2','1/3']},
+    {story:'Si Dada bumili ng 3 cheese sticks. Kinain niya ang 1.',chars:[{id:'dada',a:'sprite-wiggle'}],visual:'food',items:['🧀','🧀','🧀'],eaten:1,q:'Anong fraction ang kinain?',answer:'1/3',choices:['1/2','1/3','1/4','2/3']},
+    {story:'4 sundae mula Jollibee! Kinain nina Nathaniel at Kuya Danielle ang 2.',chars:[{id:'nathaniel',a:'sprite-bounce'},{id:'danielle',a:'sprite-bounce'}],visual:'food',items:['🍦','🍦','🍦','🍦'],eaten:2,q:'Anong fraction ang kinain nila?',answer:'1/2',choices:['1/4','1/3','1/2','3/4']},
+    // NEW VARIATIONS
+    {story:'Bumili si Lola Bong ng 4 na empanada. Binigay niya ang 3 sa mga apo!',chars:[{id:'lola_bong',a:'sprite-give'},{id:'nathaniel',a:'sprite-bounce'}],visual:'food',items:['🥟','🥟','🥟','🥟'],eaten:3,q:'Anong fraction ang binigay ni Lola Bong?',answer:'3/4',choices:['1/4','1/2','3/4','2/3']},
+    {story:'May 3 piraso ng fried chicken mula Jollibee. Kinain ni Ate Thea ang 2!',chars:[{id:'thea',a:'sprite-wiggle'}],visual:'food',items:['🍗','🍗','🍗'],eaten:2,q:'Anong fraction ang kinain ni Ate Thea?',answer:'2/3',choices:['1/3','2/3','1/2','3/4']},
+    {story:'Bumili si Mommy ng 4 na chocolate mula abroad. Kinain nina Lola Bong at Lola Neng ang 2.',chars:[{id:'mommy',a:'sprite-wave'},{id:'lola_bong',a:'sprite-slidel'},{id:'lola_neng',a:'sprite-slider'}],visual:'food',items:['🍫','🍫','🍫','🍫'],eaten:2,q:'Anong fraction ang kinain ng mga Lola?',answer:'1/2',choices:['1/4','1/2','3/4','2/3']},
+    {story:'May 4 na hotdog si Kuya Wal. Binigay niya ang 1 kay Ate Uwi.',chars:[{id:'wal',a:'sprite-give'},{id:'uwi',a:'sprite-wave'}],visual:'food',items:['🌭','🌭','🌭','🌭'],eaten:1,q:'Anong fraction ang binigay?',answer:'1/4',choices:['1/2','1/3','1/4','3/4']},
+    {story:'Nag-hati si Dada ng donut sa 2. Isa para kay Nathaniel!',chars:[{id:'dada',a:'sprite-give'},{id:'nathaniel',a:'sprite-bounce'}],visual:'food',items:['🍩','🍩'],eaten:1,q:'Anong fraction ang nakuha ni Nathaniel?',answer:'1/2',choices:['1/2','1/3','1/4','2/3']},
+    {story:'3 lollipop na binigay ni Lola Delia mula langit. Kinuha ni Nathaniel ang 1.',chars:[{id:'lola_delia',a:'sprite-bounce'},{id:'nathaniel',a:'sprite-wave'}],visual:'food',items:['🍭','🍭','🍭'],eaten:1,q:'Anong fraction ang kinuha ni Nathaniel?',answer:'1/3',choices:['1/2','1/3','1/4','2/3']},
+    {story:'May 4 na puto si Nathaniel. Kinain niya ang 2 agad!',chars:[{id:'nathaniel',a:'sprite-bounce'}],visual:'food',items:['🟤','🟤','🟤','🟤'],eaten:2,q:'Anong fraction ang kinain?',answer:'1/2',choices:['1/4','1/2','3/4','2/3']},
+    {story:'Bumili si Mommy ng 3 bibingka. Binigay ang 1 kay Dada.',chars:[{id:'mommy',a:'sprite-give'},{id:'dada',a:'sprite-wave'}],visual:'food',items:['🥮','🥮','🥮'],eaten:1,q:'Anong fraction ang binigay?',answer:'1/3',choices:['1/2','1/3','1/4','3/4']},
+    {story:'4 na orange. Kinain ng mga lola ang 2.',chars:[{id:'lola_bong',a:'sprite-slidel'},{id:'lola_neng',a:'sprite-slider'}],visual:'food',items:['🍊','🍊','🍊','🍊'],eaten:2,q:'Anong fraction ang natira?',answer:'1/2',choices:['1/4','1/3','1/2','3/4']},
+    {story:'Hinati ni Kuya Wal ang melon sa 4. Kinuha niya ang 3!',chars:[{id:'wal',a:'sprite-give'}],visual:'pie',pieces:4,filled:3,q:'Anong fraction ang kinuha?',answer:'3/4',choices:['1/4','1/2','2/3','3/4']},
+    {story:'May 3 na donut mula Krispy Kreme. Kinain ni Ate Uwi ang 2!',chars:[{id:'uwi',a:'sprite-wiggle'}],visual:'food',items:['🍩','🍩','🍩'],eaten:2,q:'Anong fraction ang natira?',answer:'1/3',choices:['1/3','2/3','1/2','1/4']},
+    // DRAG INTERACTIVE - sharing scenarios
+    {story:'May 4 cookies si Nathaniel. Gusto niyang ibigay ang 1/2 kay Kuya Danielle.',chars:[{id:'nathaniel',a:'sprite-give'},{id:'danielle',a:'sprite-wave'}],visual:'drag',dragItems:['🍪','🍪','🍪','🍪'],dragFrom:'nathaniel',dragTarget:'danielle',dragAnswer:2,q:'I-drag ang kalahati (1/2) ng cookies kay Kuya Danielle!',answer:'2',choices:[]},
+    {story:'May 4 na saging si Nathaniel. Ibibigay niya ang 1/4 kay Ate Thea.',chars:[{id:'nathaniel',a:'sprite-give'},{id:'thea',a:'sprite-wave'}],visual:'drag',dragItems:['🍌','🍌','🍌','🍌'],dragFrom:'nathaniel',dragTarget:'thea',dragAnswer:1,q:'I-drag ang 1/4 ng saging kay Ate Thea!',answer:'1',choices:[]},
+    {story:'May 6 cupcakes si Lola Bong. Ibibigay niya ang 1/3 kay Nathaniel.',chars:[{id:'lola_bong',a:'sprite-give'},{id:'nathaniel',a:'sprite-bounce'}],visual:'drag',dragItems:['🧁','🧁','🧁','🧁','🧁','🧁'],dragFrom:'lola_bong',dragTarget:'nathaniel',dragAnswer:2,q:'I-drag ang 1/3 ng cupcakes kay Nathaniel!',answer:'2',choices:[]},
+    {story:'May 4 slice ng cake si Mommy. Ibibigay niya ang 3/4 sa pamilya.',chars:[{id:'mommy',a:'sprite-wave'}],visual:'drag',dragItems:['🍰','🍰','🍰','🍰'],dragFrom:'mommy',dragTarget:'nathaniel',dragAnswer:3,q:'I-drag ang 3/4 ng cake sa pamilya!',answer:'3',choices:[]},
+    {story:'May 3 pandesal si Dada. Ibibigay niya ang 2/3 kina Lola.',chars:[{id:'dada',a:'sprite-give'},{id:'lola_bong',a:'sprite-wave'}],visual:'drag',dragItems:['🍞','🍞','🍞'],dragFrom:'dada',dragTarget:'lola_bong',dragAnswer:2,q:'I-drag ang 2/3 ng pandesal sa mga Lola!',answer:'2',choices:[]},
+  ],
+  money:[
+    {story:'Sa tindahan kasama si Lola Bong.',chars:[{id:'nathaniel',a:'sprite-slidel'},{id:'lola_bong',a:'sprite-slider'}],visual:'money',denom:'1¢',q:'Maliit na barya ito. Magkano?',answer:'1¢',choices:['1¢','5¢','25¢','₱1']},
+    {story:'Binigyan ni Lola Neng si Nathaniel ng barya.',chars:[{id:'lola_neng',a:'sprite-give'},{id:'nathaniel',a:'sprite-bounce'}],visual:'money',denom:'5¢',q:'Magkano ang binigay?',answer:'5¢',choices:['1¢','5¢','10¢','25¢']},
+    {story:'May nahanap si Kuya Danielle na barya!',chars:[{id:'danielle',a:'sprite-wiggle'}],visual:'money',denom:'25¢',q:'Magkano ito?',answer:'25¢',choices:['5¢','10¢','25¢','₱1']},
+    {story:'Binigay ni Dada ang barya para sa baon.',chars:[{id:'dada',a:'sprite-give'},{id:'nathaniel',a:'sprite-wave'}],visual:'money',denom:'₱1',q:'Magkano ang binigay ni Dada?',answer:'₱1',choices:['25¢','₱1','₱5','₱10']},
+    {story:'Nag-ipon si Nathaniel! Malaking barya na!',chars:[{id:'nathaniel',a:'sprite-bounce'}],visual:'money',denom:'₱5',q:'Magkano ang naipon?',answer:'₱5',choices:['₱1','₱5','₱10','₱20']},
+    {story:'Sa sari-sari store. Nagbayad si Ate Thea.',chars:[{id:'thea',a:'sprite-give'}],visual:'money',denom:'₱10',q:'Anong barya ang ginamit?',answer:'₱10',choices:['₱5','₱10','₱20','₱50']},
+    {story:'Bumili si Kuya Wal ng softdrinks.',chars:[{id:'wal',a:'sprite-wiggle'}],visual:'money',denom:'₱20',q:'Anong bill ang ginamit?',answer:'₱20',choices:['₱20','₱50','₱100','₱200']},
+    {story:'Si Ate Uwi bumili ng ice cream sa 7-Eleven!',chars:[{id:'uwi',a:'sprite-wave'}],visual:'money',denom:'₱50',q:'Anong bill ang ginamit?',answer:'₱50',choices:['₱20','₱50','₱100','₱500']},
+    {story:'Nag-grocery si Lola Bong sa palengke.',chars:[{id:'lola_bong',a:'sprite-slidel'}],visual:'money',denom:'₱100',q:'Anong bill ang dala niya?',answer:'₱100',choices:['₱50','₱100','₱200','₱500']},
+    {story:'Padala ni Mommy! Natanggap ni Lola Neng.',chars:[{id:'mommy',a:'sprite-wave'},{id:'lola_neng',a:'sprite-bounce'}],visual:'money',denom:'₱200',q:'Magkano ang bill na ito?',answer:'₱200',choices:['₱100','₱200','₱500','₱1,000']},
+    {story:'Shopping sa SNR! Si Ate Thea nag-picture ng bill.',chars:[{id:'thea',a:'sprite-wiggle'}],visual:'money',denom:'₱500',q:'Anong bill ito?',answer:'₱500',choices:['₱100','₱200','₱500','₱1,000']},
+    {story:'Pinakamalaking bill! Dala ni Dada pang-SNR.',chars:[{id:'dada',a:'sprite-give'}],visual:'money',denom:'₱1,000',q:'Magkano ang pinakamalaking bill?',answer:'₱1,000',choices:['₱200','₱500','₱1,000','₱100']},
+    {story:'Gusto ni Nathaniel ng candy ₱5 at juice ₱10.',chars:[{id:'nathaniel',a:'sprite-bounce'}],visual:'none',q:'Alin ang mas mahal?',answer:'Juice ₱10',choices:['Candy ₱5','Juice ₱10','Pareho','₱1']},
+    {story:'May ₱20 si Nathaniel. Bibili ng ice candy na ₱5.',chars:[{id:'nathaniel',a:'sprite-wiggle'}],visual:'none',q:'Magkano ang sukli?',answer:'₱15',choices:['₱5','₱10','₱15','₱20']},
+    {story:'Padala ni Mommy ₱100. Nag-gastos si Lola Bong ng ₱50.',chars:[{id:'mommy',a:'sprite-wave'},{id:'lola_bong',a:'sprite-slidel'}],visual:'none',q:'Magkano ang natira?',answer:'₱50',choices:['₱20','₱50','₱100','₱10']},
+    // NEW VARIATIONS
+    {story:'Bumili si Kuya Danielle ng Gatorade na ₱30. Nagbayad siya ng ₱50.',chars:[{id:'danielle',a:'sprite-give'}],visual:'none',q:'Magkano ang sukli?',answer:'₱20',choices:['₱10','₱20','₱30','₱5']},
+    {story:'Nagbigay si Dada ng ₱10 at ₱5 kay Nathaniel.',chars:[{id:'dada',a:'sprite-give'},{id:'nathaniel',a:'sprite-bounce'}],visual:'none',q:'Magkano ang lahat?',answer:'₱15',choices:['₱10','₱15','₱20','₱5']},
+    {story:'May 2 na ₱100 bill si Lola Neng.',chars:[{id:'lola_neng',a:'sprite-wiggle'}],visual:'none',q:'Magkano lahat?',answer:'₱200',choices:['₱100','₱200','₱150','₱300']},
+    {story:'Si Ate Uwi bumili ng saging ₱20 at tinapay ₱15.',chars:[{id:'uwi',a:'sprite-give'}],visual:'none',q:'Magkano lahat ng binili niya?',answer:'₱35',choices:['₱25','₱30','₱35','₱40']},
+    {story:'Nakakita si Nathaniel ng barya sa sahig!',chars:[{id:'nathaniel',a:'sprite-bounce'}],visual:'money',denom:'₱10',q:'Anong barya ito?',answer:'₱10',choices:['₱1','₱5','₱10','₱20']},
+    {story:'Nagbigay si Kuya Wal ng barya para sa snack.',chars:[{id:'wal',a:'sprite-give'},{id:'nathaniel',a:'sprite-bounce'}],visual:'money',denom:'₱5',q:'Magkano ang binigay?',answer:'₱5',choices:['₱1','₱5','₱10','25¢']},
+    {story:'May ₱50 si Nathaniel. Bumili ng juice ₱20.',chars:[{id:'nathaniel',a:'sprite-wiggle'}],visual:'none',q:'Magkano ang sukli?',answer:'₱30',choices:['₱20','₱25','₱30','₱35']},
+    {story:'Nagbigay si Mommy ng ₱500 at ₱200 kay Lola Bong.',chars:[{id:'mommy',a:'sprite-wave'},{id:'lola_bong',a:'sprite-bounce'}],visual:'none',q:'Magkano lahat?',answer:'₱700',choices:['₱500','₱600','₱700','₱800']},
+  ],
+  matter:[
+    {story:'Nag-aalmusal ang pamilya!',chars:[{id:'nathaniel',a:'sprite-bounce'},{id:'lola_bong',a:'sprite-wave'}],q:'Ang KUTSARA — ano ito?',emoji:'🥄',answer:'Solid',choices:['Solid','Liquid','Gas']},
+    {story:'Nagbuhos si Lola Neng ng tubig sa baso.',chars:[{id:'lola_neng',a:'sprite-give'}],q:'Ang TUBIG sa baso — ano ito?',emoji:'💧',answer:'Liquid',choices:['Solid','Liquid','Gas']},
+    {story:'Nag-init ng sabaw si Lola Bong. May usok!',chars:[{id:'lola_bong',a:'sprite-wiggle'}],q:'Ang USOK na umaakyat — ano ito?',emoji:'♨️',answer:'Gas',choices:['Solid','Liquid','Gas']},
+    {story:'Kumuha si Kuya Danielle ng yelo para sa shake!',chars:[{id:'danielle',a:'sprite-give'}],q:'Ang YELO — ano ito?',emoji:'🧊',answer:'Solid',choices:['Solid','Liquid','Gas']},
+    {story:'Uminom si Ate Thea ng gatas habang nag-phone.',chars:[{id:'thea',a:'sprite-wiggle'}],q:'Ang GATAS — ano ito?',emoji:'🥛',answer:'Liquid',choices:['Solid','Liquid','Gas']},
+    {story:'Pumutok ang lobo ni Nathaniel! Lumabas ang hangin.',chars:[{id:'nathaniel',a:'sprite-bounce'}],q:'Ang HANGIN sa lobo — ano ito?',emoji:'🎈💨',answer:'Gas',choices:['Solid','Liquid','Gas']},
+    {story:'Kumakain sina Kuya Wal at Ate Uwi ng lugaw.',chars:[{id:'wal',a:'sprite-slidel'},{id:'uwi',a:'sprite-slider'}],q:'Ang LUGAW — ano ito?',emoji:'🍜',answer:'Liquid',choices:['Solid','Liquid','Gas']},
+    {story:'Hinawakan ni Nathaniel ang bato sa labas.',chars:[{id:'nathaniel',a:'sprite-wiggle'}],q:'Ang BATO — ano ito?',emoji:'🪨',answer:'Solid',choices:['Solid','Liquid','Gas']},
+    {story:'Naglagay si Dada ng toyo sa adobo.',chars:[{id:'dada',a:'sprite-give'}],q:'Ang TOYO — ano ito?',emoji:'🫗',answer:'Liquid',choices:['Solid','Liquid','Gas']},
+    {story:'Nagsuot si Nathaniel ng sapatos para sa school!',chars:[{id:'nathaniel',a:'sprite-bounce'}],q:'Ang SAPATOS — ano ito?',emoji:'👟',answer:'Solid',choices:['Solid','Liquid','Gas']},
+    {story:'Nagluto si Lola Bong ng kanin. May steam!',chars:[{id:'lola_bong',a:'sprite-wiggle'}],q:'Ang STEAM mula sa kanin — ano ito?',emoji:'🍚♨️',answer:'Gas',choices:['Solid','Liquid','Gas']},
+    {story:'Kumuha si Nathaniel ng lapis para mag-drawing.',chars:[{id:'nathaniel',a:'sprite-wave'}],q:'Ang LAPIS — ano ito?',emoji:'✏️',answer:'Solid',choices:['Solid','Liquid','Gas']},
+    {story:'Nagbuhos si Ate Uwi ng juice sa baso.',chars:[{id:'uwi',a:'sprite-give'}],q:'Ang JUICE — ano ito?',emoji:'🧃',answer:'Liquid',choices:['Solid','Liquid','Gas']},
+    {story:'Pumasok si Nathaniel sa kwarto. Naamoy ang pabango ni Mommy!',chars:[{id:'nathaniel',a:'sprite-slidel'},{id:'mommy',a:'sprite-slider'}],q:'Ang AMOY ng pabango sa hangin — ano ito?',emoji:'🌸💨',answer:'Gas',choices:['Solid','Liquid','Gas']},
+    {story:'Kinain ni Kuya Danielle ang tinapay pagka-workout.',chars:[{id:'danielle',a:'sprite-bounce'}],q:'Ang TINAPAY — ano ito?',emoji:'🍞',answer:'Solid',choices:['Solid','Liquid','Gas']},
+    {story:'Naglagay si Lola Neng ng suka sa sinigang.',chars:[{id:'lola_neng',a:'sprite-wiggle'}],q:'Ang SUKA — ano ito?',emoji:'🍲',answer:'Liquid',choices:['Solid','Liquid','Gas']},
+    {story:'Nakita ni Nathaniel ang ulap sa bintana!',chars:[{id:'nathaniel',a:'sprite-wave'}],q:'Ang mga ULAP sa langit — gas o solid?',emoji:'☁️',answer:'Gas',choices:['Solid','Liquid','Gas']},
+    {story:'Kumain ng manok si Dada sa dinner.',chars:[{id:'dada',a:'sprite-wiggle'}],q:'Ang MANOK na niluto — ano ito?',emoji:'🍗',answer:'Solid',choices:['Solid','Liquid','Gas']},
+    {story:'Nag-init si Ate Thea ng kape para kay Lola Bong.',chars:[{id:'thea',a:'sprite-give'},{id:'lola_bong',a:'sprite-wave'}],q:'Ang KAPE — ano ito?',emoji:'☕',answer:'Liquid',choices:['Solid','Liquid','Gas']},
+    {story:'Nag-spray si Mommy ng air freshener sa video call!',chars:[{id:'mommy',a:'sprite-wave'}],q:'Ang SPRAY na kumakalat — ano ito?',emoji:'💨✨',answer:'Gas',choices:['Solid','Liquid','Gas']},
+  ],
+  komunidad:[
+    {story:'Linggo! Saan pupunta ang pamilya?',chars:[{id:'nathaniel',a:'sprite-bounce'},{id:'lola_bong',a:'sprite-slidel'},{id:'lola_neng',a:'sprite-slider'}],q:'Para magdasal — saan?',emoji:'🙏',answer:'Simbahan',choices:['Simbahan','Paaralan','Pamilihan','Parke']},
+    {story:'Lunes na! Gumising si Nathaniel nang maaga.',chars:[{id:'nathaniel',a:'sprite-bounce'}],q:'Saan pupunta para mag-aral?',emoji:'📚',answer:'Paaralan',choices:['Simbahan','Paaralan','Bahay','Parke']},
+    {story:'Kailangan ng sangkap para sa adobo ni Lola Bong!',chars:[{id:'lola_bong',a:'sprite-give'},{id:'nathaniel',a:'sprite-slidel'}],q:'Saan bibili ng karne at gulay?',emoji:'🥩🥕',answer:'Pamilihan',choices:['Bahay','Paaralan','Pamilihan','Simbahan']},
+    {story:'Pagod na si Nathaniel galing school.',chars:[{id:'nathaniel',a:'sprite-wiggle'}],q:'Saan siya uuwi para matulog?',emoji:'😴',answer:'Bahay',choices:['Paaralan','Bahay','Parke','Pamilihan']},
+    {story:'Sabado! Gusto ni Kuya Danielle mag-exercise!',chars:[{id:'danielle',a:'sprite-bounce'},{id:'nathaniel',a:'sprite-wave'}],q:'Saan sila maglalaro at tatakbo?',emoji:'⚽🏃',answer:'Parke',choices:['Simbahan','Pamilihan','Bahay','Parke']},
+    {story:'May krus sa taas, kampana, at maraming upuan.',chars:[],q:'Anong lugar ito?',emoji:'⛪🔔',answer:'Simbahan',choices:['Simbahan','Paaralan','Bahay','Parke']},
+    {story:'May blackboard, libro, at teacher na nagtuturo.',chars:[],q:'Anong lugar ito?',emoji:'👩‍🏫📝',answer:'Paaralan',choices:['Pamilihan','Paaralan','Parke','Bahay']},
+    {story:'May swing, damo, puno, at naglalaro ang mga bata.',chars:[],q:'Anong lugar ito?',emoji:'🌳🎠',answer:'Parke',choices:['Bahay','Simbahan','Parke','Pamilihan']},
+    {story:'Nag-video call si Mommy! Nasa loob sila ng bahay.',chars:[{id:'mommy',a:'sprite-wave'},{id:'nathaniel',a:'sprite-bounce'}],q:'Saan kumakain at natutulog ang pamilya?',emoji:'🏠📱',answer:'Bahay',choices:['Bahay','Paaralan','Parke','Simbahan']},
+    {story:'Maraming tindahan, isda, gulay, at prutas.',chars:[{id:'lola_neng',a:'sprite-slidel'}],q:'Anong lugar ito?',emoji:'🐟🍅🍌',answer:'Pamilihan',choices:['Simbahan','Bahay','Pamilihan','Parke']},
+    {story:'Pasko! Saan pupunta bago Noche Buena?',chars:[{id:'nathaniel',a:'sprite-bounce'},{id:'lola_bong',a:'sprite-wave'},{id:'dada',a:'sprite-slidel'}],q:'Saan sila magdadasal?',emoji:'🎄🙏',answer:'Simbahan',choices:['Simbahan','Parke','Pamilihan','Bahay']},
+    {story:'Kailangan ng bagong supplies para sa school.',chars:[{id:'nathaniel',a:'sprite-wiggle'},{id:'lola_neng',a:'sprite-give'}],q:'Saan bibili ng notebook at lapis?',emoji:'📓✏️',answer:'Pamilihan',choices:['Paaralan','Bahay','Simbahan','Pamilihan']},
+    {story:'Weekend! Nagdala si Kuya Wal ng football.',chars:[{id:'wal',a:'sprite-bounce'},{id:'nathaniel',a:'sprite-wave'}],q:'Saan sila maglalaro?',emoji:'⚽🌿',answer:'Parke',choices:['Simbahan','Parke','Bahay','Paaralan']},
+    {story:'Umuulan! Nandito ang buong pamilya.',chars:[{id:'nathaniel',a:'sprite-bounce'},{id:'lola_bong',a:'sprite-wave'},{id:'danielle',a:'sprite-slidel'},{id:'thea',a:'sprite-slider'}],q:'Saan sila nag-stay?',emoji:'🌧️🏠',answer:'Bahay',choices:['Parke','Paaralan','Bahay','Pamilihan']},
+  ],
+  helpers:[
+    {story:'Nakakita si Nathaniel ng pulis sa kanto!',chars:[{id:'nathaniel',a:'sprite-wave'}],q:'Humahabol sa masasamang tao — sino siya?',emoji:'👮‍♂️',answer:'Pulis',choices:['Pulis','Doktor','Guro','Bumbero'],tools:'Baril, Posas, Patrol car'},
+    {story:'Nilagnat si Nathaniel! Sa ospital sila.',chars:[{id:'nathaniel',a:'sprite-wiggle'},{id:'lola_bong',a:'sprite-slidel'}],q:'Sino ang nagbigay ng gamot?',emoji:'👨‍⚕️🩺',answer:'Doktor',choices:['Guro','Doktor','Bumbero','Pulis'],tools:'Stethoscope, Thermometer, Gamot'},
+    {story:'Nasa school si Nathaniel. May nagtuturo sa harap!',chars:[{id:'nathaniel',a:'sprite-bounce'}],q:'Sino siya?',emoji:'👩‍🏫📖',answer:'Guro',choices:['Pulis','Mangingisda','Guro','Bumbero'],tools:'Chalk, Blackboard, Libro'},
+    {story:'May sunog sa kapitbahay! Dumating ang fire truck!',chars:[{id:'nathaniel',a:'sprite-wiggle'},{id:'danielle',a:'sprite-slidel'}],q:'Sino ang pumapatay ng apoy?',emoji:'🚒🔥',answer:'Bumbero',choices:['Doktor','Bumbero','Pulis','Pandero'],tools:'Fire truck, Fire hose, Flashlight'},
+    {story:'Umaga na! Bumili si Dada ng pandesal.',chars:[{id:'dada',a:'sprite-give'}],q:'Sino ang gumawa ng pandesal?',emoji:'🍞🧑‍🍳',answer:'Pandero',choices:['Mangingisda','Bumbero','Pandero','Guro'],tools:'Oven, Harina, Palayok'},
+    {story:'Sa dagat ang pamilya! May lalaki na may bangka!',chars:[{id:'nathaniel',a:'sprite-wave'},{id:'lola_neng',a:'sprite-slidel'}],q:'Nanghuhuli siya ng isda. Sino?',emoji:'🎣⛵',answer:'Mangingisda',choices:['Pulis','Mangingisda','Pandero','Doktor'],tools:'Bangka, Lambat, Pamingwit'},
+    {story:'Kanino ang mga gamit na ito?',chars:[],q:'Fire truck, Fire hose, Flashlight',emoji:'🚒🧯🔦',answer:'Bumbero',choices:['Pulis','Doktor','Bumbero','Guro']},
+    {story:'Kanino ang mga gamit na ito?',chars:[],q:'Stethoscope, Thermometer, Gamot',emoji:'🩺🌡️💊',answer:'Doktor',choices:['Doktor','Guro','Mangingisda','Pulis']},
+    {story:'Kanino ang mga gamit na ito?',chars:[],q:'Chalk, Blackboard, Libro',emoji:'📝🎒📚',answer:'Guro',choices:['Pandero','Bumbero','Guro','Pulis']},
+    {story:'Kanino ang mga gamit na ito?',chars:[],q:'Posas, Patrol car, Baril',emoji:'🚔',answer:'Pulis',choices:['Pulis','Bumbero','Mangingisda','Doktor']},
+    {story:'Kanino ang mga gamit na ito?',chars:[],q:'Bangka, Lambat, Pamingwit',emoji:'⛵🐟🎣',answer:'Mangingisda',choices:['Pandero','Mangingisda','Guro','Bumbero']},
+    {story:'Kanino ang mga gamit na ito?',chars:[],q:'Oven, Harina, Palayok',emoji:'🍞🧁',answer:'Pandero',choices:['Doktor','Pulis','Pandero','Mangingisda']},
+    {story:'Sumakit ang ngipin ni Ate Thea!',chars:[{id:'thea',a:'sprite-wiggle'}],q:'Sino ang pupuntahan niya?',emoji:'🦷',answer:'Doktor',choices:['Guro','Pulis','Doktor','Bumbero']},
+    {story:'Gusto ni Kuya Danielle ng fresh na isda para sa diet.',chars:[{id:'danielle',a:'sprite-bounce'}],q:'Kanino siya bibili?',emoji:'🐟💪',answer:'Mangingisda',choices:['Pandero','Doktor','Mangingisda','Bumbero']},
+  ],
+  compare:(function(){
+    const items=[];
+    function side(count,denom,img,isCoin){
+      return {count,denom,img,isCoin,total:count*(COIN_DATA[denom]?COIN_DATA[denom].val:BILL_DATA[denom]?BILL_DATA[denom].val:0)};
+    }
+    function mix(img1,img2,isCoin,total){
+      return {count:1,denom:'mix',img:img1,img2:img2,isCoin,total};
+    }
+    function cq(story,chars,leftDesc,rightDesc,leftSide,rightSide){
+      const lv=leftSide.total,rv=rightSide.total;
+      const ans=lv>rv?'>':lv<rv?'<':'=';
+      return {story,chars,visual:'compare',leftSide,rightSide,leftDesc,rightDesc,q:'Alin ang mas malaki?',answer:ans,choices:['>','<','=']};
+    }
+    // ----- EASY: 1 vs 1, different denominations -----
+    items.push(cq('May barya si Nathaniel at si Kuya Danielle.',[{id:'nathaniel',a:'sprite-slidel'},{id:'danielle',a:'sprite-slider'}],'₱5','₱1',side(1,'₱5','money/coin5.jpg',true),side(1,'₱1','money/coin1.jpg',true)));
+    items.push(cq('Nagbigay si Lola Bong ng barya. Si Lola Neng din!',[{id:'lola_bong',a:'sprite-slidel'},{id:'lola_neng',a:'sprite-slider'}],'₱10','₱5',side(1,'₱10','money/coin10.jpeg',true),side(1,'₱5','money/coin5.jpg',true)));
+    items.push(cq('May bill si Ate Thea at barya si Kuya Wal.',[{id:'thea',a:'sprite-slidel'},{id:'wal',a:'sprite-slider'}],'₱20','₱10',side(1,'₱20','money/bill20.jpg',false),side(1,'₱10','money/coin10.jpeg',true)));
+    items.push(cq('Binigyan ni Dada si Nathaniel ng 25¢. Si Mommy nagbigay ng ₱1.',[{id:'dada',a:'sprite-slidel'},{id:'mommy',a:'sprite-slider'}],'25¢','₱1',side(1,'25¢','money/coin.25.jpg',true),side(1,'₱1','money/coin1.jpg',true)));
+    items.push(cq('May 5¢ si Nathaniel. May 1¢ si Ate Uwi.',[{id:'nathaniel',a:'sprite-slidel'},{id:'uwi',a:'sprite-slider'}],'5¢','1¢',side(1,'5¢','money/coin.5.jpeg',true),side(1,'1¢','money/coin.1.jpg',true)));
+    items.push(cq('May ₱100 si Lola Bong. May ₱50 si Lola Neng.',[{id:'lola_bong',a:'sprite-slidel'},{id:'lola_neng',a:'sprite-slider'}],'₱100','₱50',side(1,'₱100','money/bill100.jpg',false),side(1,'₱50','money/bill50.jpg',false)));
+    items.push(cq('May ₱500 si Mommy. May ₱200 si Dada.',[{id:'mommy',a:'sprite-slidel'},{id:'dada',a:'sprite-slider'}],'₱500','₱200',side(1,'₱500','money/bill500.jpg',false),side(1,'₱200','money/bill200.jpeg',false)));
+    items.push(cq('May ₱1 si Nathaniel. May ₱1 din si Kuya Danielle.',[{id:'nathaniel',a:'sprite-slidel'},{id:'danielle',a:'sprite-slider'}],'₱1','₱1',side(1,'₱1','money/coin1.jpg',true),side(1,'₱1','money/coin1.jpg',true)));
+    items.push(cq('May ₱50 si Ate Thea. May ₱50 din si Kuya Wal.',[{id:'thea',a:'sprite-slidel'},{id:'wal',a:'sprite-slider'}],'₱50','₱50',side(1,'₱50','money/bill50.jpg',false),side(1,'₱50','money/bill50.jpg',false)));
+    items.push(cq('May 25¢ si Nathaniel. May 5¢ si Lola Neng.',[{id:'nathaniel',a:'sprite-slidel'},{id:'lola_neng',a:'sprite-slider'}],'25¢','5¢',side(1,'25¢','money/coin.25.jpg',true),side(1,'5¢','money/coin.5.jpeg',true)));
+    // ----- MEDIUM: 2-4 coins vs 1 bill (all shown individually) -----
+    items.push(cq('May 3 barya na tig-₱5 si Nathaniel. Si Ate Thea may ₱20.',[{id:'nathaniel',a:'sprite-slidel'},{id:'thea',a:'sprite-slider'}],'3 × ₱5 = ₱15','₱20',side(3,'₱5','money/coin5.jpg',true),side(1,'₱20','money/bill20.jpg',false)));
+    items.push(cq('May 4 barya na tig-₱5 si Kuya Wal. Si Dada may ₱20.',[{id:'wal',a:'sprite-slidel'},{id:'dada',a:'sprite-slider'}],'4 × ₱5 = ₱20','₱20',side(4,'₱5','money/coin5.jpg',true),side(1,'₱20','money/bill20.jpg',false)));
+    items.push(cq('May 2 barya na tig-₱10 si Nathaniel. Si Lola Bong may ₱20.',[{id:'nathaniel',a:'sprite-slidel'},{id:'lola_bong',a:'sprite-slider'}],'2 × ₱10 = ₱20','₱20',side(2,'₱10','money/coin10.jpeg',true),side(1,'₱20','money/bill20.jpg',false)));
+    items.push(cq('May 5 barya na tig-₱1 si Nathaniel. Si Kuya Danielle may ₱5.',[{id:'nathaniel',a:'sprite-slidel'},{id:'danielle',a:'sprite-slider'}],'5 × ₱1 = ₱5','₱5',side(5,'₱1','money/coin1.jpg',true),side(1,'₱5','money/coin5.jpg',true)));
+    items.push(cq('May 4 na 25¢ si Ate Uwi. Si Lola Neng may ₱1.',[{id:'uwi',a:'sprite-slidel'},{id:'lola_neng',a:'sprite-slider'}],'4 × 25¢ = ₱1','₱1',side(4,'25¢','money/coin.25.jpg',true),side(1,'₱1','money/coin1.jpg',true)));
+    items.push(cq('May 2 na ₱50 si Mommy. Si Dada may ₱100.',[{id:'mommy',a:'sprite-slidel'},{id:'dada',a:'sprite-slider'}],'2 × ₱50 = ₱100','₱100',side(2,'₱50','money/bill50.jpg',false),side(1,'₱100','money/bill100.jpg',false)));
+    items.push(cq('May 3 barya na tig-₱1 si Nathaniel. Si Ate Thea may ₱5.',[{id:'nathaniel',a:'sprite-slidel'},{id:'thea',a:'sprite-slider'}],'3 × ₱1 = ₱3','₱5',side(3,'₱1','money/coin1.jpg',true),side(1,'₱5','money/coin5.jpg',true)));
+    items.push(cq('May 2 barya na tig-₱5 si Lola Bong. Si Kuya Wal may ₱10.',[{id:'lola_bong',a:'sprite-slidel'},{id:'wal',a:'sprite-slider'}],'2 × ₱5 = ₱10','₱10',side(2,'₱5','money/coin5.jpg',true),side(1,'₱10','money/coin10.jpeg',true)));
+    items.push(cq('May 3 na 25¢ si Nathaniel. Si Lola Neng may ₱1.',[{id:'nathaniel',a:'sprite-slidel'},{id:'lola_neng',a:'sprite-slider'}],'3 × 25¢ = 75¢','₱1',side(3,'25¢','money/coin.25.jpg',true),side(1,'₱1','money/coin1.jpg',true)));
+    // ----- MEDIUM: mixed denominations (2 images shown) -----
+    items.push(cq('Si Nathaniel: ₱5 + ₱10. Si Kuya Danielle: ₱20.',[{id:'nathaniel',a:'sprite-slidel'},{id:'danielle',a:'sprite-slider'}],'₱5 + ₱10 = ₱15','₱20',mix('money/coin5.jpg','money/coin10.jpeg',true,15),side(1,'₱20','money/bill20.jpg',false)));
+    items.push(cq('Si Lola Neng: ₱10 + ₱10. Si Ate Uwi: ₱20.',[{id:'lola_neng',a:'sprite-slidel'},{id:'uwi',a:'sprite-slider'}],'₱10 + ₱10 = ₱20','₱20',side(2,'₱10','money/coin10.jpeg',true),side(1,'₱20','money/bill20.jpg',false)));
+    items.push(cq('Si Dada: ₱100 + ₱50. Si Mommy: ₱200.',[{id:'dada',a:'sprite-slidel'},{id:'mommy',a:'sprite-slider'}],'₱100 + ₱50 = ₱150','₱200',mix('money/bill100.jpg','money/bill50.jpg',false,150),side(1,'₱200','money/bill200.jpeg',false)));
+    items.push(cq('Si Ate Thea: ₱5 + ₱1. Si Kuya Wal: ₱10.',[{id:'thea',a:'sprite-slidel'},{id:'wal',a:'sprite-slider'}],'₱5 + ₱1 = ₱6','₱10',mix('money/coin5.jpg','money/coin1.jpg',true,6),side(1,'₱10','money/coin10.jpeg',true)));
+    items.push(cq('Si Nathaniel: ₱1 + ₱1. Si Lola Bong: ₱5.',[{id:'nathaniel',a:'sprite-slidel'},{id:'lola_bong',a:'sprite-slider'}],'₱1 + ₱1 = ₱2','₱5',side(2,'₱1','money/coin1.jpg',true),side(1,'₱5','money/coin5.jpg',true)));
+    // ----- HARD: tricky (equal amounts, different combos) -----
+    items.push(cq('May 4 na ₱5 si Ate Uwi. May 2 na ₱10 si Kuya Danielle.',[{id:'uwi',a:'sprite-slidel'},{id:'danielle',a:'sprite-slider'}],'4 × ₱5 = ₱20','2 × ₱10 = ₱20',side(4,'₱5','money/coin5.jpg',true),side(2,'₱10','money/coin10.jpeg',true)));
+    items.push(cq('May 2 na ₱500 si Mommy. Si Lola Neng may ₱1,000.',[{id:'mommy',a:'sprite-slidel'},{id:'lola_neng',a:'sprite-slider'}],'2 × ₱500','₱1,000',side(2,'₱500','money/bill500.jpg',false),side(1,'₱1,000','money/bill1000.png',false)));
+    items.push(cq('May 2 na ₱100 si Dada. Si Lola Bong may ₱200.',[{id:'dada',a:'sprite-slidel'},{id:'lola_bong',a:'sprite-slider'}],'2 × ₱100 = ₱200','₱200',side(2,'₱100','money/bill100.jpg',false),side(1,'₱200','money/bill200.jpeg',false)));
+    items.push(cq('Si Nathaniel: ₱5 + ₱5 + ₱10. Si Ate Thea: ₱20.',[{id:'nathaniel',a:'sprite-slidel'},{id:'thea',a:'sprite-slider'}],'₱5+₱5+₱10 = ₱20','₱20',mix('money/coin5.jpg','money/coin10.jpeg',true,20),side(1,'₱20','money/bill20.jpg',false)));
+    items.push(cq('May 3 na ₱10 si Kuya Wal. Si Mommy may ₱50.',[{id:'wal',a:'sprite-slidel'},{id:'mommy',a:'sprite-slider'}],'3 × ₱10 = ₱30','₱50',side(3,'₱10','money/coin10.jpeg',true),side(1,'₱50','money/bill50.jpg',false)));
+    items.push(cq('Si Lola Neng: ₱20 + ₱50. Si Dada: ₱100.',[{id:'lola_neng',a:'sprite-slidel'},{id:'dada',a:'sprite-slider'}],'₱20 + ₱50 = ₱70','₱100',mix('money/bill20.jpg','money/bill50.jpg',false,70),side(1,'₱100','money/bill100.jpg',false)));
+    return items;
+  })()
+};
+
+// ===== DIFFICULTY TAGS =====
+// Tag each question: 'easy','medium','hard'
+(function tagDifficulty(){
+  // Auto-tag by position: first 40%=easy, middle=medium, last 25%=hard
+  Object.keys(DATA).forEach(topic=>{
+    const arr=DATA[topic];const n=arr.length;
+    arr.forEach((q,i)=>{
+      q._id=topic+'_'+i;
+      if(i<n*0.4) q.difficulty='easy';
+      else if(i<n*0.75) q.difficulty='medium';
+      else q.difficulty='hard';
+    });
+  });
+})();
+
+// ===== WRONG-ANSWER TRACKING =====
+function getWrongIds(){try{return JSON.parse(localStorage.getItem('nathaniel_wrong')||'{}');}catch(e){return {};}}
+function saveWrongIds(w){try{localStorage.setItem('nathaniel_wrong',JSON.stringify(w));}catch(e){}}
+function markWrong(qId){const w=getWrongIds();w[qId]=(w[qId]||0)+1;saveWrongIds(w);}
+function clearWrong(qId){const w=getWrongIds();delete w[qId];saveWrongIds(w);}
+
+// ===== GAME ENGINE =====
+let currentGame='',questions=[],currentQ=0,score=0,streak=0,answered=false,totalStars=0,gameStartTime=0;
+const enc=['Tama!','Magaling!','Ang galing!','Ayos!','Wow!','Astig!','Yehey!','Nice!','Galing mo!','Sana all!'];
+const QUESTIONS_PER_SESSION=5;
+const STAR_REWARD={easy:1,medium:2,hard:3};
+const STAR_PENALTY=1;
+const wenc=['Okay lang!','Try ulit!','Kaya mo yan!','Halos na!','Next time!'];
+
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+
+function startGame(type){
+  currentGame=type;currentQ=0;score=0;streak=0;firstTryCorrect=true;totalStars=0;gameStartTime=Date.now();
+  // Show money drawer button only for money-related games
+  const mdBtn=document.getElementById('moneyDrawerBtn');
+  mdBtn.style.display=(type==='money'||type==='compare')?'flex':'none';
+  // Priority: previously wrong questions first, then fill remaining by difficulty
+  const wrong=getWrongIds();
+  const allQ=DATA[type];
+  const wrongQs=allQ.filter(q=>wrong[q._id]);
+  const rightQs=allQ.filter(q=>!wrong[q._id]);
+  // Sort right questions: easy first for warmup, then medium, then hard
+  const diffOrder={easy:0,medium:1,hard:2};
+  rightQs.sort((a,b)=>(diffOrder[a.difficulty]||0)-(diffOrder[b.difficulty]||0));
+  // Pick: up to 2 wrong ones + fill to 5 from right pool (shuffled within difficulty)
+  let picked=shuffle(wrongQs).slice(0,2);
+  const remaining=QUESTIONS_PER_SESSION-picked.length;
+  // Mix difficulties: ~2 easy, ~2 medium, ~1 hard from available
+  const easy=shuffle(rightQs.filter(q=>q.difficulty==='easy'));
+  const med=shuffle(rightQs.filter(q=>q.difficulty==='medium'));
+  const hard=shuffle(rightQs.filter(q=>q.difficulty==='hard'));
+  const pool=[...easy.slice(0,2),...med.slice(0,2),...hard.slice(0,1),...easy.slice(2),...med.slice(2),...hard.slice(1)];
+  picked=[...picked,...pool.filter(q=>!picked.includes(q)).slice(0,remaining)];
+  questions=shuffle(picked).slice(0,QUESTIONS_PER_SESSION);
+  document.getElementById('menu').style.display='none';
+  document.getElementById('gameScreen').classList.add('active');
+  showQuestion();
+}
+// ===== SCRIBBLE / DRAW =====
+// Canvas stays pointer-events:none so buttons/choices still work.
+// We listen on document and only draw when scribble is ON and target isn't a button/interactive.
+let scribbleOn=false,scribbleDrawing=false,scribbleCtx=null;
+function initScribbleCanvas(){
+  const c=document.getElementById('scribbleCanvas');
+  c.width=window.innerWidth;c.height=window.innerHeight;
+  scribbleCtx=c.getContext('2d');
+  scribbleCtx.lineCap='round';scribbleCtx.lineJoin='round';
+  scribbleCtx.lineWidth=3;scribbleCtx.strokeStyle='#fff';
+  scribbleCtx.shadowColor='rgba(255,255,255,0.6)';scribbleCtx.shadowBlur=6;
+}
+function isInteractive(el){
+  if(!el)return false;
+  const tag=el.tagName;
+  if(tag==='BUTTON'||tag==='A'||tag==='INPUT'||tag==='SELECT')return true;
+  if(el.classList&&(el.classList.contains('choice-btn')||el.classList.contains('drag-item')||el.classList.contains('wallet-bill')||el.classList.contains('md-item')||el.classList.contains('compare-sym')))return true;
+  if(el.onclick||el.getAttribute('draggable')==='true')return true;
+  if(el.parentElement)return isInteractive(el.parentElement);
+  return false;
+}
+function toggleScribble(){
+  scribbleOn=!scribbleOn;
+  const c=document.getElementById('scribbleCanvas');
+  const btn=document.getElementById('scribbleBtn');
+  if(scribbleOn){
+    c.style.display='block';
+    initScribbleCanvas();
+    btn.classList.add('active');
+  }else{
+    clearScribble();
+  }
+}
+function clearScribble(){
+  scribbleOn=false;scribbleDrawing=false;
+  const c=document.getElementById('scribbleCanvas');
+  c.style.display='none';
+  if(scribbleCtx)scribbleCtx.clearRect(0,0,c.width,c.height);
+  document.getElementById('scribbleBtn').classList.remove('active');
+}
+// Global document-level handlers for scribble
+document.addEventListener('touchstart',function(e){
+  if(!scribbleOn||isInteractive(e.target))return;
+  scribbleDrawing=true;
+  const t=e.touches[0];
+  scribbleCtx.beginPath();scribbleCtx.moveTo(t.clientX,t.clientY);
+},{passive:true});
+document.addEventListener('touchmove',function(e){
+  if(!scribbleDrawing)return;
+  const t=e.touches[0];
+  scribbleCtx.lineTo(t.clientX,t.clientY);scribbleCtx.stroke();
+},{passive:true});
+document.addEventListener('touchend',function(){scribbleDrawing=false;});
+document.addEventListener('mousedown',function(e){
+  if(!scribbleOn||isInteractive(e.target))return;
+  scribbleDrawing=true;
+  scribbleCtx.beginPath();scribbleCtx.moveTo(e.clientX,e.clientY);
+});
+document.addEventListener('mousemove',function(e){
+  if(!scribbleDrawing)return;
+  scribbleCtx.lineTo(e.clientX,e.clientY);scribbleCtx.stroke();
+});
+document.addEventListener('mouseup',function(){scribbleDrawing=false;});
+
+// ===== IMAGE ZOOM =====
+function openImgZoom(src){
+  const overlay=document.getElementById('imgZoom');
+  document.getElementById('imgZoomImg').src=src;
+  overlay.classList.add('active');
+}
+function closeImgZoom(){
+  document.getElementById('imgZoom').classList.remove('active');
+  document.getElementById('imgZoomImg').src='';
+}
+
+// ===== MONEY DRAWER (teaching tool) =====
+const MD_COINS=[
+  {label:'1¢',value:0.01,img:'money/coin.1.jpg',size:36},
+  {label:'5¢',value:0.05,img:'money/coin.5.jpeg',size:40},
+  {label:'25¢',value:0.25,img:'money/coin.25.jpg',size:44},
+  {label:'₱1',value:1,img:'money/coin1.jpg',size:50},
+  {label:'₱5',value:5,img:'money/coin5.jpg',size:54},
+  {label:'₱10',value:10,img:'money/coin10.jpeg',size:58},
+];
+const MD_BILLS=[
+  {label:'₱20',value:20,img:'money/bill20.jpg',w:100,h:42},
+  {label:'₱50',value:50,img:'money/bill50.jpg',w:100,h:42},
+  {label:'₱100',value:100,img:'money/bill100.jpg',w:100,h:42},
+  {label:'₱500',value:500,img:'money/bill500.jpg',w:100,h:42},
+  {label:'₱1000',value:1000,img:'money/bill1000.png',w:100,h:42},
+];
+let mdPlaced=[],mdDragging=null,mdDragOff={x:0,y:0},mdOpen=false,mdBuilt=false;
+
+function toggleMoneyDrawer(){
+  mdOpen=!mdOpen;
+  const tray=document.getElementById('mdTray');
+  const total=document.getElementById('mdTotal');
+  const clr=document.getElementById('mdClearBtn');
+  const btn=document.getElementById('moneyDrawerBtn');
+  if(mdOpen){
+    if(!mdBuilt)buildMoneyTray();
+    tray.classList.add('open');
+    total.classList.add('open');
+    clr.classList.add('open');
+    btn.style.background='rgba(255,111,0,0.7)';
+  }else{
+    tray.classList.remove('open');
+    total.classList.remove('open');
+    clr.classList.remove('open');
+    btn.style.background='';
+  }
+}
+function closeMoneyDrawer(){
+  mdOpen=false;mdBuilt=false;
+  document.getElementById('mdTray').classList.remove('open');
+  document.getElementById('mdTotal').classList.remove('open');
+  document.getElementById('mdClearBtn').classList.remove('open');
+  document.getElementById('moneyDrawerBtn').style.background='';
+  clearMoneyTable();
+}
+function clearMoneyTable(){
+  mdPlaced=[];
+  document.querySelectorAll('.md-floating').forEach(el=>el.remove());
+  updateMdTotal();
+}
+function updateMdTotal(){
+  const sum=mdPlaced.reduce((a,b)=>a+b.value,0);
+  const disp=sum<1?(sum===0?'₱0':Math.round(sum*100)+'¢'):'₱'+sum;
+  document.getElementById('mdTotal').textContent=disp;
+}
+function buildMoneyTray(){
+  mdBuilt=true;
+  const tray=document.getElementById('mdTray');
+  let h='';
+  MD_COINS.forEach(c=>{
+    h+=`<div class="md-item" data-value="${c.value}" data-label="${c.label}" data-type="coin" data-img="${c.img||''}" data-size="${c.size}">
+      <img src="${c.img}" style="width:${c.size}px;height:${c.size}px;border-radius:50%;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,0.3);">
+      <div style="font-size:0.65em;color:#aaa;font-weight:700;">${c.label}</div>
+    </div>`;
+  });
+  MD_BILLS.forEach(b=>{
+    h+=`<div class="md-item" data-value="${b.value}" data-label="${b.label}" data-type="bill" data-img="${b.img||''}" data-w="${b.w}" data-h="${b.h}">
+      <img src="${b.img}" style="width:${b.w}px;height:${b.h}px;border-radius:6px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,0.3);">
+      <div style="font-size:0.65em;color:#aaa;font-weight:700;">${b.label}</div>
+    </div>`;
+  });
+  tray.innerHTML=h;
+  tray.querySelectorAll('.md-item').forEach(item=>{
+    item.addEventListener('touchstart',mdTrayStart,{passive:false});
+    item.addEventListener('mousedown',mdTrayStart);
+  });
+}
+function mdTrayStart(e){
+  e.preventDefault();
+  const item=e.currentTarget;
+  const d=item.dataset;
+  const pos=e.touches?e.touches[0]:e;
+  // Create floating clone on the page (fixed position)
+  const el=document.createElement('div');
+  el.className='md-floating';
+  if(d.type==='coin'){
+    const s=parseInt(d.size);
+    el.style.width=s+'px';el.style.height=s+'px';
+    el.innerHTML=`<img src="${d.img}" style="width:${s}px;height:${s}px;border-radius:50%;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,0.3);">`;
+  }else{
+    el.style.width=d.w+'px';el.style.height=d.h+'px';
+    el.innerHTML=`<img src="${d.img}" style="width:${d.w}px;height:${d.h}px;border-radius:6px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,0.3);">`;
+  }
+  el.style.left=(pos.clientX-30)+'px';el.style.top=(pos.clientY-30)+'px';
+  el.style.pointerEvents='auto';
+  document.body.appendChild(el);
+  const entry={el,value:parseFloat(d.value),label:d.label};
+  mdPlaced.push(entry);
+  updateMdTotal();
+  mdDragging=entry;
+  mdDragOff={x:30,y:30};
+  el.style.transition='none';
+  const moveHandler=mdDragMoveFixed;
+  const upHandler=()=>{
+    mdDragging=null;
+    document.removeEventListener('touchmove',moveHandler);
+    document.removeEventListener('mousemove',moveHandler);
+    document.removeEventListener('touchend',upHandler);
+    document.removeEventListener('mouseup',upHandler);
+  };
+  document.addEventListener('touchmove',moveHandler,{passive:false});
+  document.addEventListener('mousemove',moveHandler);
+  document.addEventListener('touchend',upHandler);
+  document.addEventListener('mouseup',upHandler);
+  // Double-tap to remove
+  el.addEventListener('dblclick',()=>{mdRemove(entry);});
+  // Long press to remove + drag on mobile
+  let longPress;
+  el.addEventListener('touchstart',(te)=>{
+    te.preventDefault();
+    longPress=setTimeout(()=>mdRemove(entry),500);
+    mdDragging=entry;
+    const tp=te.touches[0];
+    const er=el.getBoundingClientRect();
+    mdDragOff={x:tp.clientX-er.left,y:tp.clientY-er.top};
+    const uh2=()=>{
+      clearTimeout(longPress);mdDragging=null;
+      document.removeEventListener('touchmove',mdDragMoveFixed);
+      document.removeEventListener('touchend',uh2);
+    };
+    document.addEventListener('touchmove',mdDragMoveFixed,{passive:false});
+    document.addEventListener('touchend',uh2);
+  },{passive:false});
+  el.addEventListener('mousedown',(me)=>{
+    mdDragging=entry;
+    const er=el.getBoundingClientRect();
+    mdDragOff={x:me.clientX-er.left,y:me.clientY-er.top};
+    const uh2=()=>{mdDragging=null;document.removeEventListener('mousemove',mdDragMoveFixed);document.removeEventListener('mouseup',uh2);};
+    document.addEventListener('mousemove',mdDragMoveFixed);
+    document.addEventListener('mouseup',uh2);
+  });
+}
+function mdDragMoveFixed(e){
+  if(!mdDragging)return;
+  e.preventDefault();
+  const pos=e.touches?e.touches[0]:e;
+  mdDragging.el.style.left=(pos.clientX-mdDragOff.x)+'px';
+  mdDragging.el.style.top=(pos.clientY-mdDragOff.y)+'px';
+}
+function mdRemove(entry){
+  entry.el.remove();
+  mdPlaced=mdPlaced.filter(p=>p!==entry);
+  updateMdTotal();
+}
+
+function goMenu(){
+  clearScribble();
+  closeMoneyDrawer();
+  document.getElementById('menu').style.display='flex';
+  document.getElementById('gameScreen').classList.remove('active');
+  document.getElementById('resultOverlay').classList.remove('active');
+  updateStoryBtn();
+}
+function replayGame(){document.getElementById('resultOverlay').classList.remove('active');startGame(currentGame);}
+
+function showQuestion(){
+  clearScribble();
+  if(currentQ>=questions.length){showResult();return;}
+  answered=false;
+  const q=questions[currentQ];
+  document.getElementById('scoreDisplay').textContent='⭐ '+totalStars;
+  document.getElementById('progressFill').style.width=((currentQ/questions.length)*100)+'%';
+
+  let h=`<div class="prompt-label">Tanong ${currentQ+1} / ${questions.length}</div>`;
+  h+=`<div class="story-text">${q.story}</div>`;
+
+  if(q.chars&&q.chars.length>0){
+    h+='<div class="story-scene">';
+    q.chars.forEach((c,i)=>{
+      const ch=typeof c==='string'?{id:c,a:''}:c;
+      const delay=i*0.15;
+      h+=`<div style="animation-delay:${delay}s">${spriteHTML(ch.id,50,ch.a)}</div>`;
+    });
+    h+='</div>';
+  }
+
+  const isDrag=q.visual==='drag';
+
+  if(q.visual==='pie') h+=buildPie(q.pieces,q.filled);
+  else if(q.visual==='food') h+=buildFood(q.items,q.eaten);
+  else if(q.visual==='money') h+=buildMoney(q.denom);
+  else if(q.visual==='compare') h+=buildCompare(q);
+  else if(isDrag) h+=buildDrag(q);
+  else if(q.visual==='bill') h+=`<div class="bill-card" style="background:${q.color}15;border-color:${q.color};color:${q.color}">${q.label}</div>${q.hint?'<div class="hint-text">'+q.hint+'</div>':''}`;
+  else if(q.emoji) h+=`<div class="visual-row">${q.emoji}</div>`;
+
+  // Show real images for relevant topics
+  h+=getQuestionImage(q);
+
+  h+=`<div class="main-q">${q.q}</div>`;
+  if(q.tools) h+=`<div class="tools-text">Mga gamit: ${q.tools}</div>`;
+
+  const sb=document.getElementById('storyBox');
+  sb.innerHTML=h;sb.style.animation='none';sb.offsetHeight;sb.style.animation='floatIn 0.3s ease';
+
+  const cb=document.getElementById('choicesBox');
+  if(isDrag){
+    cb.innerHTML='';
+    initDrag(q);
+  }else if(q.visual==='compare'){
+    // Compare uses drag symbols inside storyBox, no choice buttons needed
+    cb.innerHTML='';
+    comparePicked=null;
+  }else{
+    cb.className=q.choices.length===3?'choices three-col':'choices';
+    const sc=shuffle(q.choices);
+    cb.innerHTML=sc.map(c=>{
+      const icon=getChoiceIcon(c);
+      return `<button class="choice-btn" onclick="playTap();pickAnswer(this,'${esc(c)}','${esc(q.answer)}')">${icon?'<span class="choice-icon">'+icon+'</span>':''}${c}</button>`;
+    }).join('');
+  }
+}
+
+function esc(s){return s.replace(/'/g,"\\'");}
+function getChoiceIcon(c){
+  const emoji={'Solid':'🧊','Liquid':'💧','Gas':'💨','Simbahan':'⛪','Paaralan':'🏫','Pamilihan':'🏪','Bahay':'🏠','Parke':'🏞️','Pulis':'👮','Doktor':'👨‍⚕️','Guro':'👩‍🏫','Bumbero':'👨‍🚒','Pandero':'🧑‍🍳','Mangingisda':'🎣'}[c]||'';
+  // Add small thumbnail for komunidad/helper choices
+  const img=TOPIC_IMG[c];
+  if(img) return emoji+`<img src="${img}" style="width:40px;height:30px;object-fit:cover;border-radius:4px;margin-top:2px;" onerror="this.style.display='none'">`;
+  return emoji;
+}
+function getQuestionImage(q){
+  const imgStyle='max-width:140px;max-height:90px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.15);margin:4px;object-fit:cover;';
+  let imgs=[];
+  // Money: already shown via buildMoney, skip
+  if(q.visual==='money') return '';
+  // Matter: find image by keyword in question
+  if(q.answer==='Solid'||q.answer==='Liquid'||q.answer==='Gas'){
+    for(const [kw,key] of Object.entries(MATTER_IMG_MAP)){
+      if(q.q.toUpperCase().includes(kw)) imgs.push({src:TOPIC_IMG[key],alt:kw});
+    }
+  }
+  // Komunidad: show image of the answer place
+  if(['Simbahan','Paaralan','Pamilihan','Bahay','Parke'].includes(q.answer)){
+    if(TOPIC_IMG[q.answer]) imgs.push({src:TOPIC_IMG[q.answer],alt:q.answer});
+  }
+  // Helpers: show image of the answer helper
+  if(['Pulis','Doktor','Guro','Bumbero','Pandero','Mangingisda'].includes(q.answer)){
+    if(TOPIC_IMG[q.answer]) imgs.push({src:TOPIC_IMG[q.answer],alt:q.answer});
+  }
+  // Helper tools questions: show tool images
+  if(q.q&&q.q.startsWith('Fire truck')) imgs.push({src:TOPIC_IMG['Fire truck'],alt:'Fire truck'});
+  if(q.q&&q.q.startsWith('Stethoscope')) imgs.push({src:TOPIC_IMG['Stethoscope'],alt:'Stethoscope'});
+  if(q.q&&q.q.startsWith('Posas')) imgs.push({src:TOPIC_IMG['Patrol car'],alt:'Patrol car'});
+  if(q.q&&q.q.startsWith('Bangka')) imgs.push({src:TOPIC_IMG['Bangka'],alt:'Bangka'});
+  if(q.q&&q.q.startsWith('Oven')) imgs.push({src:TOPIC_IMG['Oven'],alt:'Oven'});
+  if(imgs.length===0) return '';
+  return `<div style="display:flex;justify-content:center;flex-wrap:wrap;gap:4px;margin:6px 0;">${imgs.map(i=>`<img src="${i.src}" alt="${i.alt}" style="${imgStyle}cursor:pointer;" onclick="openImgZoom(this.src)" onerror="this.style.display='none'">`).join('')}</div>`;
+}
+function buildPie(p,f){const pct=(f/p)*100;return `<div class="pie-visual" style="background:conic-gradient(#6db89a 0% ${pct}%,#e5f0ea ${pct}% 100%);margin:8px auto;"></div><div style="font-size:0.8em;color:#aaa">${f} kulay green sa ${p} bahagi</div>`;}
+
+function buildFood(items,eaten){
+  return `<div class="food-grid">${items.map((it,i)=>{
+    const isEaten = i < eaten;
+    return `<span class="food-item${isEaten?' eaten':'  avail'}">${it}</span>`;
+  }).join('')}</div>
+  <div style="font-size:0.78em;color:#999;margin-top:2px;">
+    ${eaten>0?`<span style="color:#66bb6a;font-weight:700;">✓ ${items.length-eaten} natira</span> &nbsp; <span style="color:#ef5350;">✕ ${eaten} kinain</span>`:''}
+  </div>`;
+}
+
+function buildMoney(denom){
+  const bill=BILL_DATA[denom];
+  if(bill){
+    return `<div style="margin:10px auto;max-width:280px;cursor:pointer;" onclick="openImgZoom('${bill.img}')">
+      <img src="${bill.img}" alt="${denom}" style="width:100%;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.3);">
+    </div>
+    <div style="font-size:0.85em;color:#aaa;font-weight:700;margin-top:4px;">Bill: ${denom}</div>`;
+  }
+  const coin=COIN_DATA[denom];
+  if(coin){
+    if(coin.img){
+      return `<div style="margin:8px auto;width:${coin.size}px;height:${coin.size}px;cursor:pointer;" onclick="openImgZoom('${coin.img}')">
+        <img src="${coin.img}" alt="${denom}" style="width:${coin.size}px;height:${coin.size}px;border-radius:50%;object-fit:cover;box-shadow:0 4px 16px rgba(0,0,0,0.3);border:3px solid #FFD54F;">
+      </div>
+      <div style="font-size:0.85em;color:#aaa;font-weight:700;margin-top:4px;">Barya: ${denom}</div>`;
+    }
+    return `<div style="margin:8px auto;width:${coin.size}px;height:${coin.size}px;border-radius:50%;background:radial-gradient(circle at 35% 35%,${coin.color}ee,${coin.color}99,${coin.color}66);box-shadow:0 4px 16px rgba(0,0,0,0.3);border:3px solid ${coin.color};display:flex;flex-direction:column;justify-content:center;align-items:center;">
+      <div style="font-size:${coin.size*0.3}px;font-weight:900;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.4);">${coin.label}</div>
+    </div>
+    <div style="font-size:0.85em;color:#aaa;font-weight:700;margin-top:4px;">Barya: ${denom}</div>`;
+  }
+  return '';
+}
+
+// ===== MONEY COMPARISON VISUAL =====
+function buildCompareSide(s,label){
+  let h='<div class="compare-side">';
+  if(s.denom==='mix'){
+    // Mixed: show two different images
+    const sz=s.isCoin?60:120;
+    const ht=s.isCoin?60:50;
+    const rad=s.isCoin?'50%':'8px';
+    h+=`<img src="${s.img}" style="width:${sz}px;height:${ht}px;border-radius:${rad};object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,0.3);margin:2px;">`;
+    if(s.img2) h+=`<img src="${s.img2}" style="width:${sz}px;height:${ht}px;border-radius:${rad};object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,0.3);margin:2px;">`;
+  }else if(s.count<=4){
+    for(let i=0;i<s.count;i++){
+      const sz=s.isCoin?50:110;
+      const ht=s.isCoin?50:46;
+      const rad=s.isCoin?'50%':'8px';
+      h+=`<img src="${s.img}" style="width:${sz}px;height:${ht}px;border-radius:${rad};object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,0.3);margin:2px;">`;
+    }
+  }else{
+    // Many coins: show image + count badge
+    const sz=s.isCoin?56:110;
+    const ht=s.isCoin?56:46;
+    const rad=s.isCoin?'50%':'8px';
+    h+=`<div style="position:relative;display:inline-block;">
+      <img src="${s.img}" style="width:${sz}px;height:${ht}px;border-radius:${rad};object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,0.3);">
+      <span style="position:absolute;top:-6px;right:-6px;background:#ff6f00;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:0.75em;font-weight:900;box-shadow:0 2px 6px rgba(0,0,0,0.3);">×${s.count}</span>
+    </div>`;
+  }
+  h+=`<div style="font-size:0.85em;color:#aaa;font-weight:700;margin-top:4px;">${label}</div>`;
+  h+='</div>';
+  return h;
+}
+function buildCompare(q){
+  return `<div class="compare-visual">
+    ${buildCompareSide(q.leftSide,q.leftDesc)}
+    <div class="compare-drop" id="compareDrop"></div>
+    ${buildCompareSide(q.rightSide,q.rightDesc)}
+  </div>
+  <div class="compare-symbols" id="compareSymbols">
+    <div class="compare-sym" data-sym=">" ontouchstart="startDragSym(event,this)" onmousedown="startDragSym(event,this)">&gt;</div>
+    <div class="compare-sym" data-sym="=" ontouchstart="startDragSym(event,this)" onmousedown="startDragSym(event,this)">=</div>
+    <div class="compare-sym" data-sym="<" ontouchstart="startDragSym(event,this)" onmousedown="startDragSym(event,this)">&lt;</div>
+  </div>
+  <button class="compare-check" id="compareCheck" onclick="checkCompare()">Sagot!</button>`;
+}
+let comparePicked=null;
+function startDragSym(e,el){
+  e.preventDefault();
+  const sym=el.dataset.sym;
+  // Just tap to place (simpler for kinder)
+  comparePicked=sym;
+  const drop=document.getElementById('compareDrop');
+  drop.textContent=sym;
+  drop.classList.add('filled');
+  // Reset all sym buttons, highlight selected
+  document.querySelectorAll('.compare-sym').forEach(s=>{
+    s.classList.toggle('used',s.dataset.sym!==sym);
+  });
+  document.getElementById('compareCheck').classList.add('ready');
+}
+function checkCompare(){
+  if(!comparePicked)return;
+  const q=questions[currentQ];
+  // Use pickAnswer flow by simulating button press
+  const fakeBtn=document.getElementById('compareCheck');
+  playTap();
+  pickAnswer(fakeBtn,comparePicked,q.answer);
+  comparePicked=null;
+}
+
+// ===== DRAG-AND-DROP INTERACTIVE =====
+function buildDrag(q){
+  const items=q.dragItems;const target=q.dragTarget;const fromChar=q.dragFrom;
+  return `<div class="drag-zone">
+    <div class="drag-basket" id="dragFrom">
+      ${items.map((it,i)=>`<span class="drag-item" data-idx="${i}" draggable="true">${it}</span>`).join('')}
+      <span class="basket-label">${CHARS[fromChar]?CHARS[fromChar].name:'Nathaniel'}</span>
+    </div>
+    <span class="drag-arrow">➡️</span>
+    <div class="drag-basket" id="dragTo">
+      <span class="basket-label">${CHARS[target]?CHARS[target].name:target}</span>
+    </div>
+  </div>
+  <div class="drag-count" id="dragCount">I-drag ang tamang bilang!</div>
+  <button class="drag-submit" id="dragSubmit" onclick="checkDrag()">Tapos na!</button>`;
+}
+
+function initDrag(q){
+  setTimeout(()=>{
+    const fromBox=document.getElementById('dragFrom');
+    const toBox=document.getElementById('dragTo');
+    const submitBtn=document.getElementById('dragSubmit');
+    const countEl=document.getElementById('dragCount');
+    if(!fromBox||!toBox)return;
+
+    let draggedEl=null;
+
+    function updateCount(){
+      const n=toBox.querySelectorAll('.drag-item').length;
+      countEl.textContent=n>0?n+' item'+(n>1?'s':'')+' na binigay':'I-drag ang tamang bilang!';
+      if(n>0){submitBtn.classList.add('ready');}else{submitBtn.classList.remove('ready');}
+    }
+
+    // Touch support
+    function handleTouchStart(e){
+      if(!e.target.classList.contains('drag-item'))return;
+      draggedEl=e.target;
+      draggedEl.classList.add('dragging');
+      e.preventDefault();
+    }
+    function handleTouchMove(e){
+      if(!draggedEl)return;
+      e.preventDefault();
+    }
+    function handleTouchEnd(e){
+      if(!draggedEl)return;
+      const touch=e.changedTouches[0];
+      const target=document.elementFromPoint(touch.clientX,touch.clientY);
+      const basket=target?target.closest('.drag-basket'):null;
+      if(basket && basket!==draggedEl.parentElement){
+        basket.insertBefore(draggedEl,basket.querySelector('.basket-label'));
+        playTap();
+      }
+      draggedEl.classList.remove('dragging');
+      draggedEl=null;
+      updateCount();
+    }
+
+    // HTML5 drag for desktop
+    fromBox.addEventListener('dragstart',e=>{
+      if(!e.target.classList.contains('drag-item'))return;
+      draggedEl=e.target;
+      e.target.classList.add('dragging');
+    });
+    toBox.addEventListener('dragstart',e=>{
+      if(!e.target.classList.contains('drag-item'))return;
+      draggedEl=e.target;
+      e.target.classList.add('dragging');
+    });
+    [fromBox,toBox].forEach(box=>{
+      box.addEventListener('dragover',e=>{e.preventDefault();box.classList.add('highlight');});
+      box.addEventListener('dragleave',()=>box.classList.remove('highlight'));
+      box.addEventListener('drop',e=>{
+        e.preventDefault();box.classList.remove('highlight');
+        if(draggedEl&&draggedEl.parentElement!==box){
+          box.insertBefore(draggedEl,box.querySelector('.basket-label'));
+          playTap();
+        }
+        if(draggedEl)draggedEl.classList.remove('dragging');
+        draggedEl=null;
+        updateCount();
+      });
+    });
+
+    // Touch events
+    document.getElementById('storyBox').addEventListener('touchstart',handleTouchStart,{passive:false});
+    document.getElementById('storyBox').addEventListener('touchmove',handleTouchMove,{passive:false});
+    document.getElementById('storyBox').addEventListener('touchend',handleTouchEnd);
+
+    window._dragQ=q;
+  },100);
+}
+
+function checkDrag(){
+  const q=window._dragQ;if(!q)return;
+  const toBox=document.getElementById('dragTo');
+  const given=toBox.querySelectorAll('.drag-item').length;
+  const correct=q.dragAnswer;
+  if(given===correct){
+    playCorrect();
+    answered=true;
+    if(firstTryCorrect){
+      score++;
+      const reward=STAR_REWARD[q.difficulty]||1;
+      totalStars+=reward;
+      clearWrong(q._id);
+    }
+    streak=firstTryCorrect?streak+1:0;
+    document.getElementById('scoreDisplay').textContent='⭐ '+totalStars;
+    showReaction(true);
+    showEncouragement(firstTryCorrect?enc[Math.floor(Math.random()*enc.length)]:'Tama na!');
+    document.getElementById('dragSubmit').style.display='none';
+    setTimeout(()=>showLessonSummary(q),1600);
+  }else{
+    firstTryCorrect=false;
+    streak=0;
+    markWrong(q._id);
+    totalStars=Math.max(0,totalStars-STAR_PENALTY);
+    document.getElementById('scoreDisplay').textContent='⭐ '+totalStars;
+    playWrong();
+    showReaction(false);
+    document.getElementById('dragCount').textContent=given>correct?'Ang dami! Bawasan mo.':'Kulang pa! Dagdagan mo.';
+  }
+}
+
+// ===== SESSION LOG (localStorage) =====
+function getSessionLog(){
+  try{return JSON.parse(localStorage.getItem('nathaniel_scores')||'[]');}catch(e){return [];}
+}
+function saveSession(topic,score,total){
+  const log=getSessionLog();
+  const dur=Math.round((Date.now()-gameStartTime)/1000);
+  const mins=Math.floor(dur/60);const secs=dur%60;
+  const durStr=mins>0?mins+'m '+secs+'s':secs+'s';
+  log.push({topic,score,total,pct:Math.round((score/total)*100),dur:durStr,date:new Date().toLocaleString('en-PH',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})});
+  if(log.length>100) log.splice(0,log.length-100);
+  try{localStorage.setItem('nathaniel_scores',JSON.stringify(log));}catch(e){}
+}
+function showScoreLog(){
+  const log=getSessionLog();
+  const el=document.getElementById('logOverlay');
+  let html='<h2>Score History</h2>';
+  if(log.length===0){
+    html+='<div class="log-empty">Wala pang scores! Maglaro muna!</div>';
+  }else{
+    html+='<table><tr><th>Kailan</th><th>Topic</th><th>Score</th><th>%</th><th>Oras</th></tr>';
+    const topicNames={fractions:'Fractions',money:'Money',compare:'Compare',matter:'S/L/G',komunidad:'Komunidad',helpers:'Helpers'};
+    [...log].reverse().forEach(s=>{
+      const perf=s.pct===100?' class="log-perfect"':'';
+      html+=`<tr><td>${s.date}</td><td>${topicNames[s.topic]||s.topic}</td><td${perf}>${s.score}/${s.total}</td><td${perf}>${s.pct}%${s.pct===100?' ⭐':''}</td><td>${s.dur||'-'}</td></tr>`;
+    });
+    html+='</table>';
+  }
+  html+='<button class="log-close" onclick="playTap();document.getElementById(\'logOverlay\').classList.remove(\'active\')">Isara</button>';
+  if(log.length>0) html+='<button class="log-close" style="background:#ef5350;margin-top:4px;" onclick="clearScoresPin()">I-clear</button>';
+  document.getElementById('logCard').innerHTML=html;
+  el.classList.add('active');
+}
+function clearScoresPin(){
+  const pw=prompt('Enter PIN to clear scores:');
+  if(pw==='2020'){
+    if(confirm('I-clear lahat ng scores?')){localStorage.removeItem('nathaniel_scores');showScoreLog();}
+  }else if(pw!==null){alert('Wrong PIN!');}
+}
+
+// ===== STAR STORE =====
+const STORE_ITEMS=[
+  {id:'toy_gun',emoji:'🔫',name:'Toy Gun',price:5},
+  {id:'toy_car',emoji:'🏎️',name:'Toy Car',price:5},
+  {id:'spider_man',emoji:'🕷️',name:'Spider-Man',price:8},
+  {id:'robot',emoji:'🤖',name:'Robot',price:8},
+  {id:'dinosaur',emoji:'🦖',name:'Dinosaur',price:10},
+  {id:'soccer_ball',emoji:'⚽',name:'Soccer Ball',price:6},
+  {id:'skateboard',emoji:'🛹',name:'Skateboard',price:10},
+  {id:'airplane',emoji:'✈️',name:'Airplane',price:12},
+  {id:'rocket',emoji:'🚀',name:'Rocket',price:15},
+  {id:'dragon',emoji:'🐉',name:'Dragon',price:15},
+  {id:'superhero',emoji:'🦸',name:'Superhero',price:12},
+  {id:'trophy',emoji:'🏆',name:'Trophy',price:20},
+];
+
+function getStoreData(){
+  try{return JSON.parse(localStorage.getItem('nathaniel_store')||'{"stars":0,"owned":[]}');}catch(e){return {stars:0,owned:[]};}
+}
+function saveStoreData(d){try{localStorage.setItem('nathaniel_store',JSON.stringify(d));}catch(e){}}
+function addStoreStars(n){const d=getStoreData();d.stars+=n;saveStoreData(d);}
+function getStoreTotalStars(){return getStoreData().stars;}
+
+function showStore(){
+  const d=getStoreData();
+  const el=document.getElementById('storeOverlay');
+  let html=`<h2>Star Store</h2>
+    <div class="store-balance">⭐ ${d.stars} stars</div>
+    <div class="store-grid">`;
+  STORE_ITEMS.forEach(item=>{
+    const owned=d.owned.includes(item.id);
+    const canBuy=d.stars>=item.price&&!owned;
+    const cls=owned?'store-item owned':(canBuy?'store-item':'store-item locked');
+    html+=`<div class="${cls}" onclick="buyItem('${item.id}')">
+      <span class="item-emoji">${item.emoji}</span>
+      <div class="item-name">${item.name}</div>
+      <div class="item-price">${owned?'Owned!':'⭐ '+item.price}</div>
+    </div>`;
+  });
+  html+=`</div>
+    <button class="store-close" onclick="playTap();document.getElementById('storeOverlay').classList.remove('active')">Isara</button>`;
+  document.getElementById('storeCard').innerHTML=html;
+  el.classList.add('active');
+}
+
+function buyItem(id){
+  const d=getStoreData();
+  const item=STORE_ITEMS.find(i=>i.id===id);
+  if(!item)return;
+  if(d.owned.includes(id)){
+    // Already owned - show it
+    document.getElementById('storeCard').innerHTML=`
+      <div class="store-item-view">
+        <span class="big-item">${item.emoji}</span>
+        <h2>${item.name}</h2>
+        <div class="item-msg">Nasa iyo na ito, Nathaniel!</div>
+        <button class="store-close" onclick="playTap();showStore()">Balik sa Store</button>
+      </div>`;
+    return;
+  }
+  if(d.stars<item.price){
+    showEncouragement('Kulang pa ang stars! Maglaro pa!');
+    return;
+  }
+  // Buy it
+  d.stars-=item.price;
+  d.owned.push(id);
+  saveStoreData(d);
+  playCorrect();spawnConfetti(20);
+  document.getElementById('storeCard').innerHTML=`
+    <div class="store-item-view">
+      <span class="big-item">${item.emoji}</span>
+      <h2>Binili mo ang ${item.name}!</h2>
+      <div class="item-msg">Ang galing! Maglaro pa para sa iba!</div>
+      <button class="store-close" onclick="playTap();showStore()">Balik sa Store</button>
+    </div>`;
+}
+
+// ===== MY COLLECTION =====
+function showCollection(){
+  const d=getStoreData();
+  const el=document.getElementById('collectionOverlay');
+  let html='<h2>🏆 My Collection</h2>';
+  const owned=STORE_ITEMS.filter(i=>d.owned.includes(i.id));
+  if(owned.length===0){
+    html+='<div class="log-empty">Wala ka pang items! Maglaro at bumili sa Star Store!</div>';
+  }else{
+    html+='<div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;padding:12px 0;">';
+    owned.forEach(item=>{
+      html+=`<div style="text-align:center;padding:8px 12px;background:#e5f0ea;border-radius:14px;border:2px solid #6db89a;">
+        <span style="font-size:2.5em;display:block;">${item.emoji}</span>
+        <div style="font-size:0.7em;font-weight:700;color:#3a6b5a;margin-top:4px;">${item.name}</div>
+      </div>`;
+    });
+    html+='</div>';
+    html+=`<div style="text-align:center;font-size:0.85em;color:#888;margin:8px 0;">${owned.length} / ${STORE_ITEMS.length} items collected</div>`;
+  }
+  html+='<button class="log-close" onclick="playTap();document.getElementById(\'collectionOverlay\').classList.remove(\'active\')">Isara</button>';
+  document.getElementById('collectionCard').innerHTML=html;
+  el.classList.add('active');
+}
+
+// ===== CHARACTER REACTIONS =====
+const partyEmojis=['🎉','🥳','🎊','💃','🕺','✨','🌟','💫','🎶','🎵','👏'];
+const sadEmojis=['😢','💦','😔','🥺','😿'];
+const correctPhrases=['Magaling!','Ang galing!','Yehey!','Tama!','Wow!','Astig!','Nice!','Galing mo!','Sana all!','Ayos!'];
+const wrongPhrases=['Ay! Try ulit!','Hmm, hindi yan...','Isa pa!','Kaya mo yan!','Halos na!'];
+
+function showReaction(isCorrect){
+  // Remove any existing reaction
+  document.querySelectorAll('.reaction-overlay').forEach(e=>e.remove());
+
+  const overlay=document.createElement('div');
+  overlay.className='reaction-overlay '+(isCorrect?'reaction-correct':'reaction-wrong');
+
+  const stage=document.createElement('div');
+  stage.className='reaction-stage';
+
+  // Pick 2-4 random family members to react
+  const allChars=['nathaniel','wal','uwi','danielle','mommy','lola_delia','lola_bong','lola_neng','thea','dada'];
+  const picked=shuffle(allChars).slice(0,isCorrect?4:2);
+
+  if(isCorrect){
+    // Text first
+    const txt=document.createElement('div');
+    txt.className='party-text';
+    txt.textContent=correctPhrases[Math.floor(Math.random()*correctPhrases.length)];
+    stage.appendChild(txt);
+    // Small party emojis + tiny dancing characters
+    for(let i=0;i<2;i++){
+      const em=document.createElement('span');
+      em.className='party-emoji';
+      em.textContent=partyEmojis[Math.floor(Math.random()*partyEmojis.length)];
+      stage.appendChild(em);
+    }
+    picked.slice(0,3).forEach((id,i)=>{
+      const wrap=document.createElement('div');
+      wrap.innerHTML=spriteHTML(id,28);
+      stage.appendChild(wrap);
+    });
+    const em3=document.createElement('span');
+    em3.className='party-emoji';
+    em3.textContent=partyEmojis[Math.floor(Math.random()*partyEmojis.length)];
+    stage.appendChild(em3);
+  }else{
+    const txt=document.createElement('div');
+    txt.className='sad-text';
+    txt.textContent=wrongPhrases[Math.floor(Math.random()*wrongPhrases.length)];
+    stage.appendChild(txt);
+    const em=document.createElement('span');
+    em.className='sad-emoji';
+    em.textContent=sadEmojis[Math.floor(Math.random()*sadEmojis.length)];
+    stage.appendChild(em);
+    picked.slice(0,2).forEach(id=>{
+      const wrap=document.createElement('div');
+      wrap.innerHTML=spriteHTML(id,26);
+      stage.appendChild(wrap);
+    });
+  }
+
+  overlay.appendChild(stage);
+  // Reaction duration: fixed 1.5s max
+  const dur=1.5;
+  overlay.style.setProperty('--reaction-dur', dur+'s');
+  document.body.appendChild(overlay);
+  setTimeout(()=>overlay.remove(), dur*1000 + 400);
+}
+
+// ===== LESSON SUMMARIES =====
+function getLessonSummary(q){
+  // Fractions
+  if(q.answer&&q.answer.includes('/')){
+    const parts=q.answer.split('/');
+    return `📖 ${q.answer} ibig sabihin ${parts[0]} sa ${parts[1]} na bahagi. Kapag may ${parts[1]} piraso at kinuha ang ${parts[0]}, ang fraction ay ${q.answer}.`;
+  }
+  // Compare
+  if(q.visual==='compare'){
+    const lv=q.leftSide.total,rv=q.rightSide.total;
+    const sym=q.answer;
+    return `⚖️ ${q.leftDesc} = ₱${lv} ${sym} ${q.rightDesc} = ₱${rv}. ${lv===rv?'Pareho sila!':lv>rv?'Ang kaliwa ang mas malaki!':'Ang kanan ang mas malaki!'}`;
+  }
+  // Money
+  if(q.visual==='money'&&q.denom) return `💰 Ito ang ${q.denom}. Tandaan: ang kulay at laki ng pera ay iba-iba depende sa halaga nito.`;
+  if(q.q&&q.q.includes('sukli')){const s=q.answer;return `💰 Ang sukli ay ${s}. Pag nagbayad ka ng mas malaki, ibabawas ang presyo para makuha ang sukli.`;}
+  if(q.q&&q.q.includes('lahat')){return `💰 Ang sagot ay ${q.answer}. Pag maraming pera, i-add mo lahat para malaman ang total.`;}
+  if(q.q&&q.q.includes('mas mahal')) return `💰 Ang mas mahal ay ang may mas mataas na presyo. ${q.answer} ang mas mahal.`;
+  // Matter
+  if(q.answer==='Solid') return `🧊 SOLID — may sariling hugis at hindi agad nagbabago. Hindi ito dumadaloy. Halimbawa: bato, yelo, kutsara, sapatos.`;
+  if(q.answer==='Liquid') return `💧 LIQUID — dumadaloy at sumusunod sa hugis ng lalagyan. Halimbawa: tubig, gatas, juice, toyo.`;
+  if(q.answer==='Gas') return `💨 GAS — kumakalat sa hangin at hindi mo hawakan. Hindi mo rin makita minsan! Halimbawa: hangin, usok, steam, amoy.`;
+  // Komunidad
+  if(q.answer==='Simbahan') return `⛪ SIMBAHAN — dito nagdadasal ang pamilya. May krus sa taas at kampana.`;
+  if(q.answer==='Paaralan') return `🏫 PAARALAN — dito nag-aaral ang mga bata. May guro, libro, at blackboard.`;
+  if(q.answer==='Pamilihan') return `🏪 PAMILIHAN — dito bumibili ng pagkain, gulay, at isda. Tinatawag din itong palengke.`;
+  if(q.answer==='Bahay') return `🏠 BAHAY — dito nakatira ang pamilya. Dito sila kumakain, natutulog, at nagpapahinga.`;
+  if(q.answer==='Parke') return `🏞️ PARKE — dito naglalaro at nag-eexercise. May puno, damo, at playground.`;
+  // Helpers
+  if(q.answer==='Pulis') return `👮 PULIS — nagbabantay sa kaligtasan ng mga tao. Gamit nila: posas, patrol car, at baril.`;
+  if(q.answer==='Doktor') return `👨‍⚕️ DOKTOR — nagpapagaling ng may sakit. Gamit nila: stethoscope, thermometer, at gamot.`;
+  if(q.answer==='Guro') return `👩‍🏫 GURO — nagtuturo sa mga bata. Gamit nila: chalk, blackboard, at libro.`;
+  if(q.answer==='Bumbero') return `🚒 BUMBERO — pumapatay ng apoy. Gamit nila: fire truck, fire hose, at flashlight.`;
+  if(q.answer==='Pandero') return `🍞 PANDERO — gumagawa ng tinapay at pandesal. Gamit nila: oven, harina, at palayok.`;
+  if(q.answer==='Mangingisda') return `🎣 MANGINGISDA — nanghuhuli ng isda. Gamit nila: bangka, lambat, at pamingwit.`;
+  return `✅ Ang tamang sagot ay: ${q.answer}`;
+}
+
+function showLessonSummary(q){
+  const summary=getLessonSummary(q);
+  const cb=document.getElementById('choicesBox');
+  cb.innerHTML=`<div style="grid-column:1/-1;background:rgba(76,175,80,0.12);border:2px solid #66bb6a;border-radius:16px;padding:14px;text-align:center;animation:floatIn 0.3s ease;display:flex;flex-direction:column;align-items:center;">
+    <div style="font-size:0.95em;color:#81c784;line-height:1.5;margin-bottom:10px;">${summary}</div>
+    <button class="choice-btn" style="background:#66bb6a;color:#fff;border-color:#4caf50;padding:12px 32px;font-size:1.1em;width:auto;margin:0 auto;" onclick="playTap();currentQ++;firstTryCorrect=true;showQuestion();">Susunod ➡️</button>
+  </div>`;
+}
+
+// ===== RETRY LOGIC =====
+let firstTryCorrect=true;
+
+function pickAnswer(btn,picked,correct){
+  if(answered)return;
+  const q=questions[currentQ];
+  if(picked===correct){
+    answered=true;
+    btn.classList.add('correct');
+    if(firstTryCorrect){
+      score++;
+      const reward=STAR_REWARD[q.difficulty]||1;
+      totalStars+=reward;
+      clearWrong(q._id);
+      document.getElementById('scoreDisplay').textContent='⭐ '+totalStars;
+    }
+    streak = firstTryCorrect ? streak+1 : 0;
+    playCorrect();
+    showReaction(true);
+    showEncouragement(firstTryCorrect ? enc[Math.floor(Math.random()*enc.length)] : 'Tama na!');
+    if(firstTryCorrect && streak===3){showStreakBadge('🔥 3 Streak!');playStreak();}
+    else if(firstTryCorrect && streak===5){showStreakBadge('🔥🔥 5 Streak!');playStreak();spawnConfetti(15);}
+    else if(firstTryCorrect && streak>=QUESTIONS_PER_SESSION){showStreakBadge('🔥🔥🔥 PERFECT!');playStreak();spawnConfetti(25);}
+    if(navigator.vibrate)navigator.vibrate(50);
+    // Show lesson summary + manual next button
+    setTimeout(()=>showLessonSummary(q),1600);
+  }else{
+    firstTryCorrect=false;
+    streak=0;
+    markWrong(q._id);
+    totalStars=Math.max(0,totalStars-STAR_PENALTY);
+    document.getElementById('scoreDisplay').textContent='⭐ '+totalStars;
+    btn.classList.add('wrong');
+    btn.style.pointerEvents='none';
+    btn.style.opacity='0.4';
+    playWrong();
+    showReaction(false);
+    if(navigator.vibrate)navigator.vibrate([50,50,50]);
+    // Show lesson hint on wrong answer
+    showWrongHint(q);
+  }
+}
+
+function showWrongHint(q){
+  // Remove existing hint if any
+  const old=document.getElementById('wrongHint');
+  if(old)old.remove();
+  const hint=getLessonSummary(q);
+  const hintEl=document.createElement('div');
+  hintEl.id='wrongHint';
+  hintEl.style.cssText='grid-column:1/-1;background:rgba(255,152,0,0.12);border:2px solid #ffa726;border-radius:14px;padding:12px 14px;text-align:center;animation:floatIn 0.3s ease;margin-top:4px;';
+  hintEl.innerHTML=`<div style="font-size:0.75em;color:#ffb74d;font-weight:700;margin-bottom:4px;">💡 HINT</div><div style="font-size:0.85em;color:#ffe0b2;line-height:1.4;">${hint}</div>`;
+  document.getElementById('choicesBox').appendChild(hintEl);
+}
+
+function showResult(){
+  const pct=Math.round((score/questions.length)*100);
+  let emoji,title,msg;
+  if(pct===100){emoji='🏆';title='PERFECT, Nathaniel!';msg='Proud na proud si Lola Delia sa langit!';playPerfect();spawnConfetti(60);}
+  else if(pct>=80){emoji='🌟';title='Ang galing mo, Nathaniel!';msg='Halos perfect! Kaunti na lang!';playFinish();spawnConfetti(30);}
+  else if(pct>=60){emoji='😊';title='Magaling! Try ulit!';msg='Practice lang nang practice!';playFinish();}
+  else{emoji='💪';title='Kaya mo yan, Nathaniel!';msg='Maglaro tayo ulit!';playFinish();}
+
+  // Save to session log
+  saveSession(currentGame,score,questions.length);
+  addStoreStars(totalStars); // Save earned stars to store
+
+  document.getElementById('resultCard').innerHTML=`
+    <div class="big-emoji">${emoji}</div>
+    <h2>${title}</h2>
+    <div class="stars">${'⭐'.repeat(Math.max(1,totalStars))}</div>
+    <p>${totalStars} stars! Score: ${score} / ${questions.length} (${pct}%)<br>${msg}</p>
+    <div class="result-scene">${['nathaniel','lola_delia','wal','danielle','mommy'].map(c=>spriteHTML(c,36)).join('')}</div>
+    <button onclick="playTap();goMenu()">Menu</button>
+    <button class="green" onclick="playTap();replayGame()">Ulitin!</button>
+  `;
+  document.getElementById('resultOverlay').classList.add('active');
+}
+
+// ===== STORY SCENE ILLUSTRATIONS =====
+const SCENE_IMGS={
+  cake:`<svg viewBox="0 0 120 80" width="100" height="67" style="display:block;margin:0 auto;">
+    <rect x="20" y="35" width="80" height="40" rx="8" fill="#FFCC80" stroke="#E65100" stroke-width="2"/>
+    <rect x="25" y="30" width="70" height="10" rx="4" fill="#FFF9C4"/>
+    <rect x="30" y="25" width="60" height="10" rx="4" fill="#FFAB91"/>
+    <rect x="55" y="5" width="4" height="22" rx="2" fill="#FFD54F"/>
+    <ellipse cx="57" cy="5" rx="5" ry="6" fill="#FF7043" opacity="0.8"/>
+    <text x="57" y="8" text-anchor="middle" font-size="8" fill="#fff">🔥</text>
+    <circle cx="40" cy="50" r="3" fill="#E91E63"/><circle cx="60" cy="45" r="2.5" fill="#4CAF50"/>
+    <circle cx="75" cy="55" r="2" fill="#2196F3"/><circle cx="50" cy="60" r="2.5" fill="#FF9800"/>
+  </svg>`,
+  drinks:`<svg viewBox="0 0 80 100" width="60" height="75" style="display:block;margin:0 auto;">
+    <rect x="22" y="20" width="36" height="65" rx="4" fill="none" stroke="#90CAF9" stroke-width="3"/>
+    <rect x="25" y="50" width="30" height="32" rx="2" fill="#FF9800" opacity="0.7"/>
+    <rect x="25" y="55" width="30" height="27" rx="2" fill="#FFB74D" opacity="0.5"/>
+    <circle cx="10" cy="30" r="12" fill="#FF9800" stroke="#E65100" stroke-width="2"/>
+    <text x="10" y="35" text-anchor="middle" font-size="14">🍊</text>
+    <path d="M22 30 L10 30" stroke="#FFB74D" stroke-width="2" stroke-dasharray="3,2"/>
+  </svg>`,
+  regalo:`<svg viewBox="0 0 120 80" width="100" height="67" style="display:block;margin:0 auto;">
+    <rect x="10" y="20" width="100" height="50" rx="8" fill="#8D6E63" stroke="#5D4037" stroke-width="2"/>
+    <rect x="15" y="25" width="90" height="40" rx="4" fill="#A1887F"/>
+    <text x="60" y="52" text-anchor="middle" font-size="22">💰</text>
+    <rect x="75" y="10" width="30" height="25" rx="4" fill="#FFF9C4" stroke="#F9A825" stroke-width="1.5"/>
+    <text x="90" y="27" text-anchor="middle" font-size="10" fill="#E65100">₱100</text>
+    <rect x="15" y="10" width="30" height="25" rx="4" fill="#C8E6C9" stroke="#43A047" stroke-width="1.5"/>
+    <text x="30" y="27" text-anchor="middle" font-size="10" fill="#2E7D32">₱50</text>
+  </svg>`,
+  matter:`<svg viewBox="0 0 140 60" width="120" height="52" style="display:block;margin:0 auto;">
+    <rect x="5" y="10" width="35" height="35" rx="4" fill="#90CAF9" stroke="#1976D2" stroke-width="2"/>
+    <text x="22" y="32" text-anchor="middle" font-size="8" fill="#1976D2" font-weight="bold">SOLID</text>
+    <text x="22" y="8" text-anchor="middle" font-size="14">🧊</text>
+    <ellipse cx="70" cy="30" rx="20" ry="15" fill="#4FC3F7" opacity="0.6" stroke="#0288D1" stroke-width="2"/>
+    <text x="70" y="35" text-anchor="middle" font-size="8" fill="#0277BD" font-weight="bold">LIQUID</text>
+    <text x="70" y="14" text-anchor="middle" font-size="14">💧</text>
+    <ellipse cx="118" cy="25" rx="18" ry="18" fill="#E0E0E0" opacity="0.4" stroke="#9E9E9E" stroke-width="1.5" stroke-dasharray="3,2"/>
+    <text x="118" y="30" text-anchor="middle" font-size="8" fill="#757575" font-weight="bold">GAS</text>
+    <text x="118" y="14" text-anchor="middle" font-size="14">💨</text>
+  </svg>`,
+  map:`<svg viewBox="0 0 100 60" width="90" height="54" style="display:block;margin:0 auto;">
+    <rect x="5" y="5" width="90" height="50" rx="6" fill="#E8F5E9" stroke="#4CAF50" stroke-width="2"/>
+    <path d="M5 30 L95 30" stroke="#BDBDBD" stroke-width="2"/>
+    <path d="M50 5 L50 55" stroke="#BDBDBD" stroke-width="2"/>
+    <text x="25" y="22" text-anchor="middle" font-size="16">⛪</text>
+    <text x="75" y="22" text-anchor="middle" font-size="16">🏫</text>
+    <text x="25" y="48" text-anchor="middle" font-size="16">🌳</text>
+    <text x="75" y="48" text-anchor="middle" font-size="16">🏠</text>
+    <text x="50" y="30" text-anchor="middle" font-size="10">🚐</text>
+  </svg>`,
+  prayer:`<svg viewBox="0 0 100 80" width="80" height="64" style="display:block;margin:0 auto;">
+    <rect x="10" y="20" width="80" height="55" rx="6" fill="#FFF9C4" opacity="0.3"/>
+    <path d="M50 5 L45 20 L55 20 Z" fill="#FFD54F"/>
+    <path d="M35 20 L65 20 L60 75 L40 75 Z" fill="#FFF9C4" opacity="0.5"/>
+    <text x="50" y="45" text-anchor="middle" font-size="22">🙏</text>
+    <text x="25" y="20" font-size="10">✨</text>
+    <text x="75" y="20" font-size="10">✨</text>
+    <text x="50" y="70" text-anchor="middle" font-size="10">🕯️ 🕯️</text>
+  </svg>`,
+  hamburglar:`<svg viewBox="0 0 120 70" width="100" height="58" style="display:block;margin:0 auto;">
+    <text x="60" y="30" text-anchor="middle" font-size="32">🍔</text>
+    <text x="30" y="55" text-anchor="middle" font-size="20">🏃</text>
+    <text x="85" y="55" text-anchor="middle" font-size="20">🚔</text>
+    <path d="M40 50 L75 50" stroke="#EF5350" stroke-width="2" stroke-dasharray="4,3"/>
+    <text x="60" y="65" text-anchor="middle" font-size="8" fill="#E53935" font-weight="bold">HULI!</text>
+  </svg>`
+};
+
+// ===== INTERACTIVE STORYBOOK MODE =====
+const STORY_CHAPTERS=[
+  {
+    id:'cake', title:'Ang Cake ni Nathaniel!',
+    scene:'Birthday ni Nathaniel! Dumating ang pamilya para sa party. Kailangang hatiin ang cake para sa lahat ng bisita!',
+    chars:[{id:'nathaniel',a:'sprite-bounce'},{id:'lola_bong',a:'sprite-wave'},{id:'danielle',a:'sprite-slidel'},{id:'thea',a:'sprite-slider'}],
+    type:'swipe-slice', target:4,
+    instruction:'Gumuhit ng mga linya sa cake para hatiin sa 4!',
+    starReward:3,
+  },
+  {
+    id:'drinks', title:'Ang Inumin',
+    scene:'Uhaw na ang mga bisita! Kailangang magbuhos ng juice sa baso. Punuin hanggang kalahati (1/2)!',
+    chars:[{id:'nathaniel',a:'sprite-give'},{id:'wal',a:'sprite-wave'}],
+    type:'fill-pour', target:0.5, targetLabel:'1/2',
+    instruction:'Pindutin at hawakan para magbuhos! Itigil sa 1/2!',
+    starReward:3,
+  },
+  {
+    id:'regalo', title:'Regalo ni Ate Thea',
+    scene:'Nasa toy store si Ate Thea! Gusto niyang bilhin ang laruan na ₱100 para kay Nathaniel. Tulungan siyang magbayad!',
+    chars:[{id:'thea',a:'sprite-give'},{id:'nathaniel',a:'sprite-bounce'}],
+    type:'money-pick', target:100,
+    instruction:'Pumili ng mga bills at barya para maka-₱100!',
+    starReward:3,
+  },
+  {
+    id:'matter', title:'Si Kuya Danielle Nadulas!',
+    scene:'Naku! Nadulas si Kuya Danielle sa sahig! May tubig sa lapag na nanggaling sa natunaw na yelo!',
+    chars:[{id:'danielle',a:'sprite-wiggle'},{id:'nathaniel',a:'sprite-bounce'}],
+    type:'choice',
+    questions:[
+      {q:'Ang tubig sa lapag — ano ito?', answer:'Liquid', choices:['Solid','Liquid','Gas']},
+      {q:'Ang yelo bago natunaw — ano ito?', answer:'Solid', choices:['Solid','Liquid','Gas']},
+      {q:'Ang steam mula sa mainit na sabaw — ano ito?', answer:'Gas', choices:['Solid','Liquid','Gas']},
+    ],
+    instruction:'Sagutin ang mga tanong tungkol sa matter!',
+    starReward:3,
+  },
+  {
+    id:'map', title:'Saan ang Simbahan?',
+    scene:'Sumasakay ang pamilya sa van ni Dada. Kailangan nilang pumunta sa simbahan para magdasal para kay Lola Delia.',
+    chars:[{id:'dada',a:'sprite-wiggle'},{id:'nathaniel',a:'sprite-bounce'},{id:'lola_bong',a:'sprite-wave'}],
+    type:'map-tap', target:'simbahan',
+    instruction:'Hanapin at pindutin ang Simbahan sa mapa!',
+    starReward:3,
+  },
+  {
+    id:'prayer', title:'Dasal para kay Lola Delia',
+    scene:'Nasa loob na ng simbahan ang pamilya. Nanalangin si Nathaniel para kay Lola Delia...\n\n"Lola, miss na miss kita. Sana masaya ka diyan sa langit. Mahal kita, Lola."',
+    chars:[{id:'nathaniel',a:'sprite-bounce'},{id:'lola_delia',a:'sprite-bounce'}],
+    type:'narrative',
+    narrativeExtra:'Parang may malamig na hanging dumampi... at isang maliwanag na ilaw ang lumitaw. Si Lola Delia, nakangiti mula sa langit.',
+    instruction:'',
+    starReward:0,
+  },
+  {
+    id:'hamburglar', title:'Ang Hamburglar!',
+    scene:'Sa daan pauwi, may nakita silang kakaibang tao na nagnakaw ng hamburger! Sino ang dapat nilang tawagan?',
+    chars:[{id:'nathaniel',a:'sprite-bounce'},{id:'dada',a:'sprite-wiggle'},{id:'danielle',a:'sprite-slidel'}],
+    type:'choice',
+    questions:[
+      {q:'May nagnakaw ng hamburger! Sino ang tatawagan?', answer:'Pulis', choices:['Pulis','Doktor','Bumbero','Guro']},
+    ],
+    instruction:'Piliin ang tamang helper!',
+    starReward:3,
+  }
+];
+
+let storyChapter=0, storyStars=0, storySubQ=0, storyMode=false;
+
+function getStoryProgress(){
+  try{return JSON.parse(localStorage.getItem('nathaniel_story')||'{"chapter":0}');}catch(e){return {chapter:0};}
+}
+function saveStoryProgress(ch){
+  try{localStorage.setItem('nathaniel_story',JSON.stringify({chapter:ch}));}catch(e){}
+}
+
+function startStory(){
+  storyMode=true;storyChapter=0;storyStars=0;storySubQ=0;
+  document.getElementById('menu').style.display='none';
+  document.getElementById('gameScreen').classList.add('active');
+  showChapter();
+}
+
+function showChapter(){
+  clearScribble();
+  if(storyChapter>=STORY_CHAPTERS.length){showStoryResult();return;}
+  const ch=STORY_CHAPTERS[storyChapter];
+  storySubQ=0;
+
+  // Progress bar shows chapter progress
+  document.getElementById('scoreDisplay').textContent='⭐ '+storyStars;
+  document.getElementById('progressFill').style.width=((storyChapter/STORY_CHAPTERS.length)*100)+'%';
+
+  const sb=document.getElementById('storyBox');
+  const cb=document.getElementById('choicesBox');
+
+  let h='<div class="story-mode chapter-enter">';
+  // Chapter progress dots
+  h+='<div class="story-progress">';
+  for(let i=0;i<STORY_CHAPTERS.length;i++){
+    const cls=i<storyChapter?'ch-dot done':(i===storyChapter?'ch-dot current':'ch-dot');
+    h+=`<div class="${cls}"></div>`;
+  }
+  h+='</div>';
+  h+=`<div class="chapter-title">Chapter ${storyChapter+1}: ${ch.title}</div>`;
+  // Scene illustration
+  if(SCENE_IMGS[ch.id]) h+=`<div style="margin:6px 0;">${SCENE_IMGS[ch.id]}</div>`;
+  h+=`<div class="chapter-narrative">${ch.scene.replace(/\n/g,'<br>')}</div>`;
+
+  // Characters
+  if(ch.chars&&ch.chars.length>0){
+    h+='<div class="chapter-scene">';
+    ch.chars.forEach((c,i)=>{
+      const delay=i*0.15;
+      if(ch.id==='prayer'&&c.id==='lola_delia'){
+        h+=`<div class="angel-glow" style="animation-delay:${delay}s">${spriteHTML(c.id,60,c.a)}</div>`;
+      }else{
+        h+=`<div style="animation-delay:${delay}s">${spriteHTML(c.id,50,c.a)}</div>`;
+      }
+    });
+    h+='</div>';
+  }
+
+  if(ch.instruction) h+=`<div class="chapter-instruction">${ch.instruction}</div>`;
+  // Reset button for tricky interactions
+  if(ch.type!=='narrative') h+=`<button class="story-reset-btn" onclick="playTap();resetChapter()">🔄 Ulitin ang Chapter</button>`;
+
+  // Build interaction area
+  if(ch.type==='swipe-slice') h+=buildSwipeSlice(ch);
+  else if(ch.type==='fill-pour') h+=buildFillPour(ch);
+  else if(ch.type==='money-pick') h+=buildMoneyPick(ch);
+  else if(ch.type==='map-tap') h+=buildMapTap(ch);
+  else if(ch.type==='narrative') h+=buildNarrative(ch);
+
+  h+='</div>';
+  sb.innerHTML=h;
+  sb.style.animation='none';sb.offsetHeight;sb.style.animation='floatIn 0.4s ease';
+
+  if(ch.type==='choice') buildStoryChoice(ch, cb);
+  else cb.innerHTML='';
+
+  // Init interactive handlers after DOM renders
+  setTimeout(()=>{
+    if(ch.type==='swipe-slice') initSwipeSlice(ch);
+    else if(ch.type==='fill-pour') initFillPour(ch);
+    else if(ch.type==='money-pick') initMoneyPick(ch);
+    else if(ch.type==='map-tap') initMapTap(ch);
+  },150);
+}
+
+// ---- SWIPE-SLICE (Chapter 1: Cake) ----
+function buildSwipeSlice(ch){
+  return `<div class="cake-canvas" id="cakeCanvas">
+    <svg viewBox="0 0 200 200" id="cakeSvg">
+      <circle cx="100" cy="100" r="90" fill="#FFCC80" stroke="#E65100" stroke-width="3"/>
+      <circle cx="100" cy="100" r="70" fill="#FFF9C4"/>
+      <text x="100" y="60" text-anchor="middle" font-size="24">🎂</text>
+      <text x="100" y="110" text-anchor="middle" font-size="11" fill="#888">I-swipe para hatiin!</text>
+      <g id="sliceLines"></g>
+    </svg>
+  </div>
+  <div id="sliceCount" style="text-align:center;font-size:0.9em;color:#e65100;font-weight:700;">0 / ${ch.target} na hiwa</div>
+  <button class="story-next-btn" id="sliceCheck" style="opacity:0.4;pointer-events:none;" onclick="checkSlice()">Tapos na!</button>`;
+}
+
+function initSwipeSlice(ch){
+  const canvas=document.getElementById('cakeCanvas');
+  const svg=document.getElementById('cakeSvg');
+  const linesG=document.getElementById('sliceLines');
+  if(!canvas||!svg)return;
+  let drawing=false, startX, startY, sliceCount=0;
+
+  function getPos(e){
+    const rect=svg.getBoundingClientRect();
+    const t=e.touches?e.touches[0]:e;
+    return {x:((t.clientX-rect.left)/rect.width)*200, y:((t.clientY-rect.top)/rect.height)*200};
+  }
+
+  function onStart(e){
+    e.preventDefault();
+    const p=getPos(e);startX=p.x;startY=p.y;drawing=true;
+  }
+  function onEnd(e){
+    if(!drawing)return;drawing=false;
+    const t=e.changedTouches?e.changedTouches[0]:e;
+    const rect=svg.getBoundingClientRect();
+    const endX=((t.clientX-rect.left)/rect.width)*200;
+    const endY=((t.clientY-rect.top)/rect.height)*200;
+    const dist=Math.sqrt((endX-startX)**2+(endY-startY)**2);
+    if(dist>40){
+      const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1',startX);line.setAttribute('y1',startY);
+      line.setAttribute('x2',endX);line.setAttribute('y2',endY);
+      line.setAttribute('class','slice-line');
+      linesG.appendChild(line);
+      sliceCount++;playTap();
+      document.getElementById('sliceCount').textContent=sliceCount+' / '+ch.target+' na hiwa';
+      if(sliceCount>=ch.target-1){
+        const btn=document.getElementById('sliceCheck');
+        btn.style.opacity='1';btn.style.pointerEvents='auto';
+      }
+    }
+  }
+
+  canvas.addEventListener('mousedown',onStart);
+  canvas.addEventListener('mouseup',onEnd);
+  canvas.addEventListener('touchstart',onStart,{passive:false});
+  canvas.addEventListener('touchend',onEnd);
+  window._storySliceCount=()=>linesG.querySelectorAll('line').length;
+}
+
+function checkSlice(){
+  const ch=STORY_CHAPTERS[storyChapter];
+  const lines=window._storySliceCount?window._storySliceCount():0;
+  if(lines>=ch.target-1){
+    playCorrect();spawnConfetti(15);
+    storyStars+=ch.starReward;
+    showEncouragement('Magaling! Nahati mo ang cake!');
+    document.getElementById('scoreDisplay').textContent='⭐ '+storyStars;
+    setTimeout(()=>{storyChapter++;showChapter();},1800);
+  }else{
+    playWrong();
+    showEncouragement('Kulang pa ang hiwa! Dagdagan mo!');
+  }
+}
+
+// ---- FILL-POUR (Chapter 2: Drinks) ----
+function buildFillPour(ch){
+  return `<div class="glass-container">
+    <div style="position:relative;display:inline-block;">
+      <div class="glass-fill" id="glassFill">
+        <div class="glass-liquid" id="glassLiquid" style="height:0%"></div>
+      </div>
+      <div style="position:absolute;left:-34px;top:0;bottom:0;width:30px;">
+        <div style="position:absolute;bottom:50%;right:0;font-size:0.65em;color:#999;font-weight:700;">― 1/2</div>
+        <div style="position:absolute;bottom:33%;right:0;font-size:0.65em;color:#ccc;font-weight:700;">― 1/3</div>
+        <div style="position:absolute;bottom:100%;right:0;font-size:0.65em;color:#ccc;font-weight:700;">― puno</div>
+      </div>
+    </div>
+    <div class="glass-level-text" id="glassLevel">0%</div>
+    <div style="font-size:0.8em;color:#999;margin-top:4px;">Pindutin at hawakan para magbuhos!</div>
+  </div>
+  <button class="story-next-btn" id="pourCheck" onclick="checkPour()">Tapos na!</button>`;
+}
+
+function initFillPour(ch){
+  const glass=document.getElementById('glassFill');
+  const liquid=document.getElementById('glassLiquid');
+  const levelText=document.getElementById('glassLevel');
+  if(!glass)return;
+  let filling=false, level=0, fillInterval;
+
+  function startFill(e){
+    e.preventDefault();
+    if(filling)return;filling=true;
+    fillInterval=setInterval(()=>{
+      level=Math.min(100,level+1.5);
+      liquid.style.height=level+'%';
+      levelText.textContent=Math.round(level)+'%';
+    },50);
+  }
+  function stopFill(e){
+    filling=false;
+    if(fillInterval)clearInterval(fillInterval);
+  }
+
+  glass.addEventListener('mousedown',startFill);
+  glass.addEventListener('mouseup',stopFill);
+  glass.addEventListener('mouseleave',stopFill);
+  glass.addEventListener('touchstart',startFill,{passive:false});
+  glass.addEventListener('touchend',stopFill);
+  window._pourLevel=()=>level;
+}
+
+function checkPour(){
+  const ch=STORY_CHAPTERS[storyChapter];
+  const level=window._pourLevel?window._pourLevel():0;
+  const targetPct=ch.target*100;
+  const diff=Math.abs(level-targetPct);
+  if(diff<=10){
+    playCorrect();spawnConfetti(12);
+    storyStars+=ch.starReward;
+    showEncouragement(diff<=5?'Perpekto!':'Magaling! Halos tamang-tama!');
+    document.getElementById('scoreDisplay').textContent='⭐ '+storyStars;
+    setTimeout(()=>{storyChapter++;showChapter();},1800);
+  }else{
+    playWrong();
+    showEncouragement(level<targetPct?'Kulang pa! Dagdagan mo!':'Sobra na! Bawasan!');
+  }
+}
+
+// ---- MONEY-PICK (Chapter 3: Regalo) ----
+function buildMoneyPick(ch){
+  const bills=[
+    {label:'₱5',value:5},
+    {label:'₱10',value:10},
+    {label:'₱20',value:20},
+    {label:'₱50',value:50},
+    {label:'₱100',value:100}
+  ];
+  let h=`<div class="wallet-total" id="walletTotal">₱0 / ₱${ch.target}</div>`;
+  h+='<div class="wallet-zone" id="walletZone">';
+  bills.forEach(b=>{
+    h+=`<button class="wallet-bill" data-value="${b.value}" onclick="toggleBill(this)">${b.label}</button>`;
+  });
+  // Add duplicates for reaching target
+  bills.slice(0,3).forEach(b=>{
+    h+=`<button class="wallet-bill" data-value="${b.value}" onclick="toggleBill(this)">${b.label}</button>`;
+  });
+  h+='</div>';
+  h+=`<button class="story-next-btn" id="moneyCheck" onclick="checkMoney()">Bayaran!</button>`;
+  return h;
+}
+
+function initMoneyPick(ch){
+  window._moneyTarget=ch.target;
+}
+
+function toggleBill(btn){
+  btn.classList.toggle('selected');
+  playTap();
+  updateMoneyTotal();
+}
+
+function updateMoneyTotal(){
+  const selected=document.querySelectorAll('.wallet-bill.selected');
+  let total=0;
+  selected.forEach(b=>total+=parseInt(b.dataset.value));
+  const target=window._moneyTarget||100;
+  document.getElementById('walletTotal').textContent='₱'+total+' / ₱'+target;
+}
+
+function checkMoney(){
+  const selected=document.querySelectorAll('.wallet-bill.selected');
+  let total=0;
+  selected.forEach(b=>total+=parseInt(b.dataset.value));
+  const target=window._moneyTarget||100;
+  if(total===target){
+    const ch=STORY_CHAPTERS[storyChapter];
+    playCorrect();spawnConfetti(15);
+    storyStars+=ch.starReward;
+    showEncouragement('Tama! ₱'+target+' na!');
+    document.getElementById('scoreDisplay').textContent='⭐ '+storyStars;
+    setTimeout(()=>{storyChapter++;showChapter();},1800);
+  }else if(total>target){
+    playWrong();showEncouragement('Sobra na! Bawasan mo!');
+  }else{
+    playWrong();showEncouragement('Kulang pa! Dagdagan mo!');
+  }
+}
+
+// ---- CHOICE (Chapter 4 & 7) ----
+function buildStoryChoice(ch, cb){
+  const qs=ch.questions;
+  const q=qs[storySubQ]||qs[0];
+  // Show question text in story box
+  let qBox=document.getElementById('storyChoiceQ');
+  if(!qBox){
+    qBox=document.createElement('div');
+    qBox.id='storyChoiceQ';
+    qBox.style.cssText='font-size:1.2em;font-weight:900;color:#3a6b5a;text-align:center;margin:10px 0 4px;animation:floatIn 0.3s ease;';
+    const sb=document.getElementById('storyBox');
+    const resetBtn=sb.querySelector('.story-reset-btn');
+    if(resetBtn) sb.querySelector('.story-mode').insertBefore(qBox,resetBtn);
+    else sb.querySelector('.story-mode').appendChild(qBox);
+  }
+  qBox.textContent=`Tanong ${storySubQ+1}/${qs.length}: ${q.q}`;
+  // Dark mode color
+  if(!document.body.classList.contains('light-mode')) qBox.style.color='#81d4fa';
+
+  cb.className=q.choices.length===3?'choices three-col':'choices';
+  const sc=shuffle(q.choices);
+  cb.innerHTML=sc.map(c=>{
+    const icon=getChoiceIcon(c);
+    return `<button class="choice-btn" onclick="playTap();pickStoryChoice(this,'${esc(c)}','${esc(q.answer)}')">${icon?'<span class="choice-icon">'+icon+'</span>':''}${c}</button>`;
+  }).join('');
+}
+
+function pickStoryChoice(btn,picked,correct){
+  const ch=STORY_CHAPTERS[storyChapter];
+  if(picked===correct){
+    btn.classList.add('correct');
+    playCorrect();
+    showReaction(true);
+    showEncouragement(enc[Math.floor(Math.random()*enc.length)]);
+    storySubQ++;
+    if(storySubQ>=ch.questions.length){
+      storyStars+=ch.starReward;
+      document.getElementById('scoreDisplay').textContent='⭐ '+storyStars;
+      setTimeout(()=>{storyChapter++;showChapter();},1800);
+    }else{
+      setTimeout(()=>buildStoryChoice(ch, document.getElementById('choicesBox')),1200);
+    }
+  }else{
+    btn.classList.add('wrong');
+    btn.style.pointerEvents='none';btn.style.opacity='0.4';
+    playWrong();showReaction(false);
+  }
+}
+
+// ---- MAP-TAP (Chapter 5: Komunidad) ----
+function buildMapTap(ch){
+  return `<div class="story-map" id="storyMap">
+    <svg viewBox="0 0 340 220" id="mapSvg">
+      <rect width="340" height="220" fill="#e8f5e9" rx="12"/>
+      <!-- Roads -->
+      <rect x="0" y="100" width="340" height="20" fill="#e0e0e0"/>
+      <rect x="160" y="0" width="20" height="220" fill="#e0e0e0"/>
+      <!-- Simbahan -->
+      <g class="map-building" data-name="simbahan" onclick="tapBuilding(this,'simbahan')">
+        <rect x="20" y="20" width="60" height="55" rx="6" fill="#FFF9C4" stroke="#F9A825" stroke-width="2"/>
+        <text x="50" y="48" text-anchor="middle" font-size="22">⛪</text>
+        <text x="50" y="68" text-anchor="middle" font-size="7" fill="#333" font-weight="bold">Simbahan</text>
+      </g>
+      <!-- Paaralan -->
+      <g class="map-building" data-name="paaralan" onclick="tapBuilding(this,'paaralan')">
+        <rect x="90" y="20" width="60" height="55" rx="6" fill="#E3F2FD" stroke="#1976D2" stroke-width="2"/>
+        <text x="120" y="48" text-anchor="middle" font-size="22">🏫</text>
+        <text x="120" y="68" text-anchor="middle" font-size="7" fill="#333" font-weight="bold">Paaralan</text>
+      </g>
+      <!-- Pamilihan -->
+      <g class="map-building" data-name="pamilihan" onclick="tapBuilding(this,'pamilihan')">
+        <rect x="200" y="20" width="60" height="55" rx="6" fill="#FFF3E0" stroke="#E65100" stroke-width="2"/>
+        <text x="230" y="48" text-anchor="middle" font-size="22">🏪</text>
+        <text x="230" y="68" text-anchor="middle" font-size="7" fill="#333" font-weight="bold">Pamilihan</text>
+      </g>
+      <!-- Bahay -->
+      <g class="map-building" data-name="bahay" onclick="tapBuilding(this,'bahay')">
+        <rect x="270" y="20" width="55" height="55" rx="6" fill="#FCE4EC" stroke="#C62828" stroke-width="2"/>
+        <text x="297" y="48" text-anchor="middle" font-size="22">🏠</text>
+        <text x="297" y="68" text-anchor="middle" font-size="7" fill="#333" font-weight="bold">Bahay</text>
+      </g>
+      <!-- Parke -->
+      <g class="map-building" data-name="parke" onclick="tapBuilding(this,'parke')">
+        <rect x="20" y="140" width="60" height="55" rx="6" fill="#E8F5E9" stroke="#2E7D32" stroke-width="2"/>
+        <text x="50" y="168" text-anchor="middle" font-size="22">🌳</text>
+        <text x="50" y="188" text-anchor="middle" font-size="7" fill="#333" font-weight="bold">Parke</text>
+      </g>
+      <!-- Van on road -->
+      <text x="250" y="115" font-size="18">🚐</text>
+    </svg>
+  </div>`;
+}
+
+function initMapTap(ch){
+  window._mapTarget=ch.target;
+  window._mapAnswered=false;
+}
+
+function tapBuilding(el,name){
+  if(window._mapAnswered)return;
+  const target=window._mapTarget||'simbahan';
+  if(name===target){
+    window._mapAnswered=true;
+    el.classList.add('correct');
+    playCorrect();spawnConfetti(15);
+    const ch=STORY_CHAPTERS[storyChapter];
+    storyStars+=ch.starReward;
+    showEncouragement('Tama! Ito ang Simbahan!');
+    document.getElementById('scoreDisplay').textContent='⭐ '+storyStars;
+    setTimeout(()=>{storyChapter++;showChapter();},1800);
+  }else{
+    el.classList.add('wrong');
+    playWrong();
+    showEncouragement('Hindi yan! Hanapin ang Simbahan!');
+    setTimeout(()=>el.classList.remove('wrong'),500);
+  }
+}
+
+// ---- NARRATIVE (Chapter 6: Prayer) ----
+function buildNarrative(ch){
+  let h='<div class="story-narrative">';
+  if(ch.narrativeExtra) h+=`<div style="font-size:0.95em;color:#9c27b0;font-style:italic;margin:12px 0;line-height:1.5;">${ch.narrativeExtra}</div>`;
+  h+=`<button class="story-next-btn" onclick="playTap();storyChapter++;showChapter();">Susunod ➜</button>`;
+  h+='</div>';
+  return h;
+}
+
+// ---- STORY RESULT ----
+function showStoryResult(){
+  storyMode=false;
+  addStoreStars(storyStars);
+  saveStoryProgress(STORY_CHAPTERS.length);
+  playPerfect();spawnConfetti(60);
+
+  document.getElementById('resultCard').innerHTML=`
+    <div class="big-emoji">🎂🎉</div>
+    <h2>Tapos na ang Birthday Adventure!</h2>
+    <div class="stars">${'⭐'.repeat(Math.max(1,storyStars))}</div>
+    <p>${storyStars} stars ang nakuha mo!</p>
+    <div style="font-size:0.9em;color:#666;margin:8px 0;">Masaya ang birthday ni Nathaniel kasama ang buong pamilya!</div>
+    <div class="result-scene">${['nathaniel','lola_delia','wal','danielle','mommy','thea','dada','lola_bong','lola_neng','uwi'].map(c=>spriteHTML(c,30)).join('')}</div>
+    <button onclick="playTap();goMenu()">Menu</button>
+    <button class="green" onclick="playTap();startStory()">Ulitin!</button>
+  `;
+  document.getElementById('resultOverlay').classList.add('active');
+}
+
+// Reset current chapter
+function resetChapter(){
+  storySubQ=0;
+  showChapter();
+}
+
+// Override goMenu to handle story mode
+const _origGoMenu=goMenu;
+window.goMenu=function(){
+  storyMode=false;
+  _origGoMenu();
+};
+
+// ===== STORY UNLOCK LOGIC =====
+const ALL_TOPICS=['fractions','money','matter','komunidad','helpers'];
+
+function getCompletedTopics(){
+  const log=getSessionLog();
+  const done=new Set();
+  log.forEach(s=>{ if(ALL_TOPICS.includes(s.topic)) done.add(s.topic); });
+  return done;
+}
+
+function isStoryUnlocked(){
+  try{ if(localStorage.getItem('nathaniel_story_unlocked')==='true') return true; }catch(e){}
+  const done=getCompletedTopics();
+  return ALL_TOPICS.every(t=>done.has(t));
+}
+
+function updateStoryBtn(){
+  const btn=document.getElementById('storyBtn');
+  const label=document.getElementById('storyBtnLabel');
+  if(!btn||!label) return;
+  const unlocked=isStoryUnlocked();
+  const done=getCompletedTopics();
+  if(unlocked){
+    btn.style.background='linear-gradient(135deg,#ff8a65,#ff5722)';
+    btn.style.opacity='1';
+    label.innerHTML='Birthday Adventure<span class="btn-desc">Interactive na kwento ni Nathaniel!</span>';
+  }else{
+    btn.style.background='linear-gradient(135deg,#666,#444)';
+    btn.style.opacity='0.7';
+    const missing=ALL_TOPICS.filter(t=>!done.has(t));
+    const names={fractions:'Fractions',money:'Money',matter:'Solid/Liquid/Gas',komunidad:'Komunidad',helpers:'Mga Tumutulong'};
+    const left=missing.map(t=>names[t]).join(', ');
+    label.innerHTML='🔒 Birthday Adventure<span class="btn-desc">Laruin muna: '+left+'</span>';
+  }
+}
+
+function tryStartStory(){
+  if(isStoryUnlocked()){
+    startStory();
+  }else{
+    const done=getCompletedTopics();
+    const missing=ALL_TOPICS.filter(t=>!done.has(t));
+    const names={fractions:'Fractions',money:'Money',matter:'Solid/Liquid/Gas',komunidad:'Komunidad',helpers:'Mga Tumutulong'};
+    alert('Laruin muna ang lahat ng topics para ma-unlock!\n\nKulang pa: '+missing.map(t=>names[t]).join(', '));
+  }
+}
+
+function toggleStoryLock(){
+  const pw=prompt('Enter password to toggle story lock:');
+  if(pw==='2020'){
+    const current=localStorage.getItem('nathaniel_story_unlocked')==='true';
+    if(current){
+      localStorage.removeItem('nathaniel_story_unlocked');
+      alert('Birthday Adventure locked. Kailangan muna laruin ang lahat ng topics.');
+    }else{
+      localStorage.setItem('nathaniel_story_unlocked','true');
+      alert('Birthday Adventure unlocked!');
+    }
+    updateStoryBtn();
+  }else if(pw!==null){
+    alert('Wrong password!');
+  }
+}
+
+// ===== PASSWORD-PROTECTED RESET =====
+function resetGame(){
+  const pw=prompt('Enter password to reset:');
+  if(pw==='2020'){
+    if(confirm('I-clear lahat ng data? Scores, stars, items, at story progress?')){
+      localStorage.removeItem('nathaniel_scores');
+      localStorage.removeItem('nathaniel_store');
+      localStorage.removeItem('nathaniel_wrong');
+      localStorage.removeItem('nathaniel_story');
+      localStorage.removeItem('nathaniel_story_unlocked');
+      alert('Game data cleared!');
+      location.reload();
+    }
+  }else if(pw!==null){
+    alert('Wrong password!');
+  }
+}
+
+// Init on load
+updateStoryBtn();
+
+// Register service worker for PWA
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+</script>
+</body>
+</html>
