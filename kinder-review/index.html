@@ -1064,15 +1064,17 @@ function clearScribble(){
 // Global document-level handlers for scribble
 document.addEventListener('touchstart',function(e){
   if(!scribbleOn||isInteractive(e.target))return;
+  e.preventDefault();
   scribbleDrawing=true;
   const t=e.touches[0];
   scribbleCtx.beginPath();scribbleCtx.moveTo(t.clientX,t.clientY);
-},{passive:true});
+},{passive:false});
 document.addEventListener('touchmove',function(e){
   if(!scribbleDrawing)return;
+  e.preventDefault();
   const t=e.touches[0];
   scribbleCtx.lineTo(t.clientX,t.clientY);scribbleCtx.stroke();
-},{passive:true});
+},{passive:false});
 document.addEventListener('touchend',function(){scribbleDrawing=false;});
 document.addEventListener('mousedown',function(e){
   if(!scribbleOn||isInteractive(e.target))return;
