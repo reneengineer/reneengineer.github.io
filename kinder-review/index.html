@@ -1455,11 +1455,35 @@ function startDragSym(e,el){
 function checkCompare(){
   if(!comparePicked)return;
   const q=questions[currentQ];
-  // Use pickAnswer flow by simulating button press
-  const fakeBtn=document.getElementById('compareCheck');
+  const btn=document.getElementById('compareCheck');
   playTap();
-  pickAnswer(fakeBtn,comparePicked,q.answer);
-  comparePicked=null;
+  if(comparePicked===q.answer){
+    // Correct — use normal pickAnswer flow
+    pickAnswer(btn,comparePicked,q.answer);
+    comparePicked=null;
+  }else{
+    // Wrong — penalize but let them try again
+    firstTryCorrect=false;
+    streak=0;
+    markWrong(q._id);
+    totalStars=Math.max(0,totalStars-STAR_PENALTY);
+    document.getElementById('scoreDisplay').textContent='⭐ '+totalStars;
+    playWrong();
+    showReaction(false);
+    if(navigator.vibrate)navigator.vibrate([50,50,50]);
+    showWrongHint(q);
+    // Reset: remove placed symbol from drop zone, re-enable all symbols
+    const dz=document.getElementById('compareDrop');
+    if(dz)dz.innerHTML='<span style="color:#888;font-size:1.2em;">?</span>';
+    document.querySelectorAll('.compare-sym').forEach(s=>{
+      s.classList.remove('used');
+    });
+    comparePicked=null;
+    // Disable Sagot button until they pick again
+    btn.classList.remove('ready');
+    btn.style.opacity='0.4';
+    btn.style.pointerEvents='none';
+  }
 }
 
 // ===== DRAG-AND-DROP INTERACTIVE =====
