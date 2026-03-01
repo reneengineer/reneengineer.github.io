@@ -679,6 +679,24 @@ function toggleTTS(){
   try{localStorage.setItem('nathaniel_tts',ttsEnabled?'true':'false');}catch(e){}
   if(!ttsEnabled) speechSynthesis.cancel();
 }
+let _ttsVoice=null;
+function findBestVoice(){
+  const voices=speechSynthesis.getVoices();
+  if(!voices.length)return null;
+  // Priority: Filipino > Spanish > Portuguese (all pronounce Filipino vowels correctly)
+  const fil=voices.find(v=>v.lang==='fil-PH'||v.lang==='tl-PH'||v.lang.startsWith('fil')||v.lang.startsWith('tl'));
+  if(fil)return fil;
+  // Spanish is the best fallback — Filipino vowels (a,e,i,o,u) sound nearly identical to Spanish
+  const es=voices.find(v=>v.lang.startsWith('es'));
+  if(es)return es;
+  // Portuguese is another good phonetic match
+  const pt=voices.find(v=>v.lang.startsWith('pt'));
+  if(pt)return pt;
+  // Italian also has similar vowel sounds
+  const it=voices.find(v=>v.lang.startsWith('it'));
+  if(it)return it;
+  return null;
+}
 function speakText(text){
   if(!ttsEnabled||!('speechSynthesis' in window))return;
   speechSynthesis.cancel();
@@ -688,19 +706,20 @@ function speakText(text){
   const utter=new SpeechSynthesisUtterance(clean);
   utter.rate=0.85;
   utter.pitch=1.1;
-  // Try Filipino voice, fallback to default
-  const voices=speechSynthesis.getVoices();
-  const filVoice=voices.find(v=>v.lang==='fil-PH'||v.lang==='tl-PH'||v.lang.startsWith('fil')||v.lang.startsWith('tl'));
-  if(filVoice) utter.voice=filVoice;
-  else utter.lang='fil-PH';
+  if(!_ttsVoice) _ttsVoice=findBestVoice();
+  if(_ttsVoice) utter.voice=_ttsVoice;
+  else utter.lang='es-ES'; // Spanish fallback pronounces Filipino much better than English
   speechSynthesis.speak(utter);
 }
-// Init TTS button state
+// Init TTS button state & preload voices
 if(typeof document!=='undefined'){
   const _ttsBtn=document.getElementById('ttsBtn');
   if(_ttsBtn&&ttsEnabled) _ttsBtn.classList.add('active');
-  // Load voices (some browsers load async)
-  if('speechSynthesis' in window) speechSynthesis.onvoiceschanged=()=>{};
+  if('speechSynthesis' in window){
+    speechSynthesis.onvoiceschanged=()=>{_ttsVoice=findBestVoice();};
+    // Trigger voice loading
+    speechSynthesis.getVoices();
+  }
 }
 function playTone(f,d,t,v){if(soundMuted)return;try{const c=getAC(),o=c.createOscillator(),g=c.createGain();o.type=t||'sine';o.frequency.value=f;g.gain.value=v||0.13;g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+d);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+d);}catch(e){}}
 function playCorrect(){playTone(523,0.1,'sine',0.15);setTimeout(()=>playTone(659,0.1,'sine',0.15),90);setTimeout(()=>playTone(784,0.18,'sine',0.18),180);}
