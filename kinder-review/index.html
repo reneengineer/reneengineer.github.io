@@ -459,9 +459,7 @@ body.dark-mode .memory-status{color:#81d4fa;}
 body:not(.dark-mode) .theme-toggle{background:rgba(255,255,255,0.8);border-color:#c5ddd0;}
 .mute-btn{position:fixed;top:10px;right:52px;z-index:200;background:rgba(40,40,60,0.8);border:2px solid #455a64;border-radius:50%;width:36px;height:36px;font-size:1.1em;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.2);}
 body:not(.dark-mode) .mute-btn{background:rgba(255,255,255,0.8);border-color:#c5ddd0;}
-.tts-btn{position:fixed;top:10px;right:94px;z-index:200;background:rgba(40,40,60,0.8);border:2px solid #455a64;border-radius:50%;width:36px;height:36px;font-size:1.1em;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.2);}
-body:not(.dark-mode) .tts-btn{background:rgba(255,255,255,0.8);border-color:#c5ddd0;}
-.tts-btn.active{border-color:#66bb6a;background:rgba(76,175,80,0.25);}
+
 
 /* ===== BRAIN BREAK ===== */
 .brain-break-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#1a237e,#0d47a1);z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;}
@@ -501,7 +499,6 @@ body.dark-mode .dash-bar{background:#444;}
 <style>@keyframes splashSpin{to{transform:rotate(360deg)}}</style>
 
 <!-- THEME TOGGLE -->
-<button class="tts-btn" id="ttsBtn" onclick="toggleTTS()" title="Auto-Read">🗣️</button>
 <button class="mute-btn" id="muteBtn" onclick="toggleMute()">🔊</button>
 <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">☀️</button>
 
@@ -669,58 +666,6 @@ function toggleMute(){
   document.getElementById('muteBtn').textContent=soundMuted?'🔇':'🔊';
 }
 
-// ===== TEXT-TO-SPEECH (AUTO-READ) =====
-let ttsEnabled=false;
-try{ttsEnabled=localStorage.getItem('nathaniel_tts')==='true';}catch(e){}
-function toggleTTS(){
-  ttsEnabled=!ttsEnabled;
-  const btn=document.getElementById('ttsBtn');
-  btn.classList.toggle('active',ttsEnabled);
-  try{localStorage.setItem('nathaniel_tts',ttsEnabled?'true':'false');}catch(e){}
-  if(!ttsEnabled) speechSynthesis.cancel();
-}
-let _ttsVoice=null;
-function findBestVoice(){
-  const voices=speechSynthesis.getVoices();
-  if(!voices.length)return null;
-  // Priority: Filipino > Spanish > Portuguese (all pronounce Filipino vowels correctly)
-  const fil=voices.find(v=>v.lang==='fil-PH'||v.lang==='tl-PH'||v.lang.startsWith('fil')||v.lang.startsWith('tl'));
-  if(fil)return fil;
-  // Spanish is the best fallback — Filipino vowels (a,e,i,o,u) sound nearly identical to Spanish
-  const es=voices.find(v=>v.lang.startsWith('es'));
-  if(es)return es;
-  // Portuguese is another good phonetic match
-  const pt=voices.find(v=>v.lang.startsWith('pt'));
-  if(pt)return pt;
-  // Italian also has similar vowel sounds
-  const it=voices.find(v=>v.lang.startsWith('it'));
-  if(it)return it;
-  return null;
-}
-function speakText(text){
-  if(!ttsEnabled||!('speechSynthesis' in window))return;
-  speechSynthesis.cancel();
-  // Clean text: remove emojis and special chars for cleaner speech
-  const clean=text.replace(/[\u{1F000}-\u{1FFFF}|\u{2600}-\u{27BF}|\u{FE00}-\u{FEFF}|\u{1F900}-\u{1F9FF}|\u{200D}|\u{20E3}|\u{FE0F}]/gu,'').replace(/[<>]/g,'').replace(/\s+/g,' ').trim();
-  if(!clean)return;
-  const utter=new SpeechSynthesisUtterance(clean);
-  utter.rate=0.85;
-  utter.pitch=1.1;
-  if(!_ttsVoice) _ttsVoice=findBestVoice();
-  if(_ttsVoice) utter.voice=_ttsVoice;
-  else utter.lang='es-ES'; // Spanish fallback pronounces Filipino much better than English
-  speechSynthesis.speak(utter);
-}
-// Init TTS button state & preload voices
-if(typeof document!=='undefined'){
-  const _ttsBtn=document.getElementById('ttsBtn');
-  if(_ttsBtn&&ttsEnabled) _ttsBtn.classList.add('active');
-  if('speechSynthesis' in window){
-    speechSynthesis.onvoiceschanged=()=>{_ttsVoice=findBestVoice();};
-    // Trigger voice loading
-    speechSynthesis.getVoices();
-  }
-}
 function playTone(f,d,t,v){if(soundMuted)return;try{const c=getAC(),o=c.createOscillator(),g=c.createGain();o.type=t||'sine';o.frequency.value=f;g.gain.value=v||0.13;g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+d);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+d);}catch(e){}}
 function playCorrect(){playTone(523,0.1,'sine',0.15);setTimeout(()=>playTone(659,0.1,'sine',0.15),90);setTimeout(()=>playTone(784,0.18,'sine',0.18),180);}
 function playWrong(){playTone(200,0.14,'sawtooth',0.08);setTimeout(()=>playTone(170,0.22,'sawtooth',0.08),110);}
@@ -1514,8 +1459,6 @@ function showQuestion(){
     sb.style.opacity='1';sb.style.transform='scale(1)';
     cb2.style.transition='opacity 0.25s ease';
     cb2.style.opacity='1';
-    // Auto-read story + question
-    speakText(q.story+'. '+q.q);
   },150);
 
   const cb=document.getElementById('choicesBox');
@@ -2092,7 +2035,6 @@ function getLessonSummary(q){
 
 function showLessonSummary(q){
   const summary=getLessonSummary(q);
-  speakText(summary);
   const cb=document.getElementById('choicesBox');
   cb.innerHTML=`<div style="grid-column:1/-1;background:rgba(76,175,80,0.12);border:2px solid #66bb6a;border-radius:16px;padding:14px;text-align:center;animation:floatIn 0.3s ease;display:flex;flex-direction:column;align-items:center;">
     <div style="font-size:0.95em;color:#81c784;line-height:1.5;margin-bottom:10px;">${summary}</div>
@@ -2148,7 +2090,6 @@ function showWrongHint(q){
   const old=document.getElementById('wrongHint');
   if(old)old.remove();
   const hint=getLessonSummary(q);
-  speakText('Hindi tama. '+hint);
   const hintEl=document.createElement('div');
   hintEl.id='wrongHint';
   hintEl.style.cssText='grid-column:1/-1;background:rgba(255,152,0,0.12);border:2px solid #ffa726;border-radius:14px;padding:12px 14px;text-align:center;animation:floatIn 0.3s ease;margin-top:4px;';
@@ -2179,7 +2120,6 @@ function startMemoryMatch(){
   document.getElementById('scoreDisplay').textContent='⭐ 0';
   const sb=document.getElementById('storyBox');
   sb.innerHTML=`<div class="prompt-label">MEMORY MATCH</div><div class="main-q">Hanapin ang magkapareha!</div><div class="memory-status" id="memStatus">Pairs: 0 / ${pairs.length}</div>`;
-  speakText('Memory Match! Hanapin ang magkapareha!');
   const cb=document.getElementById('choicesBox');
   cb.className='';
   cb.innerHTML=`<div class="memory-grid">${cards.map((c,i)=>
@@ -2262,7 +2202,6 @@ function startTapAll(){
   document.getElementById('scoreDisplay').textContent='⭐ 0';
   const sb=document.getElementById('storyBox');
   sb.innerHTML=`<div class="prompt-label">TAP LAHAT!</div><div class="main-q">${round.q}</div>`;
-  speakText(round.q);
   const cb=document.getElementById('choicesBox');
   cb.className='';
   const selected=new Set();
@@ -2331,7 +2270,6 @@ function showResult(){
     <button class="green" onclick="playTap();replayGame()">Ulitin!</button>
   `;
   document.getElementById('resultOverlay').classList.add('active');
-  speakText(title+'. '+msg);
 }
 
 // ===== STORY SCENE ILLUSTRATIONS =====
@@ -2541,8 +2479,6 @@ function showChapter(){
   h+='</div>';
   sb.innerHTML=h;
   sb.style.animation='none';sb.offsetHeight;sb.style.animation='floatIn 0.4s ease';
-  // Auto-read chapter scene + instruction
-  speakText(ch.scene+(ch.instruction?'. '+ch.instruction:''));
 
   if(ch.type==='choice') buildStoryChoice(ch, cb);
   else cb.innerHTML='';
@@ -2775,7 +2711,6 @@ function buildStoryChoice(ch, cb){
     else sb.querySelector('.story-mode').appendChild(qBox);
   }
   qBox.textContent=`Tanong ${storySubQ+1}/${qs.length}: ${q.q}`;
-  speakText(q.q);
   // Dark mode color
   if(!document.body.classList.contains('light-mode')) qBox.style.color='#81d4fa';
 
