@@ -2344,8 +2344,8 @@ const STORY_CHAPTERS=[
     id:'cake', title:'Ang Cake ni Nathaniel!',
     scene:'Birthday ni Nathaniel! Dumating ang pamilya para sa party. Kailangang hatiin ang cake para sa lahat ng bisita!',
     chars:[{id:'nathaniel',a:'sprite-bounce'},{id:'lola_bong',a:'sprite-wave'},{id:'danielle',a:'sprite-slidel'},{id:'thea',a:'sprite-slider'}],
-    type:'swipe-slice', target:4,
-    instruction:'Gumuhit ng mga linya sa cake para hatiin sa 4!',
+    type:'swipe-slice', target:4, cuts:2,
+    instruction:'Gumuhit ng 2 linya sa cake para hatiin sa 4!',
     starReward:3,
   },
   {
@@ -2501,7 +2501,7 @@ function buildSwipeSlice(ch){
       <g id="sliceLines"></g>
     </svg>
   </div>
-  <div id="sliceCount" style="text-align:center;font-size:0.9em;color:#e65100;font-weight:700;">0 / ${ch.target} na hiwa</div>
+  <div id="sliceCount" style="text-align:center;font-size:0.9em;color:#e65100;font-weight:700;">0 / ${ch.cuts||ch.target-1} na hiwa</div>
   <button class="story-next-btn" id="sliceCheck" style="opacity:0.4;pointer-events:none;" onclick="checkSlice()">Tapos na!</button>`;
 }
 
@@ -2536,8 +2536,9 @@ function initSwipeSlice(ch){
       line.setAttribute('class','slice-line');
       linesG.appendChild(line);
       sliceCount++;playTap();
-      document.getElementById('sliceCount').textContent=sliceCount+' / '+ch.target+' na hiwa';
-      if(sliceCount>=ch.target-1){
+      const neededCuts=ch.cuts||ch.target-1;
+      document.getElementById('sliceCount').textContent=sliceCount+' / '+neededCuts+' na hiwa';
+      if(sliceCount>=neededCuts){
         const btn=document.getElementById('sliceCheck');
         btn.style.opacity='1';btn.style.pointerEvents='auto';
       }
@@ -2554,7 +2555,8 @@ function initSwipeSlice(ch){
 function checkSlice(){
   const ch=STORY_CHAPTERS[storyChapter];
   const lines=window._storySliceCount?window._storySliceCount():0;
-  if(lines>=ch.target-1){
+  const neededCuts=ch.cuts||ch.target-1;
+  if(lines>=neededCuts){
     playCorrect();spawnConfetti(15);
     storyStars+=ch.starReward;
     showEncouragement('Magaling! Nahati mo ang cake!');
