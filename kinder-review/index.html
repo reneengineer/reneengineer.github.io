@@ -2073,6 +2073,7 @@ function getLessonSummary(q){
 
 function showLessonSummary(q){
   const summary=getLessonSummary(q);
+  speakText(summary);
   const cb=document.getElementById('choicesBox');
   cb.innerHTML=`<div style="grid-column:1/-1;background:rgba(76,175,80,0.12);border:2px solid #66bb6a;border-radius:16px;padding:14px;text-align:center;animation:floatIn 0.3s ease;display:flex;flex-direction:column;align-items:center;">
     <div style="font-size:0.95em;color:#81c784;line-height:1.5;margin-bottom:10px;">${summary}</div>
@@ -2128,6 +2129,7 @@ function showWrongHint(q){
   const old=document.getElementById('wrongHint');
   if(old)old.remove();
   const hint=getLessonSummary(q);
+  speakText('Hindi tama. '+hint);
   const hintEl=document.createElement('div');
   hintEl.id='wrongHint';
   hintEl.style.cssText='grid-column:1/-1;background:rgba(255,152,0,0.12);border:2px solid #ffa726;border-radius:14px;padding:12px 14px;text-align:center;animation:floatIn 0.3s ease;margin-top:4px;';
@@ -2310,6 +2312,7 @@ function showResult(){
     <button class="green" onclick="playTap();replayGame()">Ulitin!</button>
   `;
   document.getElementById('resultOverlay').classList.add('active');
+  speakText(title+'. '+msg);
 }
 
 // ===== STORY SCENE ILLUSTRATIONS =====
@@ -2753,6 +2756,7 @@ function buildStoryChoice(ch, cb){
     else sb.querySelector('.story-mode').appendChild(qBox);
   }
   qBox.textContent=`Tanong ${storySubQ+1}/${qs.length}: ${q.q}`;
+  speakText(q.q);
   // Dark mode color
   if(!document.body.classList.contains('light-mode')) qBox.style.color='#81d4fa';
 
