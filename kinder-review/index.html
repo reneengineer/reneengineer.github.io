@@ -466,9 +466,9 @@ body:not(.dark-mode) .mute-btn{background:rgba(255,255,255,0.8);border-color:#c5
 .bb-subtitle{font-size:0.9em;color:rgba(255,255,255,0.7);}
 .bb-arena{position:relative;width:100%;max-width:400px;height:300px;margin:10px 0;}
 .bb-bubble{position:absolute;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.5em;
-  animation:bbFloat 3s ease-in-out infinite;box-shadow:0 4px 15px rgba(0,0,0,0.2);transition:transform 0.15s ease;}
-.bb-bubble:active{transform:scale(0.5)!important;}
-@keyframes bbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
+  animation:bbFloat 3s ease-in-out infinite;box-shadow:0 4px 15px rgba(0,0,0,0.2);
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;padding:8px;min-width:60px;min-height:60px;}
+@keyframes bbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 .bb-skip{margin-top:8px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:8px 20px;border-radius:20px;font-size:0.85em;cursor:pointer;}
 
 /* ===== PARENT DASHBOARD ===== */
@@ -2963,7 +2963,7 @@ function showBrainBreak(){
     const color=colors[i%colors.length];
     const emoji=emojis[i%emojis.length];
     const delay=(Math.random()*2).toFixed(1);
-    html+=`<div class="bb-bubble" style="width:${size}px;height:${size}px;left:${x}%;top:${y}%;background:${color};animation-delay:${delay}s;" onclick="popBubble(this)">${emoji}</div>`;
+    html+=`<div class="bb-bubble" style="width:${size}px;height:${size}px;left:${x}%;top:${y}%;background:${color};animation-delay:${delay}s;" ontouchstart="event.preventDefault();popBubble(this)" onclick="popBubble(this)">${emoji}</div>`;
   }
   html+=`</div><div class="bb-subtitle" id="bbCount">${popped} / ${total}</div>
     <button class="bb-skip" onclick="closeBrainBreak()">Skip ➡️</button>`;
