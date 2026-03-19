@@ -13,8 +13,8 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg: #0a0a0a;
-  --surface: #1a1a1a;
+  --bg: #000000;
+  --surface: #141414;
   --text: #e8e8e8;
   --muted: #888;
   --accent: #4ade80;
@@ -51,7 +51,20 @@ html, body {
 }
 .screen.active { display: flex; }
 
-/* Top bar: home button + progress */
+/* Tap flash overlay */
+#tap-flash {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(74, 222, 128, 0.12);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 50;
+  transition: opacity 0.15s;
+}
+#tap-flash.flash { opacity: 1; transition: none; }
+
+/* Top bar */
 #top-bar {
   position: fixed;
   top: 0; left: 0;
@@ -75,12 +88,12 @@ html, body {
   top: 10px;
   left: 12px;
   z-index: 30;
-  background: rgba(26,26,26,0.85);
+  background: rgba(20,20,20,0.85);
   border: none;
   color: var(--muted);
   font-size: 1.3rem;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   cursor: pointer;
   display: none;
@@ -89,19 +102,17 @@ html, body {
   backdrop-filter: blur(4px);
 }
 #btn-home:active { opacity: 0.6; }
-
-/* Exercise nav dots */
 #btn-nav {
   position: fixed;
   top: 10px;
   right: 12px;
   z-index: 30;
-  background: rgba(26,26,26,0.85);
+  background: rgba(20,20,20,0.85);
   border: none;
   color: var(--muted);
   font-size: 1.1rem;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   cursor: pointer;
   display: none;
@@ -117,7 +128,7 @@ html, body {
   position: fixed;
   top: 0; left: 0;
   width: 100%; height: 100%;
-  background: rgba(0,0,0,0.85);
+  background: rgba(0,0,0,0.92);
   z-index: 40;
   flex-direction: column;
   align-items: center;
@@ -132,11 +143,7 @@ html, body {
   color: var(--text);
   margin-bottom: 1.2rem;
 }
-.picker-round {
-  width: 100%;
-  max-width: 360px;
-  margin-bottom: 1.2rem;
-}
+.picker-round { width: 100%; max-width: 360px; margin-bottom: 1.2rem; }
 .picker-round-label {
   font-size: 0.8rem;
   font-weight: 700;
@@ -162,23 +169,15 @@ html, body {
 .picker-item:active { background: var(--surface); }
 .picker-item.current { background: var(--surface); }
 .picker-dot {
-  width: 10px;
-  height: 10px;
+  width: 10px; height: 10px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 .picker-dot.done { background: var(--done-color); }
 .picker-dot.current { background: var(--current-color); }
 .picker-dot.pending { background: var(--pending-color); }
-.picker-name {
-  font-size: 0.95rem;
-  font-weight: 600;
-  flex: 1;
-}
-.picker-reps {
-  font-size: 0.8rem;
-  color: var(--muted);
-}
+.picker-name { font-size: 0.95rem; font-weight: 600; flex: 1; }
+.picker-reps { font-size: 0.8rem; color: var(--muted); }
 .picker-name.done-text { color: var(--muted); }
 #picker-close {
   margin-top: 0.5rem;
@@ -199,17 +198,49 @@ html, body {
   font-size: clamp(2.5rem, 10vw, 4rem);
   font-weight: 800;
   letter-spacing: -0.02em;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.3rem;
 }
-#start-screen p {
+#start-subtitle {
   color: var(--muted);
   font-size: clamp(1rem, 3.5vw, 1.2rem);
-  margin-bottom: 2.5rem;
+  margin-bottom: 0.8rem;
+}
+#streak-display {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.3rem;
+  min-height: 1.5rem;
+}
+#week-dots {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 2rem;
+  align-items: center;
+}
+.week-dot {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+.week-dot.worked { background: var(--accent); color: #000; }
+.week-dot.empty { background: var(--surface); }
+.week-dot.today { border: 2px solid var(--accent); }
+#badday-suggest {
+  color: var(--rest-accent);
+  font-size: 0.85rem;
+  margin-bottom: 1.5rem;
+  min-height: 1.2rem;
 }
 #last-workout {
   color: var(--muted);
-  font-size: 0.85rem;
-  margin-top: 1.5rem;
+  font-size: 0.8rem;
+  margin-top: 1rem;
 }
 .btn {
   width: 100%;
@@ -225,7 +256,7 @@ html, body {
 .btn:active { opacity: 0.7; }
 .btn-primary {
   background: var(--accent);
-  color: #0a0a0a;
+  color: #000;
   margin-bottom: 1rem;
 }
 .btn-secondary {
@@ -233,19 +264,41 @@ html, body {
   color: var(--muted);
 }
 
+/* Countdown screen */
+#countdown-screen {
+  background: var(--bg);
+}
+#countdown-number {
+  font-size: clamp(8rem, 35vw, 14rem);
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1;
+}
+#countdown-label {
+  font-size: 1.1rem;
+  color: var(--muted);
+  margin-top: 0.5rem;
+}
+
 /* Exercise screen */
 #exercise-screen { cursor: pointer; padding-top: 3.5rem; }
 #exercise-meta {
   font-size: 0.85rem;
   color: var(--muted);
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
+}
+#exercise-counter {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
 }
 #exercise-img {
   max-width: 85vw;
-  max-height: 35vh;
+  max-height: 32vh;
   object-fit: contain;
   border-radius: 12px;
-  margin-bottom: 1.2rem;
+  margin-bottom: 1rem;
   background: var(--surface);
 }
 #exercise-name {
@@ -257,7 +310,7 @@ html, body {
   font-size: clamp(1.4rem, 5vw, 2rem);
   font-weight: 700;
   color: var(--accent);
-  margin-bottom: 1.2rem;
+  margin-bottom: 1rem;
 }
 #exercise-tips {
   list-style: none;
@@ -274,11 +327,9 @@ html, body {
 #exercise-tips li::before {
   content: "";
   position: absolute;
-  left: 0;
-  top: 50%;
+  left: 0; top: 50%;
   transform: translateY(-50%);
-  width: 6px;
-  height: 6px;
+  width: 6px; height: 6px;
   border-radius: 50%;
   background: var(--accent);
 }
@@ -302,7 +353,13 @@ html, body {
   font-weight: 800;
   color: var(--rest-accent);
   line-height: 1;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.3rem;
+}
+#rest-next {
+  font-size: 1rem;
+  color: var(--text);
+  margin-bottom: 0.3rem;
+  font-weight: 600;
 }
 #rest-sub {
   color: var(--muted);
@@ -328,15 +385,22 @@ html, body {
   color: var(--accent);
   margin-bottom: 0.5rem;
 }
-#done-screen p {
+#done-msg {
   color: var(--muted);
   font-size: clamp(1rem, 3.5vw, 1.2rem);
+  margin-bottom: 0.3rem;
+}
+#done-time {
+  color: var(--accent);
+  font-size: 1.2rem;
+  font-weight: 700;
   margin-bottom: 2.5rem;
 }
 </style>
 </head>
 <body>
 <div id="app">
+  <div id="tap-flash"></div>
   <div id="top-bar">
     <div id="progress-bar"><div id="progress-fill"></div></div>
   </div>
@@ -353,26 +417,37 @@ html, body {
   <!-- START -->
   <div id="start-screen" class="screen active">
     <h1>WORKOUT</h1>
-    <p>6 exercises. 3 rounds. Tap to go.</p>
+    <div id="start-subtitle">6 exercises. 3 rounds. Tap to go.</div>
+    <div id="streak-display"></div>
+    <div id="week-dots"></div>
+    <div id="badday-suggest"></div>
     <button class="btn btn-primary" id="btn-start">START</button>
     <button class="btn btn-secondary" id="btn-badday">BAD DAY</button>
     <div id="last-workout"></div>
   </div>
 
+  <!-- COUNTDOWN -->
+  <div id="countdown-screen" class="screen">
+    <div id="countdown-number">3</div>
+    <div id="countdown-label">get ready</div>
+  </div>
+
   <!-- EXERCISE -->
   <div id="exercise-screen" class="screen">
     <span id="exercise-meta"></span>
+    <div id="exercise-counter"></div>
     <img id="exercise-img" src="" alt="">
     <div id="exercise-name"></div>
     <div id="exercise-reps"></div>
     <ul id="exercise-tips"></ul>
-    <div id="tap-hint">tap anywhere for next</div>
+    <div id="tap-hint">tap or swipe to continue</div>
   </div>
 
   <!-- REST -->
   <div id="rest-screen" class="screen">
     <div id="rest-label">REST</div>
     <div id="rest-timer">60</div>
+    <div id="rest-next"></div>
     <div id="rest-sub"></div>
     <button class="btn-skip" id="btn-skip">SKIP</button>
   </div>
@@ -381,6 +456,7 @@ html, body {
   <div id="done-screen" class="screen">
     <h1>DONE</h1>
     <p id="done-msg">3 rounds complete</p>
+    <div id="done-time"></div>
     <button class="btn btn-primary" id="btn-again">AGAIN</button>
   </div>
 </div>
@@ -458,9 +534,9 @@ html, body {
 
   const TOTAL_ROUNDS = 3;
   const REST_DURATION = 60;
-
-  // completed[round][exercise] = true/false
   const completed = [];
+  let wakeLock = null;
+  let workoutStartTime = null;
 
   const state = {
     screen: "start",
@@ -474,10 +550,10 @@ html, body {
     tapped: false
   };
 
-  // DOM refs
   const $ = id => document.getElementById(id);
   const screens = {
     start: $("start-screen"),
+    countdown: $("countdown-screen"),
     exercise: $("exercise-screen"),
     rest: $("rest-screen"),
     done: $("done-screen")
@@ -487,17 +563,119 @@ html, body {
   const btnNav = $("btn-nav");
   const progressFill = $("progress-fill");
   const exMeta = $("exercise-meta");
+  const exCounter = $("exercise-counter");
   const exImg = $("exercise-img");
   const exName = $("exercise-name");
   const exReps = $("exercise-reps");
   const exTips = $("exercise-tips");
   const tapHint = $("tap-hint");
   const restTimerEl = $("rest-timer");
+  const restNext = $("rest-next");
   const restSub = $("rest-sub");
-  const lastWorkout = $("last-workout");
+  const lastWorkoutEl = $("last-workout");
   const doneMsg = $("done-msg");
+  const doneTime = $("done-time");
   const pickerOverlay = $("picker-overlay");
   const pickerList = $("picker-list");
+  const tapFlash = $("tap-flash");
+  const streakDisplay = $("streak-display");
+  const weekDots = $("week-dots");
+  const baddaySuggest = $("badday-suggest");
+
+  // Wake Lock
+  async function requestWakeLock() {
+    try {
+      if ('wakeLock' in navigator) {
+        wakeLock = await navigator.wakeLock.request('screen');
+      }
+    } catch(e) {}
+  }
+  function releaseWakeLock() {
+    if (wakeLock) { wakeLock.release().catch(() => {}); wakeLock = null; }
+  }
+
+  // Workout history via localStorage
+  function getWorkoutDays() {
+    try {
+      const raw = localStorage.getItem("workoutDays");
+      return raw ? JSON.parse(raw) : [];
+    } catch(e) { return []; }
+  }
+  function saveWorkoutDay() {
+    try {
+      const days = getWorkoutDays();
+      const today = new Date().toISOString().slice(0, 10);
+      if (!days.includes(today)) days.push(today);
+      // keep last 90 days
+      const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 90);
+      const filtered = days.filter(d => new Date(d) >= cutoff);
+      localStorage.setItem("workoutDays", JSON.stringify(filtered));
+      localStorage.setItem("lastWorkout", Date.now());
+    } catch(e) {}
+  }
+
+  function calcStreak() {
+    const days = getWorkoutDays().sort().reverse();
+    if (!days.length) return 0;
+    let streak = 0;
+    const today = new Date(); today.setHours(0,0,0,0);
+    const check = new Date(today);
+    // allow today or yesterday as start
+    const last = new Date(days[0]); last.setHours(0,0,0,0);
+    const diffMs = today - last;
+    if (diffMs > 86400000) return 0; // more than 1 day ago
+    for (let i = 0; i < 365; i++) {
+      const dateStr = check.toISOString().slice(0, 10);
+      if (days.includes(dateStr)) {
+        streak++;
+        check.setDate(check.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+    return streak;
+  }
+
+  function renderStreak() {
+    const streak = calcStreak();
+    if (streak > 0) {
+      streakDisplay.textContent = streak + " day streak";
+    } else {
+      streakDisplay.textContent = "";
+    }
+  }
+
+  function renderWeekDots() {
+    const days = getWorkoutDays();
+    const dayNames = ["M", "T", "W", "T", "F", "S", "S"];
+    const today = new Date();
+    const dayOfWeek = (today.getDay() + 6) % 7; // Monday = 0
+    weekDots.innerHTML = "";
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - dayOfWeek + i);
+      const dateStr = d.toISOString().slice(0, 10);
+      const dot = document.createElement("div");
+      const worked = days.includes(dateStr);
+      const isToday = i === dayOfWeek;
+      dot.className = "week-dot " + (worked ? "worked" : "empty") + (isToday ? " today" : "");
+      dot.textContent = dayNames[i];
+      weekDots.appendChild(dot);
+    }
+  }
+
+  function renderBaddaySuggest() {
+    try {
+      const ts = localStorage.getItem("lastWorkout");
+      if (!ts) { baddaySuggest.textContent = ""; return; }
+      const days = Math.floor((Date.now() - Number(ts)) / 86400000);
+      if (days >= 3) {
+        baddaySuggest.textContent = "Been a few days. Try a quick Bad Day round?";
+      } else {
+        baddaySuggest.textContent = "";
+      }
+    } catch(e) {}
+  }
 
   function initCompleted() {
     completed.length = 0;
@@ -528,18 +706,55 @@ html, body {
     progressFill.style.width = (done / total * 100) + "%";
   }
 
+  function getTotalDone() {
+    let done = 0;
+    for (let r = 0; r < state.totalRounds; r++) {
+      for (let e = 0; e < state.exercises.length; e++) {
+        if (completed[r] && completed[r][e]) done++;
+      }
+    }
+    return done;
+  }
+
   function renderExercise() {
     const ex = state.exercises[state.exercise];
+    const total = state.exercises.length * state.totalRounds;
+    const done = getTotalDone();
     exMeta.textContent = `Round ${state.round + 1}/${state.totalRounds}  \u00B7  Exercise ${state.exercise + 1}/${state.exercises.length}`;
+    exCounter.textContent = `${done + 1} of ${total}`;
     exImg.src = ex.image;
     exImg.alt = ex.name;
     exName.textContent = ex.name;
     exReps.textContent = ex.reps;
     exTips.innerHTML = ex.tips.map(t => `<li>${t}</li>`).join("");
     updateProgress();
-    if (!state.tapped) {
-      tapHint.style.opacity = "1";
-    }
+    if (!state.tapped) tapHint.style.opacity = "1";
+  }
+
+  // 3-2-1-GO countdown
+  function startCountdown(badDay, cb) {
+    showScreen("countdown");
+    const numEl = $("countdown-number");
+    const labelEl = $("countdown-label");
+    let count = 3;
+    numEl.textContent = count;
+    labelEl.textContent = "get ready";
+    requestWakeLock();
+    const iv = setInterval(() => {
+      count--;
+      if (count > 0) {
+        numEl.textContent = count;
+        beep(600, 80);
+      } else if (count === 0) {
+        numEl.textContent = "GO";
+        labelEl.textContent = "";
+        beep(900, 150);
+      } else {
+        clearInterval(iv);
+        cb();
+      }
+    }, 1000);
+    beep(600, 80);
   }
 
   function startWorkout(badDay) {
@@ -551,20 +766,30 @@ html, body {
     state.tapped = false;
     tapHint.style.opacity = "1";
     initCompleted();
-    renderExercise();
-    showScreen("exercise");
+    startCountdown(badDay, () => {
+      workoutStartTime = Date.now();
+      renderExercise();
+      showScreen("exercise");
+    });
+  }
+
+  function flashTap() {
+    tapFlash.classList.add("flash");
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        tapFlash.classList.remove("flash");
+      });
+    });
   }
 
   function nextExercise() {
     if (navigator.vibrate) navigator.vibrate(15);
+    flashTap();
     if (!state.tapped) {
       state.tapped = true;
       tapHint.style.opacity = "0";
     }
-
-    // Mark current as completed
     completed[state.round][state.exercise] = true;
-
     state.exercise++;
     if (state.exercise >= state.exercises.length) {
       state.round++;
@@ -578,12 +803,20 @@ html, body {
     renderExercise();
   }
 
-  function jumpTo(round, exercise) {
-    // Stop rest timer if running
-    if (state.restTimer) {
-      clearInterval(state.restTimer);
-      state.restTimer = null;
+  function prevExercise() {
+    if (state.round === 0 && state.exercise === 0) return;
+    if (navigator.vibrate) navigator.vibrate(15);
+    if (state.exercise > 0) {
+      state.exercise--;
+    } else if (state.round > 0) {
+      state.round--;
+      state.exercise = state.exercises.length - 1;
     }
+    renderExercise();
+  }
+
+  function jumpTo(round, exercise) {
+    if (state.restTimer) { clearInterval(state.restTimer); state.restTimer = null; }
     state.round = round;
     state.exercise = exercise;
     closePicker();
@@ -591,14 +824,33 @@ html, body {
     showScreen("exercise");
   }
 
+  // Speech announcement
+  function announceNext(name) {
+    try {
+      if ('speechSynthesis' in window) {
+        const u = new SpeechSynthesisUtterance("Next up: " + name);
+        u.rate = 1.1;
+        u.volume = 0.8;
+        speechSynthesis.speak(u);
+      }
+    } catch(e) {}
+  }
+
   function startRest() {
     state.restTime = REST_DURATION;
     restTimerEl.textContent = state.restTime;
     restSub.textContent = `Round ${state.round}/${state.totalRounds} complete`;
+    const nextEx = state.exercises[0];
+    restNext.textContent = nextEx ? "Next: " + nextEx.name : "";
     showScreen("rest");
+    let announced = false;
     state.restTimer = setInterval(() => {
       state.restTime--;
       restTimerEl.textContent = state.restTime;
+      if (state.restTime === 5 && !announced && nextEx) {
+        announced = true;
+        announceNext(nextEx.name);
+      }
       if (state.restTime <= 3 && state.restTime > 0) beep(600, 80);
       if (state.restTime <= 0) {
         beep(900, 200);
@@ -617,20 +869,24 @@ html, body {
 
   function finishWorkout() {
     progressFill.style.width = "100%";
-    const rounds = state.badDay ? `${state.totalRounds} rounds (bad day mode)` : `${state.totalRounds} rounds complete`;
-    doneMsg.textContent = rounds;
+    releaseWakeLock();
+    const elapsed = workoutStartTime ? Math.floor((Date.now() - workoutStartTime) / 1000) : 0;
+    const mins = Math.floor(elapsed / 60);
+    const secs = elapsed % 60;
+    const total = state.exercises.length * state.totalRounds;
+    const label = state.badDay ? `${state.totalRounds} rounds (bad day mode)` : `${state.totalRounds} rounds complete`;
+    doneMsg.textContent = label;
+    doneTime.textContent = `${total} exercises in ${mins}:${secs.toString().padStart(2, "0")}`;
+    saveWorkoutDay();
     showScreen("done");
-    try { localStorage.setItem("lastWorkout", Date.now()); } catch(e) {}
   }
 
   function goHome() {
-    if (state.restTimer) {
-      clearInterval(state.restTimer);
-      state.restTimer = null;
-    }
+    if (state.restTimer) { clearInterval(state.restTimer); state.restTimer = null; }
+    releaseWakeLock();
     closePicker();
     showScreen("start");
-    showLastWorkout();
+    renderHomeScreen();
   }
 
   // Picker
@@ -643,30 +899,23 @@ html, body {
       label.className = "picker-round-label";
       label.textContent = `Round ${r + 1}`;
       roundDiv.appendChild(label);
-
       for (let e = 0; e < state.exercises.length; e++) {
         const ex = state.exercises[e];
         const isCurrent = r === state.round && e === state.exercise;
         const isDone = completed[r] && completed[r][e];
-
         const item = document.createElement("button");
         item.className = "picker-item" + (isCurrent ? " current" : "");
-
         const dot = document.createElement("span");
         dot.className = "picker-dot " + (isDone ? "done" : isCurrent ? "current" : "pending");
-
         const name = document.createElement("span");
         name.className = "picker-name" + (isDone ? " done-text" : "");
         name.textContent = ex.name;
-
         const reps = document.createElement("span");
         reps.className = "picker-reps";
         reps.textContent = ex.reps;
-
         item.appendChild(dot);
         item.appendChild(name);
         item.appendChild(reps);
-
         const rr = r, ee = e;
         item.addEventListener("click", () => jumpTo(rr, ee));
         roundDiv.appendChild(item);
@@ -675,23 +924,27 @@ html, body {
     }
     pickerOverlay.classList.add("active");
   }
-
-  function closePicker() {
-    pickerOverlay.classList.remove("active");
-  }
+  function closePicker() { pickerOverlay.classList.remove("active"); }
 
   function showLastWorkout() {
     try {
       const ts = localStorage.getItem("lastWorkout");
       if (!ts) return;
       const days = Math.floor((Date.now() - Number(ts)) / 86400000);
-      if (days === 0) lastWorkout.textContent = "Last workout: today";
-      else if (days === 1) lastWorkout.textContent = "Last workout: yesterday";
-      else lastWorkout.textContent = `Last workout: ${days} days ago`;
+      if (days === 0) lastWorkoutEl.textContent = "Last workout: today";
+      else if (days === 1) lastWorkoutEl.textContent = "Last workout: yesterday";
+      else lastWorkoutEl.textContent = `Last workout: ${days} days ago`;
     } catch(e) {}
   }
 
-  // Audio beep
+  function renderHomeScreen() {
+    renderStreak();
+    renderWeekDots();
+    renderBaddaySuggest();
+    showLastWorkout();
+  }
+
+  // Audio
   let audioCtx;
   function beep(freq, ms) {
     try {
@@ -707,22 +960,49 @@ html, body {
     } catch(e) {}
   }
 
+  // Swipe detection
+  let touchStartX = 0, touchStartY = 0;
+  document.addEventListener("touchstart", (e) => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  document.addEventListener("touchend", (e) => {
+    if (state.screen !== "exercise") return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    if (Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx)) return; // not a horizontal swipe
+    e.preventDefault();
+    if (dx < -50) nextExercise();  // swipe left = next
+    if (dx > 50) prevExercise();   // swipe right = prev
+  });
+
   // Events
   $("btn-start").addEventListener("click", () => startWorkout(false));
   $("btn-badday").addEventListener("click", () => startWorkout(true));
   $("exercise-screen").addEventListener("click", (e) => {
-    // Don't advance if tapping home or nav buttons
     if (e.target.id === "btn-home" || e.target.id === "btn-nav") return;
     nextExercise();
   });
   btnHome.addEventListener("click", (e) => { e.stopPropagation(); goHome(); });
   btnNav.addEventListener("click", (e) => { e.stopPropagation(); openPicker(); });
   $("btn-skip").addEventListener("click", endRest);
-  $("btn-again").addEventListener("click", () => { showScreen("start"); showLastWorkout(); });
+  $("btn-again").addEventListener("click", () => { showScreen("start"); renderHomeScreen(); });
   $("picker-close").addEventListener("click", closePicker);
+  // Tap rest screen to skip
+  $("rest-screen").addEventListener("click", (e) => {
+    if (e.target.id === "btn-skip" || e.target.id === "btn-home" || e.target.id === "btn-nav") return;
+    endRest();
+  });
+
+  // Re-acquire wake lock on visibility change
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && (state.screen === "exercise" || state.screen === "rest")) {
+      requestWakeLock();
+    }
+  });
 
   // Init
-  showLastWorkout();
+  renderHomeScreen();
 })();
 </script>
 </body>
