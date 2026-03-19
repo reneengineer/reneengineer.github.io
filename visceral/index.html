@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Workout</title>
+<link rel="preload" as="image" href="exercises/01-goblet-squat.png">
+<link rel="preload" as="image" href="exercises/02-dumbbell-row.png">
+<link rel="preload" as="image" href="exercises/03-dumbbell-floor-press.png">
+<link rel="preload" as="image" href="exercises/04-dumbbell-romanian-deadlift.png">
+<link rel="preload" as="image" href="exercises/05-dumbbell-overhead-press.png">
+<link rel="preload" as="image" href="exercises/06-farmers-carry.png">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0a0a0a;
+  --surface: #1a1a1a;
+  --text: #e8e8e8;
+  --muted: #888;
+  --accent: #4ade80;
+  --rest-accent: #facc15;
+  --done-color: #4ade80;
+  --pending-color: #333;
+  --current-color: #facc15;
+}
+html, body {
+  height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  touch-action: manipulation;
+  overflow: hidden;
+}
+#app {
+  height: 100dvh;
+  width: 100vw;
+  position: relative;
+}
+.screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  padding: 1.5rem;
+  position: absolute;
+  top: 0; left: 0;
+}
+.screen.active { display: flex; }
+
+/* Top bar: home button + progress */
+#top-bar {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  z-index: 20;
+  display: none;
+}
+#progress-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--surface);
+}
+#progress-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.3s ease;
+  width: 0%;
+}
+#btn-home {
+  position: fixed;
+  top: 10px;
+  left: 12px;
+  z-index: 30;
+  background: rgba(26,26,26,0.85);
+  border: none;
+  color: var(--muted);
+  font-size: 1.3rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+#btn-home:active { opacity: 0.6; }
+
+/* Exercise nav dots */
+#btn-nav {
+  position: fixed;
+  top: 10px;
+  right: 12px;
+  z-index: 30;
+  background: rgba(26,26,26,0.85);
+  border: none;
+  color: var(--muted);
+  font-size: 1.1rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+#btn-nav:active { opacity: 0.6; }
+
+/* Exercise picker overlay */
+#picker-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.85);
+  z-index: 40;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  padding-top: 2rem;
+  overflow-y: auto;
+}
+#picker-overlay.active { display: flex; }
+#picker-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1.2rem;
+}
+.picker-round {
+  width: 100%;
+  max-width: 360px;
+  margin-bottom: 1.2rem;
+}
+.picker-round-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+.picker-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: 10px;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  color: var(--text);
+  font-family: inherit;
+}
+.picker-item:active { background: var(--surface); }
+.picker-item.current { background: var(--surface); }
+.picker-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.picker-dot.done { background: var(--done-color); }
+.picker-dot.current { background: var(--current-color); }
+.picker-dot.pending { background: var(--pending-color); }
+.picker-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  flex: 1;
+}
+.picker-reps {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.picker-name.done-text { color: var(--muted); }
+#picker-close {
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
+  background: var(--surface);
+  border: none;
+  color: var(--text);
+  padding: 0.8rem 2.5rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+#picker-close:active { opacity: 0.6; }
+
+/* Start screen */
+#start-screen h1 {
+  font-size: clamp(2.5rem, 10vw, 4rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+}
+#start-screen p {
+  color: var(--muted);
+  font-size: clamp(1rem, 3.5vw, 1.2rem);
+  margin-bottom: 2.5rem;
+}
+#last-workout {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 1.5rem;
+}
+.btn {
+  width: 100%;
+  max-width: 320px;
+  padding: 1.2rem;
+  border: none;
+  border-radius: 12px;
+  font-size: clamp(1.1rem, 4vw, 1.3rem);
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn:active { opacity: 0.7; }
+.btn-primary {
+  background: var(--accent);
+  color: #0a0a0a;
+  margin-bottom: 1rem;
+}
+.btn-secondary {
+  background: var(--surface);
+  color: var(--muted);
+}
+
+/* Exercise screen */
+#exercise-screen { cursor: pointer; padding-top: 3.5rem; }
+#exercise-meta {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+#exercise-img {
+  max-width: 85vw;
+  max-height: 35vh;
+  object-fit: contain;
+  border-radius: 12px;
+  margin-bottom: 1.2rem;
+  background: var(--surface);
+}
+#exercise-name {
+  font-size: clamp(1.8rem, 6vw, 2.5rem);
+  font-weight: 800;
+  margin-bottom: 0.4rem;
+}
+#exercise-reps {
+  font-size: clamp(1.4rem, 5vw, 2rem);
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 1.2rem;
+}
+#exercise-tips {
+  list-style: none;
+  max-width: 340px;
+  text-align: left;
+}
+#exercise-tips li {
+  font-size: clamp(0.85rem, 3.2vw, 1rem);
+  color: var(--muted);
+  padding: 0.3rem 0;
+  padding-left: 1.2rem;
+  position: relative;
+}
+#exercise-tips li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+#tap-hint {
+  position: fixed;
+  bottom: 2rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+  transition: opacity 0.5s;
+}
+
+/* Rest screen */
+#rest-screen { background: var(--bg); }
+#rest-label {
+  font-size: clamp(1rem, 4vw, 1.3rem);
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+#rest-timer {
+  font-size: clamp(5rem, 22vw, 9rem);
+  font-weight: 800;
+  color: var(--rest-accent);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+#rest-sub {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+}
+.btn-skip {
+  background: transparent;
+  border: 2px solid var(--muted);
+  color: var(--muted);
+  padding: 0.8rem 2rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-skip:active { opacity: 0.6; }
+
+/* Done screen */
+#done-screen h1 {
+  font-size: clamp(3rem, 12vw, 5rem);
+  font-weight: 800;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+#done-screen p {
+  color: var(--muted);
+  font-size: clamp(1rem, 3.5vw, 1.2rem);
+  margin-bottom: 2.5rem;
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="top-bar">
+    <div id="progress-bar"><div id="progress-fill"></div></div>
+  </div>
+  <button id="btn-home">&times;</button>
+  <button id="btn-nav">&#9776;</button>
+
+  <!-- EXERCISE PICKER -->
+  <div id="picker-overlay">
+    <div id="picker-title">EXERCISES</div>
+    <div id="picker-list"></div>
+    <button id="picker-close">CLOSE</button>
+  </div>
+
+  <!-- START -->
+  <div id="start-screen" class="screen active">
+    <h1>WORKOUT</h1>
+    <p>6 exercises. 3 rounds. Tap to go.</p>
+    <button class="btn btn-primary" id="btn-start">START</button>
+    <button class="btn btn-secondary" id="btn-badday">BAD DAY</button>
+    <div id="last-workout"></div>
+  </div>
+
+  <!-- EXERCISE -->
+  <div id="exercise-screen" class="screen">
+    <span id="exercise-meta"></span>
+    <img id="exercise-img" src="" alt="">
+    <div id="exercise-name"></div>
+    <div id="exercise-reps"></div>
+    <ul id="exercise-tips"></ul>
+    <div id="tap-hint">tap anywhere for next</div>
+  </div>
+
+  <!-- REST -->
+  <div id="rest-screen" class="screen">
+    <div id="rest-label">REST</div>
+    <div id="rest-timer">60</div>
+    <div id="rest-sub"></div>
+    <button class="btn-skip" id="btn-skip">SKIP</button>
+  </div>
+
+  <!-- DONE -->
+  <div id="done-screen" class="screen">
+    <h1>DONE</h1>
+    <p id="done-msg">3 rounds complete</p>
+    <button class="btn btn-primary" id="btn-again">AGAIN</button>
+  </div>
+</div>
+
+<script>
+(function() {
+  const ALL_EXERCISES = [
+    {
+      name: "Goblet Squat",
+      image: "exercises/01-goblet-squat.png",
+      reps: "12 reps",
+      tips: [
+        "Hold dumbbell at chest, elbows down",
+        "Feet shoulder-width, toes slightly out",
+        "Sit back and down, chest upright",
+        "Push through heels to stand"
+      ]
+    },
+    {
+      name: "Dumbbell Row",
+      image: "exercises/02-dumbbell-row.png",
+      reps: "10 reps each arm",
+      tips: [
+        "One hand on sturdy surface for support",
+        "Pull dumbbell to hip, not shoulder",
+        "Squeeze shoulder blade at the top",
+        "Lower with control, full extension"
+      ]
+    },
+    {
+      name: "Floor Press",
+      image: "exercises/03-dumbbell-floor-press.png",
+      reps: "12 reps",
+      tips: [
+        "Lie flat, knees bent, feet flat",
+        "Press dumbbells straight up over chest",
+        "Lower until triceps touch the floor",
+        "Pause at bottom, then press up"
+      ]
+    },
+    {
+      name: "Romanian Deadlift",
+      image: "exercises/04-dumbbell-romanian-deadlift.png",
+      reps: "12 reps",
+      tips: [
+        "Hold dumbbells in front of thighs",
+        "Hinge at hips, push them back",
+        "Slight knee bend, keep back flat",
+        "Feel hamstring stretch, squeeze glutes to stand"
+      ]
+    },
+    {
+      name: "Overhead Press",
+      image: "exercises/05-dumbbell-overhead-press.png",
+      reps: "10 reps",
+      tips: [
+        "Dumbbells at shoulder height",
+        "Brace core, press straight overhead",
+        "Lock out arms at the top",
+        "Lower with control to shoulders"
+      ]
+    },
+    {
+      name: "Farmer's Carry",
+      image: "exercises/06-farmers-carry.png",
+      reps: "30 seconds",
+      tips: [
+        "Hold heavy dumbbells at your sides",
+        "Stand tall, shoulders back and down",
+        "Walk with short, controlled steps",
+        "Squeeze grip hard the entire time"
+      ]
+    }
+  ];
+
+  const TOTAL_ROUNDS = 3;
+  const REST_DURATION = 60;
+
+  // completed[round][exercise] = true/false
+  const completed = [];
+
+  const state = {
+    screen: "start",
+    exercises: ALL_EXERCISES,
+    round: 0,
+    exercise: 0,
+    totalRounds: TOTAL_ROUNDS,
+    restTime: REST_DURATION,
+    restTimer: null,
+    badDay: false,
+    tapped: false
+  };
+
+  // DOM refs
+  const $ = id => document.getElementById(id);
+  const screens = {
+    start: $("start-screen"),
+    exercise: $("exercise-screen"),
+    rest: $("rest-screen"),
+    done: $("done-screen")
+  };
+  const topBar = $("top-bar");
+  const btnHome = $("btn-home");
+  const btnNav = $("btn-nav");
+  const progressFill = $("progress-fill");
+  const exMeta = $("exercise-meta");
+  const exImg = $("exercise-img");
+  const exName = $("exercise-name");
+  const exReps = $("exercise-reps");
+  const exTips = $("exercise-tips");
+  const tapHint = $("tap-hint");
+  const restTimerEl = $("rest-timer");
+  const restSub = $("rest-sub");
+  const lastWorkout = $("last-workout");
+  const doneMsg = $("done-msg");
+  const pickerOverlay = $("picker-overlay");
+  const pickerList = $("picker-list");
+
+  function initCompleted() {
+    completed.length = 0;
+    for (let r = 0; r < state.totalRounds; r++) {
+      completed.push(new Array(state.exercises.length).fill(false));
+    }
+  }
+
+  function showScreen(name) {
+    state.screen = name;
+    Object.entries(screens).forEach(([k, el]) => {
+      el.classList.toggle("active", k === name);
+    });
+    const showControls = name === "exercise" || name === "rest";
+    topBar.style.display = showControls ? "block" : "none";
+    btnHome.style.display = showControls ? "flex" : "none";
+    btnNav.style.display = showControls ? "flex" : "none";
+  }
+
+  function updateProgress() {
+    const total = state.exercises.length * state.totalRounds;
+    let done = 0;
+    for (let r = 0; r < state.totalRounds; r++) {
+      for (let e = 0; e < state.exercises.length; e++) {
+        if (completed[r] && completed[r][e]) done++;
+      }
+    }
+    progressFill.style.width = (done / total * 100) + "%";
+  }
+
+  function renderExercise() {
+    const ex = state.exercises[state.exercise];
+    exMeta.textContent = `Round ${state.round + 1}/${state.totalRounds}  \u00B7  Exercise ${state.exercise + 1}/${state.exercises.length}`;
+    exImg.src = ex.image;
+    exImg.alt = ex.name;
+    exName.textContent = ex.name;
+    exReps.textContent = ex.reps;
+    exTips.innerHTML = ex.tips.map(t => `<li>${t}</li>`).join("");
+    updateProgress();
+    if (!state.tapped) {
+      tapHint.style.opacity = "1";
+    }
+  }
+
+  function startWorkout(badDay) {
+    state.badDay = badDay;
+    state.exercises = badDay ? ALL_EXERCISES.slice(0, 3) : ALL_EXERCISES;
+    state.totalRounds = TOTAL_ROUNDS;
+    state.round = 0;
+    state.exercise = 0;
+    state.tapped = false;
+    tapHint.style.opacity = "1";
+    initCompleted();
+    renderExercise();
+    showScreen("exercise");
+  }
+
+  function nextExercise() {
+    if (navigator.vibrate) navigator.vibrate(15);
+    if (!state.tapped) {
+      state.tapped = true;
+      tapHint.style.opacity = "0";
+    }
+
+    // Mark current as completed
+    completed[state.round][state.exercise] = true;
+
+    state.exercise++;
+    if (state.exercise >= state.exercises.length) {
+      state.round++;
+      if (state.round >= state.totalRounds) {
+        finishWorkout();
+        return;
+      }
+      startRest();
+      return;
+    }
+    renderExercise();
+  }
+
+  function jumpTo(round, exercise) {
+    // Stop rest timer if running
+    if (state.restTimer) {
+      clearInterval(state.restTimer);
+      state.restTimer = null;
+    }
+    state.round = round;
+    state.exercise = exercise;
+    closePicker();
+    renderExercise();
+    showScreen("exercise");
+  }
+
+  function startRest() {
+    state.restTime = REST_DURATION;
+    restTimerEl.textContent = state.restTime;
+    restSub.textContent = `Round ${state.round}/${state.totalRounds} complete`;
+    showScreen("rest");
+    state.restTimer = setInterval(() => {
+      state.restTime--;
+      restTimerEl.textContent = state.restTime;
+      if (state.restTime <= 3 && state.restTime > 0) beep(600, 80);
+      if (state.restTime <= 0) {
+        beep(900, 200);
+        endRest();
+      }
+    }, 1000);
+  }
+
+  function endRest() {
+    clearInterval(state.restTimer);
+    state.restTimer = null;
+    state.exercise = 0;
+    renderExercise();
+    showScreen("exercise");
+  }
+
+  function finishWorkout() {
+    progressFill.style.width = "100%";
+    const rounds = state.badDay ? `${state.totalRounds} rounds (bad day mode)` : `${state.totalRounds} rounds complete`;
+    doneMsg.textContent = rounds;
+    showScreen("done");
+    try { localStorage.setItem("lastWorkout", Date.now()); } catch(e) {}
+  }
+
+  function goHome() {
+    if (state.restTimer) {
+      clearInterval(state.restTimer);
+      state.restTimer = null;
+    }
+    closePicker();
+    showScreen("start");
+    showLastWorkout();
+  }
+
+  // Picker
+  function openPicker() {
+    pickerList.innerHTML = "";
+    for (let r = 0; r < state.totalRounds; r++) {
+      const roundDiv = document.createElement("div");
+      roundDiv.className = "picker-round";
+      const label = document.createElement("div");
+      label.className = "picker-round-label";
+      label.textContent = `Round ${r + 1}`;
+      roundDiv.appendChild(label);
+
+      for (let e = 0; e < state.exercises.length; e++) {
+        const ex = state.exercises[e];
+        const isCurrent = r === state.round && e === state.exercise;
+        const isDone = completed[r] && completed[r][e];
+
+        const item = document.createElement("button");
+        item.className = "picker-item" + (isCurrent ? " current" : "");
+
+        const dot = document.createElement("span");
+        dot.className = "picker-dot " + (isDone ? "done" : isCurrent ? "current" : "pending");
+
+        const name = document.createElement("span");
+        name.className = "picker-name" + (isDone ? " done-text" : "");
+        name.textContent = ex.name;
+
+        const reps = document.createElement("span");
+        reps.className = "picker-reps";
+        reps.textContent = ex.reps;
+
+        item.appendChild(dot);
+        item.appendChild(name);
+        item.appendChild(reps);
+
+        const rr = r, ee = e;
+        item.addEventListener("click", () => jumpTo(rr, ee));
+        roundDiv.appendChild(item);
+      }
+      pickerList.appendChild(roundDiv);
+    }
+    pickerOverlay.classList.add("active");
+  }
+
+  function closePicker() {
+    pickerOverlay.classList.remove("active");
+  }
+
+  function showLastWorkout() {
+    try {
+      const ts = localStorage.getItem("lastWorkout");
+      if (!ts) return;
+      const days = Math.floor((Date.now() - Number(ts)) / 86400000);
+      if (days === 0) lastWorkout.textContent = "Last workout: today";
+      else if (days === 1) lastWorkout.textContent = "Last workout: yesterday";
+      else lastWorkout.textContent = `Last workout: ${days} days ago`;
+    } catch(e) {}
+  }
+
+  // Audio beep
+  let audioCtx;
+  function beep(freq, ms) {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.frequency.value = freq;
+      gain.gain.value = 0.1;
+      osc.start();
+      osc.stop(audioCtx.currentTime + ms / 1000);
+    } catch(e) {}
+  }
+
+  // Events
+  $("btn-start").addEventListener("click", () => startWorkout(false));
+  $("btn-badday").addEventListener("click", () => startWorkout(true));
+  $("exercise-screen").addEventListener("click", (e) => {
+    // Don't advance if tapping home or nav buttons
+    if (e.target.id === "btn-home" || e.target.id === "btn-nav") return;
+    nextExercise();
+  });
+  btnHome.addEventListener("click", (e) => { e.stopPropagation(); goHome(); });
+  btnNav.addEventListener("click", (e) => { e.stopPropagation(); openPicker(); });
+  $("btn-skip").addEventListener("click", endRest);
+  $("btn-again").addEventListener("click", () => { showScreen("start"); showLastWorkout(); });
+  $("picker-close").addEventListener("click", closePicker);
+
+  // Init
+  showLastWorkout();
+})();
+</script>
+</body>
+</html>
