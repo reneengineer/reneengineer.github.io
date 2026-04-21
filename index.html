@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Renee Duran | Operations & Strategy Lead</title>
+    <title>Renee Duran | Operations Lead & AI Systems Builder</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         :root {
             --bg: #000000;
@@ -29,13 +29,13 @@
             --text-dim: #6e6e73;
             --glass: rgba(245, 245, 247, 0.8);
             --aura-color: rgba(0, 0, 0, 0.05);
-            --spotlight-opacity: 0.7; /* Dimmer by default in light mode for the spotlight effect */
+            --spotlight-opacity: 0.7;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.4s ease, color 0.4s ease; }
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: var(--bg); color: var(--text-main); 
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg); color: var(--text-main);
             line-height: 1.6; overflow-x: hidden; font-weight: 300;
         }
 
@@ -66,13 +66,13 @@
             min-height: 100vh; display: flex; align-items: center; justify-content: center;
             padding: 120px 10% 80px; gap: 60px;
         }
-        .hero-img { 
-            width: 400px; height: 500px; object-fit: cover; border-radius: 40px; 
+        .hero-img {
+            width: 400px; height: 500px; object-fit: cover; border-radius: 40px;
             border: 1px solid var(--card-border); box-shadow: 0 30px 60px rgba(0,0,0,0.2);
         }
         .hero-text h1 { font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 200; letter-spacing: -2px; line-height: 1.1; }
         .hero-subtitle { font-size: 1.2rem; color: var(--accent); font-weight: 500; margin: 10px 0 25px; }
-        
+
         /* Status Pulse */
         .status-tag { display: inline-flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 600; color: var(--text-dim); letter-spacing: 1px; margin-bottom: 15px;}
         .pulse-dot { width: 8px; height: 8px; background: #34c759; border-radius: 50%; position: relative; }
@@ -83,24 +83,40 @@
         /* Bento Grid */
         .container { max-width: 1400px; margin: 0 auto; padding: 0 5% 100px; }
         .bento-grid { display: grid; grid-template-columns: repeat(12, 1fr); grid-auto-rows: 220px; gap: 20px; }
-        .bento-item { 
-            background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 30px; 
+        .bento-item {
+            background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 30px;
             padding: 40px; overflow: hidden; backdrop-filter: blur(10px); opacity: var(--spotlight-opacity);
             transition: opacity 0.3s ease, transform 0.4s ease;
         }
         .bento-item.highlight { opacity: 1 !important; border-color: var(--accent); }
 
+        /* Grid spans */
         .item-exp { grid-column: span 8; grid-row: span 2; }
-        .item-soft { grid-column: span 4; grid-row: span 2; }
+        .item-whatido { grid-column: span 4; grid-row: span 2; }
+        .item-highlights { grid-column: span 6; grid-row: span 2; }
+        .item-howitworks { grid-column: span 6; grid-row: span 2; }
+        .item-skills { grid-column: span 8; grid-row: span 1; }
+        .item-testimonial { grid-column: span 4; grid-row: span 1; }
         .item-assets { grid-column: span 4; grid-row: span 1; }
-        .item-skills { grid-column: span 4; grid-row: span 1; }
+        .item-projects { grid-column: span 4; grid-row: span 1; }
         .item-social { grid-column: span 4; grid-row: span 1; }
+
+        .project-link {
+            display: flex; align-items: center; gap: 10px; padding: 6px 12px;
+            border-radius: 12px; text-decoration: none; color: var(--text-main);
+            border: 1px solid var(--card-border); transition: border-color 0.3s ease;
+        }
+        .project-link:hover { border-color: var(--accent); }
+        .project-link i { font-size: 1.2rem; color: var(--accent); width: 20px; text-align: center; }
+        .project-link .project-info { display: flex; flex-direction: column; }
+        .project-link .project-name { font-size: 0.8rem; font-weight: 600; }
+        .project-link .project-desc { font-size: 0.65rem; color: var(--text-dim); }
 
         /* Tabs & Experience */
         .exp-container { display: flex; gap: 40px; margin-top: 20px; }
         .exp-tabs { display: flex; flex-direction: column; gap: 8px; min-width: 200px; }
         .tab-btn {
-            background: none; border: none; color: var(--text-dim); text-align: left; 
+            background: none; border: none; color: var(--text-dim); text-align: left;
             padding: 12px; cursor: pointer; border-radius: 12px; font-size: 0.85rem; font-family: inherit;
         }
         .tab-btn.active { background: rgba(0, 113, 227, 0.15); color: var(--accent); font-weight: 600; }
@@ -111,15 +127,38 @@
         .takeaway-box { background: rgba(0, 113, 227, 0.1); border-left: 3px solid var(--accent); padding: 15px; margin-top: 15px; border-radius: 0 10px 10px 0; }
 
         /* Social Copy Utility */
-        .email-copy-btn { 
-            background: var(--accent); color: white; border: none; padding: 10px 20px; 
+        .email-copy-btn {
+            background: var(--accent); color: white; border: none; padding: 10px 20px;
             border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 0.8rem; width: 100%; margin-top: 10px;
         }
 
-        /* Mockups */
-        .mockup-container { position: relative; height: 100%; display: flex; align-items: center; justify-content: center; }
-        .mac-img { width: 95%; border-radius: 8px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); border: 1px solid var(--card-border); }
-        .iphone-img { position: absolute; bottom: -10px; right: -5px; width: 90px; border: 4px solid #1c1c1e; border-radius: 15px; }
+        /* Testimonial */
+        .testimonial-card {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .testimonial-card::before {
+            content: "\201C";
+            position: absolute;
+            top: 0.3em;
+            left: 0.5rem;
+            font-size: 6rem;
+            font-family: Georgia, serif;
+            color: var(--accent);
+            opacity: 0.12;
+            line-height: 1;
+            pointer-events: none;
+        }
+        .testimonial { margin: 0; padding: 0; border: none; }
+        .testimonial p { font-size: 0.9rem; line-height: 1.6; font-style: italic; margin: 0 0 12px; }
+        .testimonial cite { color: var(--text-dim); font-size: 0.75rem; font-style: normal; display: block; text-align: right; }
+        .testimonial .role { opacity: 0.7; }
+
+        /* How I Work */
+        .hiw-item { margin-bottom: 16px; }
+        .hiw-q { font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; }
+        .hiw-a { font-size: 0.75rem; color: var(--text-dim); }
 
         /* Lightbox & Theme */
         .theme-toggle { position: fixed; bottom: 30px; right: 30px; z-index: 1001; background: var(--accent); color: white; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; border: none; }
@@ -138,11 +177,10 @@
             .hero-img { width: 300px; height: 380px; order: 2; }
             .hero-text { order: 1; }
             .bento-grid { display: flex; flex-direction: column; }
-            
-            /* Horizontal Scroll Tabs for Mobile */
+
             .exp-container { flex-direction: column; }
-            .exp-tabs { 
-                flex-direction: row; overflow-x: auto; padding-bottom: 15px; 
+            .exp-tabs {
+                flex-direction: row; overflow-x: auto; padding-bottom: 15px;
                 width: 100%; border-bottom: 1px solid var(--card-border);
                 scrollbar-width: none;
             }
@@ -169,11 +207,11 @@
         </div>
         <div class="hero-text">
             <div class="status-tag">
-                <div class="pulse-dot"></div> LOCATION: PHILIPPINES / REMOTE
+                <div class="pulse-dot"></div> AVAILABLE FOR PROJECTS
             </div>
             <h1>Renee Brielle <br><b>Angelo Duran</b></h1>
-            <p class="hero-subtitle">MBA Graduate & Civil Engineer</p>
-            <p style="color: var(--text-dim); max-width: 500px; margin-bottom: 30px;">Strategizing operational scale through engineering precision and technical logic.</p>
+            <p class="hero-subtitle">Operations Engineer Building AI Automation for Healthcare Teams</p>
+            <p style="color: var(--text-dim); max-width: 500px; margin-bottom: 30px;">I automate clinical operations using AI and custom integrations. From EHR data pipelines to intelligent email triage, I build systems that work autonomously.</p>
             <div style="display: flex; gap: 30px;">
                 <div style="text-align: left;"><b>2</b><br><span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase;">Degrees</span></div>
                 <div style="text-align: left;"><b>30+</b><br><span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase;">Remote Staff</span></div>
@@ -184,14 +222,14 @@
 
     <div class="container">
         <div class="bento-grid">
-            
-            <!-- Professional Journey Tab -->
+
+            <!-- Row 1-2: Professional Journey + What I Do -->
             <div class="bento-item item-exp">
                 <h3 style="font-weight: 500;">Professional Journey</h3>
                 <div class="exp-container">
                     <div class="exp-tabs">
                         <button class="tab-btn active" onclick="openTab(event, 'mba')">Master of Business Administration</button>
-                        <button class="tab-btn" onclick="openTab(event, 'rpmlogix')">RPM Logix</button>
+                        <button class="tab-btn" onclick="openTab(event, 'opsmanager')">Operations Manager</button>
                         <button class="tab-btn" onclick="openTab(event, 'navy')">Philippine Navy</button>
                         <button class="tab-btn" onclick="openTab(event, 'carecoach')">Care Coach</button>
                     </div>
@@ -206,12 +244,13 @@
                             </div>
                             <a href="https://research-manila.letran.edu.ph/article/239" target="_blank" style="font-size: 0.75rem; color: var(--accent); display: block; margin-top: 10px;">View Publication <i class="fas fa-external-link-alt"></i></a>
                         </div>
-                        <div id="rpmlogix" class="exp-content">
+                        <div id="opsmanager" class="exp-content">
                             <h4>Operations Manager <span>Since 2020</span></h4>
                             <ul style="font-size: 0.85rem; color: var(--text-dim); margin-top: 10px; padding-left: 20px;">
-                                <li>Directing daily operations for 30+ remote team members.</li>
-                                <li>End-to-end inventory architecture for medical device distribution.</li>
-                                <li>Implementation of SOPs and corrective actions for 100% KPI adherence.</li>
+                                <li>Directing daily operations for 30+ remote team members across multiple time zones.</li>
+                                <li>End-to-end inventory and logistics architecture for healthcare product distribution.</li>
+                                <li>Built internal automation tools: API integrations, monitoring dashboards, and AI-powered workflows.</li>
+                                <li>Implementation of SOPs and corrective actions achieving 100% KPI adherence.</li>
                             </ul>
                         </div>
                         <div id="navy" class="exp-content">
@@ -229,16 +268,88 @@
                 </div>
             </div>
 
-            <!-- System Design -->
-            <div class="bento-item item-soft">
-                <h3 style="font-weight: 500;">System Design</h3>
-                <div class="mockup-container">
-                    <img src="images/dashboard.jpg" class="mac-img" alt="Web">
-                    <img src="images/app.jpg" class="iphone-img" alt="App">
+            <!-- What I Do -->
+            <div class="bento-item item-whatido">
+                <h3 style="font-weight: 500; margin-bottom: 15px;">What I Do</h3>
+                <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 20px;">I build backend systems and AI-powered automation for teams drowning in manual workflows. My focus is healthcare, where I connect EHR platforms, automate patient data pipelines, and build monitoring dashboards that run without babysitting.</p>
+                <div style="border-left: 2px solid var(--accent); padding-left: 12px; margin-bottom: 12px;">
+                    <p style="font-size: 0.75rem; color: var(--text-dim);">I work professionally with healthcare data and understand the handling requirements of regulated environments.</p>
+                </div>
+                <a href="mailto:ReneengineerServices@gmail.com" style="font-size: 0.8rem; color: var(--accent); text-decoration: none;">Tell me about your project <i class="fas fa-arrow-right" style="font-size: 0.7rem;"></i></a>
+            </div>
+
+            <!-- Row 3-4: Project Highlights + How I Work -->
+            <div class="bento-item item-highlights">
+                <h3 style="font-weight: 500; margin-bottom: 15px;">Project Highlights</h3>
+                <div style="display: flex; flex-direction: column; gap: 12px; overflow-y: auto; height: calc(100% - 40px); padding-right: 8px;">
+                    <div style="border-left: 2px solid var(--accent); padding-left: 12px;">
+                        <p style="font-size: 0.8rem; font-weight: 600;">Healthcare Integration Platform</p>
+                        <p style="font-size: 0.7rem; color: var(--text-dim);">Multi-service API proxy connecting EHR systems. Automated patient data sync, compliance reporting, and enrollment workflows. Flask + REST APIs on GCP.</p>
+                    </div>
+                    <div style="border-left: 2px solid var(--accent); padding-left: 12px;">
+                        <p style="font-size: 0.8rem; font-weight: 600;">AI Email Triage System</p>
+                        <p style="font-size: 0.7rem; color: var(--text-dim);">LLM-powered classifier with sent-email RAG for tone matching. Auto-categorizes, drafts responses, and archives. Claude AI + ChromaDB.</p>
+                    </div>
+                    <div style="border-left: 2px solid var(--accent); padding-left: 12px;">
+                        <p style="font-size: 0.8rem; font-weight: 600;">Remote Patient Monitoring Dashboard</p>
+                        <p style="font-size: 0.7rem; color: var(--text-dim);">Real-time vitals dashboard with out-of-range alerting and care manager SMS notifications. Flask + Google Sheets + ThoroughCare API.</p>
+                    </div>
+                    <div style="border-left: 2px solid var(--accent); padding-left: 12px;">
+                        <p style="font-size: 0.8rem; font-weight: 600;">AI Agent Framework</p>
+                        <p style="font-size: 0.7rem; color: var(--text-dim);">Multi-agent routing system with domain-specialized agents, voice I/O via Telegram, and persistent memory across channels.</p>
+                    </div>
+                    <div style="border-left: 2px solid var(--accent); padding-left: 12px;">
+                        <p style="font-size: 0.8rem; font-weight: 600;">Production Infrastructure</p>
+                        <p style="font-size: 0.7rem; color: var(--text-dim);">Multi-server deployment: Docker containers on GCP, local LLM inference, Nginx reverse proxy, uptime monitoring, and automated data pipelines.</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Strategic Assets -->
+            <div class="bento-item item-howitworks">
+                <h3 style="font-weight: 500; margin-bottom: 15px;">How I Work</h3>
+                <div style="display: flex; flex-direction: column; gap: 4px; overflow-y: auto; height: calc(100% - 40px); padding-right: 8px;">
+                    <div class="hiw-item">
+                        <p class="hiw-q">How do we start working together?</p>
+                        <p class="hiw-a">Email me with what you need. I will ask clarifying questions, scope the work, and give you a timeline and fixed quote before anything starts.</p>
+                    </div>
+                    <div class="hiw-item">
+                        <p class="hiw-q">What does a typical engagement look like?</p>
+                        <p class="hiw-a">Most projects are 1 to 4 weeks. I build iteratively with frequent check-ins, deploy to your infrastructure, and document everything.</p>
+                    </div>
+                    <div class="hiw-item">
+                        <p class="hiw-q">Do you maintain what you build?</p>
+                        <p class="hiw-a">Yes. I build systems I can support long-term. Maintenance agreements are available after the initial build.</p>
+                    </div>
+                    <div class="hiw-item">
+                        <p class="hiw-q">What if I need something outside healthcare?</p>
+                        <p class="hiw-a">Healthcare is my focus, but the underlying skills (API integration, AI automation, deployment) apply to any industry. Happy to discuss.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 5: Tech Stack + Testimonial -->
+            <div class="bento-item item-skills">
+                <h3 style="font-weight: 500; margin-bottom: 12px;">Tech Stack</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                    <span class="btn-outline" style="font-size: 0.65rem; padding: 4px 10px; border-radius: 5px;">Python / Flask</span>
+                    <span class="btn-outline" style="font-size: 0.65rem; padding: 4px 10px; border-radius: 5px;">SvelteKit</span>
+                    <span class="btn-outline" style="font-size: 0.65rem; padding: 4px 10px; border-radius: 5px;">Google Cloud</span>
+                    <span class="btn-outline" style="font-size: 0.65rem; padding: 4px 10px; border-radius: 5px;">Docker</span>
+                    <span class="btn-outline" style="font-size: 0.65rem; padding: 4px 10px; border-radius: 5px;">Claude AI / LLM</span>
+                    <span class="btn-outline" style="font-size: 0.65rem; padding: 4px 10px; border-radius: 5px;">REST APIs</span>
+                    <span class="btn-outline" style="font-size: 0.65rem; padding: 4px 10px; border-radius: 5px;">Linux / Nginx</span>
+                    <span class="btn-outline" style="font-size: 0.65rem; padding: 4px 10px; border-radius: 5px;">Playwright</span>
+                </div>
+            </div>
+
+            <div class="bento-item item-testimonial testimonial-card">
+                <blockquote class="testimonial">
+                    <p>"One of the most resourceful engineers I have worked with. Renee consistently finds a way to make things work."</p>
+                    <cite>— Mario, <span class="role">CEO</span></cite>
+                </blockquote>
+            </div>
+
+            <!-- Row 6: Assets + Side Projects + Demo -->
             <div class="bento-item item-assets" style="padding: 0; cursor: pointer;" onclick="openLightbox()">
                 <div style="height: 100%; position: relative;">
                     <img src="images/resume.jpg" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.4;">
@@ -249,25 +360,41 @@
                 </div>
             </div>
 
-            <!-- Skills -->
-            <div class="bento-item item-skills">
-                <h3 style="font-weight: 500; margin-bottom: 12px;">Tech Stack</h3>
-                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-                    <span class="btn-outline" style="font-size: 0.65rem; padding: 4px 10px; border-radius: 5px;">Apps Script</span>
-                    <span class="btn-outline" style="font-size: 0.65rem; padding: 4px 10px; border-radius: 5px;">Google Cloud</span>
-                    <span class="btn-outline" style="font-size: 0.65rem; padding: 4px 10px; border-radius: 5px;">Glide</span>
-                    <span class="btn-outline" style="font-size: 0.65rem; padding: 4px 10px; border-radius: 5px;">STAAD Pro</span>
-                    <span class="btn-outline" style="font-size: 0.65rem; padding: 4px 10px; border-radius: 5px;">Excel</span>
+            <div class="bento-item item-projects" style="padding: 20px 25px;">
+                <h3 style="font-weight: 500; margin-bottom: 6px; font-size: 0.95rem;">Side Projects</h3>
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <a href="kinder-review/index.html" class="project-link">
+                        <i class="fas fa-graduation-cap"></i>
+                        <div class="project-info">
+                            <span class="project-name">Kinder Review</span>
+                            <span class="project-desc">Interactive learning app for kids</span>
+                        </div>
+                    </a>
+                    <a href="cardgame/index.html" class="project-link">
+                        <i class="fas fa-heart"></i>
+                        <div class="project-info">
+                            <span class="project-name">Just the 2 of Us</span>
+                            <span class="project-desc">Couples card game</span>
+                        </div>
+                    </a>
+                    <a href="visceral/index.html" class="project-link">
+                        <i class="fas fa-dumbbell"></i>
+                        <div class="project-info">
+                            <span class="project-name">Visceral</span>
+                            <span class="project-desc">Dumbbell circuit timer</span>
+                        </div>
+                    </a>
                 </div>
             </div>
 
-            <!-- Social/Network -->
-            <div class="bento-item item-social">
-                <h3 style="font-weight: 500; margin-bottom: 12px;">Network <span style="font-size: 0.6rem; background: var(--accent); color: white; padding: 2px 6px; border-radius: 4px; margin-left: 5px;">VERIFIED</span></h3>
-                <div style="display: flex; flex-direction: column; gap: 10px;">
+            <!-- Row 7: Network -->
+            <div class="bento-item item-social" style="padding: 25px 30px;">
+                <h3 style="font-weight: 500; margin-bottom: 8px; font-size: 1rem;">Network <span style="font-size: 0.6rem; background: var(--accent); color: white; padding: 2px 6px; border-radius: 4px; margin-left: 5px;">VERIFIED</span></h3>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
                     <a href="https://www.linkedin.com/in/reneengineer" target="_blank" style="text-decoration: none; color: var(--text-dim); font-size: 0.8rem;"><i class="fab fa-linkedin" style="color: var(--accent);"></i> LinkedIn Profile</a>
-                    <a href="https://www.facebook.com/Reneengineered/" target="_blank" style="text-decoration: none; color: var(--text-dim); font-size: 0.8rem;"><i class="fab fa-facebook" style="color: var(--accent);"></i> Facebook Portfolio</a>
-                    <button class="email-copy-btn" id="emailBtn" onclick="copyEmail()">Copy Corporate Email</button>
+                    <a href="https://github.com/reneengineer" target="_blank" style="text-decoration: none; color: var(--text-dim); font-size: 0.8rem;"><i class="fab fa-github" style="color: var(--accent);"></i> GitHub</a>
+                    <a href="https://paypal.me/Reneengineered" target="_blank" style="text-decoration: none; color: var(--text-dim); font-size: 0.8rem;"><i class="fab fa-paypal" style="color: var(--accent);"></i> Pay via PayPal</a>
+                    <button class="email-copy-btn" id="emailBtn" onclick="copyEmail()" style="margin-top: 4px; padding: 8px 16px;">Copy Email</button>
                 </div>
             </div>
 
@@ -289,13 +416,13 @@
     <script>
         // Copy Email Logic
         function copyEmail() {
-            const email = "reneebrielleangeloduran@yahoo.com";
+            const email = "ReneengineerServices@gmail.com";
             navigator.clipboard.writeText(email).then(() => {
                 const btn = document.getElementById('emailBtn');
                 btn.innerText = "Email Copied!";
                 btn.style.background = "#34c759";
                 setTimeout(() => {
-                    btn.innerText = "Copy Corporate Email";
+                    btn.innerText = "Copy Email";
                     btn.style.background = "var(--accent)";
                 }, 2000);
             });
@@ -313,8 +440,7 @@
         document.addEventListener('mousemove', (e) => {
             document.getElementById('aura').style.setProperty('--x', e.clientX + 'px');
             document.getElementById('aura').style.setProperty('--y', e.clientY + 'px');
-            
-            // In light mode, highlight the bento box under cursor
+
             if(document.body.classList.contains('light-mode')) {
                 const hovered = document.elementFromPoint(e.clientX, e.clientY);
                 const card = hovered ? hovered.closest('.bento-item') : null;
